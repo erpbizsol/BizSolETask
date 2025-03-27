@@ -58,7 +58,7 @@
     </div>
     <hr />
     <form>
-        <div id="dvLogin" style="display:none">
+        <div id="dvLogin">
             <div class="mt-2">
                 <label for="txtCompanyCode" class="form-label login-form-text">User Login</label>
                 <input id="txtCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" required autocomplete="off">
@@ -80,11 +80,11 @@
             </div>
             <div class="row">
                 <div class="col-sm-12 text-right" style="margin-top: 1.4rem; font-size: 0.8rem;">
-                    <span id="forgotpassword" style="cursor: pointer; color: #f58220;">Forgot Password ?</span>
+                    <a><span id="forgotpassword" style="cursor: pointer; color: #f58220;">Forgot Password ?</span></a>
                 </div>
             </div>
         </div>
-        <div id="dvForgetPassword">
+        <div id="dvForgetPassword" style="display:none">
             <div class="mt-2">
                 <label for="txtForgetCompanyCode" class="form-label login-form-text">User Login</label>
                 <input id="txtForgetCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" required autocomplete="off">
@@ -94,7 +94,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-8 mt-1">
-                        <span style="color:blue;font-size:12px;cursor:pointer;">GO TO BACK ?</span>
+                        <span style="color:blue;font-size:12px;cursor:pointer;" id="btnBack">GO TO BACK ?</span>
                     </div>
                 <div class="col-sm-4">
                     <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnGetOtp" value="GET OTP" />

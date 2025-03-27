@@ -40,7 +40,12 @@ $(document).ready(function () {
     } else {
         console.warn("CompanyCode cookie not found!");
     }
-
+    $("#forgotpassword").click(function () {
+        FogetPassword();
+    });
+    $("#btnBack").click(function () {
+        Back();
+    });
 });
 function getCookie(name) {
     let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -118,5 +123,10 @@ function Login() {
     });
 }
 function Back() {
-
+    $("#dvLogin").show();
+    $("#dvForgetPassword").hide();
+}
+function FogetPassword() {
+    $("#dvLogin").hide();
+    $("#dvForgetPassword").show();
 }
