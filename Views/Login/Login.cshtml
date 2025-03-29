@@ -61,14 +61,14 @@
         <div id="dvLogin">
             <div class="mt-2">
                 <label for="txtCompanyCode" class="form-label login-form-text">User Login</label>
-                <input id="txtCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" required autocomplete="off">
+                <input id="txtCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" maxlength="15" autocomplete="off">
             </div>
             <div>
                 <div class="mt-2" id="txtU">
-                    <input id="txtUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="text" required autocomplete="off">
+                    <input id="txtUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="text" maxlength="15" autocomplete="off">
                 </div>
                 <div class="mt-2" id="txtP">
-                    <input id="txtPassword" name="Password" class="login-test-field form-control login-form-text" placeholder="Enter Password" autocomplete="off" type="password" required>
+                    <input id="txtPassword" name="Password" class="login-test-field form-control login-form-text" placeholder="Enter Password" autocomplete="off" type="password" maxlength="15">
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
@@ -87,18 +87,29 @@
         <div id="dvForgetPassword" style="display:none">
             <div class="mt-2">
                 <label for="txtForgetCompanyCode" class="form-label login-form-text">User Login</label>
-                <input id="txtForgetCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" required autocomplete="off">
+                <input id="txtForgetCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" autocomplete="off" maxlength="15">
+                <input id="hfOtp" class="login-test-field form-control login-form-text" type="hidden" required autocomplete="off">
             </div>
                 <div class="mt-2" id="txtU">
-                <input id="txtForgetUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="text" required autocomplete="off">
+                <input id="txtForgetUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="text" maxlength="15" autocomplete="off">
+                </div>
+                <div class="mt-2" id="dvOTP" style="display:none">
+                <input id="txtOtp" class="login-test-field form-control login-form-text" placeholder="Enter OTP" type="text" maxlength="4" autocomplete="off">
                 </div>
                 <div class="row">
-                    <div class="col-sm-8 mt-1">
+                    <div class="col-sm-6 mt-1">
                         <span style="color:blue;font-size:12px;cursor:pointer;" id="btnBack">GO TO BACK ?</span>
                     </div>
-                <div class="col-sm-4">
-                    <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnGetOtp" value="GET OTP" />
+                <div class="col-sm-6 text-right">
+                    <div id="dvAfterGetOtp" style="display:none;">
+                        <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnSubmit" value="Submit" />
+                        <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnGetOtp1" value="Re-Send OTP" />
+                    </div>
+                    <div id="dvBeforeGetOtp">
+                        <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnGetOtp" value="GET OTP" />
+                    </div>
                 </div>
+                <level id="txtMsg" style="color:red"></level>
                 </div>
             </div>
     </form>

@@ -1,6 +1,7 @@
 ﻿let AppBaseURLMenu = window.location.href.toLowerCase().includes('local') == true ? 'https://localhost:7077' : 'https://web.bizsol.in/esms'
 let G_IsCompanyValidate = false;
 let G_Goligin = false;
+let G_OTP = false;
 $(document).ready(function () {
     $('#txtCompanyCode').on('keydown', function (e) {
         if (e.key === "Enter") {
@@ -31,10 +32,17 @@ $(document).ready(function () {
         Login();
     });
     $('#btnGetOtp').click(function () {
-        ForgetPasswordOtp();
+        SendOtp();
     });
-  
-    let companyCode = getCookie('CompanyCode');
+    $('#btnGetOtp1').click(function () {
+        SendOtp();
+    });
+    $('#txtOtp').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#btnSubmit").focus();
+        }
+    });
+    let companyCode = getCookie('ETaskCompanyCode');
     if (companyCode) {
         $('#txtCompanyCode').val(companyCode);
     } else {
@@ -46,6 +54,16 @@ $(document).ready(function () {
     $("#btnBack").click(function () {
         Back();
     });
+    $("#btnSubmit").click(function () {
+        CheckOtp();
+    });
+    let RememberMe = getCookie1("ETaskIsRememberMe");
+    if (RememberMe !='') {
+        let decodedStr = decodeURIComponent(RememberMe);
+        let parts = decodedStr.split("()");
+        $('#txtUserID').val(parts[1]);
+        $('#txtPassword').val(parts[2]);
+    }
 });
 function getCookie(name) {
     let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -69,6 +87,9 @@ function CheckCompany() {
                 if (G_Goligin) {
                     Login();
                 }
+                if (G_OTP) {
+                    SendOtp();
+                }
 
             } else {
                 toastr.error(response.message);
@@ -83,16 +104,17 @@ function Login() {
     var CompanyCode = $('#txtCompanyCode').val();
     var UserID = $('#txtUserID').val();
     var Password = $('#txtPassword').val();
+    var RememberMe = $('#chkIsRememberMe').is(":checked")?'Y':'N';
     if (CompanyCode.trim() === "") {
-        toastr.error("Please enter a Company Code.!");
+        toastr.error("Please enter Company Code.!");
         $('#txtCompanyCode').focus();
         return;
     } else if (UserID.trim() === "") {
-        toastr.error("Please enter a User Id.!");
+        toastr.error("Please enter User Id.!");
         $('#txtUserID').focus();
         return;
     } else if (Password.trim() === "") {
-        toastr.error("Please enter a Password.!");
+        toastr.error("Please enter Password.!");
         $('#txtPassword').focus();
         return;
     }
@@ -105,7 +127,7 @@ function Login() {
     $.ajax({
         url: `${AppBaseURLMenu}/Login/Authenticate`,
         type: 'POST',
-        data: { CompanyCode: CompanyCode, UserID: UserID, Password: Password},
+        data: { CompanyCode: CompanyCode, UserID: UserID, Password: Password, RememberMe: RememberMe },
         success: function (response) {
             if (response.success && response.isFirstLogin == 'N') {
                 window.location.href = `${AppBaseURLMenu}/Dashboard/Dashboard`;
@@ -125,8 +147,90 @@ function Login() {
 function Back() {
     $("#dvLogin").show();
     $("#dvForgetPassword").hide();
+    $("#dvOTP").hide();
+    $("#dvAfterGetOtp").hide();
+    $("#dvBeforeGetOtp").show();
+    $("#hfOtp").val("");
+    $("#txtMsg").text("");
 }
 function FogetPassword() {
     $("#dvLogin").hide();
     $("#dvForgetPassword").show();
+    $('#txtForgetCompanyCode').val($('#txtCompanyCode').val())
+}
+function SendOtp() {
+    var CompanyCode = $('#txtForgetCompanyCode').val();
+    var UserID = $('#txtForgetUserID').val();
+    if (CompanyCode.trim() === "") {
+        toastr.error("Please enter Company Code.!");
+        $('#txtForgetCompanyCode').focus();
+        return;
+    } else if (UserID.trim() === "") {
+        toastr.error("Please enter User Id.!");
+        $('#txtForgetUserID').focus();
+        return;
+    }
+    if (!G_IsCompanyValidate) {
+        CheckCompany();
+        G_OTP = true;
+        return;
+    }
+    $.ajax({
+        url: `${AppBaseURLMenu}/Login/SendOTP`,
+        type: 'POST',
+        data: { CompanyCode: CompanyCode, UserID: UserID},
+        success: function (response) {
+            if (response.status == "Y") {
+                $("#dvOTP").show();
+                $("#hfOtp").val(response.otp);
+                $("#dvAfterGetOtp").show();
+                $("#dvBeforeGetOtp").hide();
+                $("#txtMsg").text(response.msg);
+                alert(response.otp);
+                $('#txtOtp').focus();
+            } else if (response.status == 'N') {
+                $("#dvOTP").hide();
+                $("#dvAfterGetOtp").hide();
+                $("#dvBeforeGetOtp").show();
+                $("#hfOtp").val("");
+                $("#txtMsg").text(response.msg);
+            }
+            else {
+                $("#dvOTP").hide();
+                $("#dvAfterGetOtp").hide();
+                $("#dvBeforeGetOtp").show();
+                $("#hfOtp").val("");
+                $("#txtMsg").text(response.message);
+            }
+        },
+        error: function (xhr) {
+            console.error("Error:", xhr.responseText);
+            toastr.error("An error occurred. Please try again.");
+        }
+    });
+}
+function CheckOtp() {
+    var OTP = $("#hfOtp").val();
+    var InputOTP = $("#txtOtp").val();
+    if (InputOTP == '') {
+        toastr.error("Please enter OTP.!");
+        $('#txtOtp').focus();
+        return;
+    }
+    if (OTP === InputOTP) {
+        window.location.href = `${AppBaseURLMenu}/Login/ResetPassword`;
+    } else {
+        alert("Invalid OTP.");
+        $('#txtOtp').focus();
+    }
+}
+function getCookie1(name) {
+    let cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            return decodeURIComponent(cookie.substring(name.length + 1));
+        }
+    }
+    return null;
 }

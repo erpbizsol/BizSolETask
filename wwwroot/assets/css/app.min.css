@@ -659,7 +659,7 @@ body[data-layout=horizontal] .footer {
     .metismenu li {
         display: block;
         width: 100%;
-        height:35px;
+        height: 35px;
     }
 
     .metismenu .mm-collapse {
@@ -689,8 +689,7 @@ body[data-layout=horizontal] .footer {
 .vertical-menu {
     width: 250px;
     z-index: 1001;
-    background: linear-gradient(90deg, #9bd1d5 29%, #0ba4af);
-    ;
+    background-image: linear-gradient(324deg, #ebf5f6 0%, #fff8f6 29%, #dcf1f5 67%, #d5e1f2 100%);
     bottom: 0;
     margin-top: 0;
     position: fixed;
@@ -767,7 +766,8 @@ body[data-layout=horizontal] .footer {
             vertical-align: middle;
             color: #f4f5f7;
             -webkit-transition: all .4s;
-            transition: all .4s
+            transition: all .4s;
+            font-size: 14px;
         }
 
         #sidebar-menu ul li a .side-menu-icon {
@@ -819,7 +819,7 @@ body[data-layout=horizontal] .footer {
             }
 
     #sidebar-menu .iconBg {
-        background-color: #0ba4af;
+        background-color: #0b464b;
         padding: 5px 5px;
         border-radius: 5px;
         margin-right: 10px;
@@ -1012,7 +1012,7 @@ body[data-sidebar-size=sm] {
                 }
 
                 body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li > a i {
-                    font-size: 1.45rem;
+                    font-size: 14px;
                     margin-left: 4px
                 }
 
@@ -1034,16 +1034,16 @@ body[data-sidebar-size=sm] {
             top: 0.5px;
         }
 
-                body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li > a span {
-                    display: none;
-                    /*padding-left: 25px;*/
-                }
+        body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li > a span {
+            display: none;
+            /*padding-left: 25px;*/
+        }
 
         body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li > a .iconBg {
             display: block;
-            padding: 3px 5px;
+            padding: 1px 2px;
             border-radius: 5px;
-            margin-right: 15px;
+            margin-right: 12px;
         }
 
         body[data-sidebar-size=sm] .vertical-menu #sidebar-menu .side-menu-search {
@@ -1074,8 +1074,8 @@ body[data-sidebar-size=sm] {
             }
 
             body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li:hover > a span {
-               /* display: inline*/
-               display: inline-block;
+                /* display: inline*/
+                display: inline-block;
             }
 
         body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li:hover > ul {
@@ -5900,20 +5900,19 @@ table, th, tr, td {
     font-size: 11px;
 }
 
-table > thead, th {
-    position: sticky;
-    /*top: 0px;*/
-    top: -1px;
-    border-collapse: collapse;
-    z-index: 1;
-}
+    table > thead, th {
+        position: sticky;
+        /*top: 0px;*/
+        top: -1px;
+        border-collapse: collapse;
+        z-index: 1;
+    }
 
 table, th, td, tr {
     padding: 5px 5px !important;
     border: 1px solid #ddd;
     height: 16px !important;
     vertical-align: middle !important;
-    
 }
 
 .table th {
@@ -5967,7 +5966,7 @@ table, th, td, tr {
     width: 100px;
 }
 
- .icon-height {
+.icon-height {
     border-radius: 6px;
     height: 23px;
     font-size: 7pt;
@@ -6258,14 +6257,14 @@ a.icon-height {
     z-index: 1000; /*Ensure it appears above other content */
 }
 
-.AutoSuggestion-list li {
-    padding: 8px;
-    cursor: pointer;
-}
+    .AutoSuggestion-list li {
+        padding: 8px;
+        cursor: pointer;
+    }
 
-.AutoSuggestion-list li:hover {
-    background-color: #f0f0f0;
-}
+        .AutoSuggestion-list li:hover {
+            background-color: #f0f0f0;
+        }
 
 .AutoSuggestion-list-highlighted {
     background-color: #9aa0a5;
@@ -6277,14 +6276,17 @@ a.icon-height {
 
 .sm-table {
     width: 60% !important;
-    margin:auto;
+    margin: auto;
 }
+
 .ssm-table {
     width: 60% !important;
 }
+
 .btnAuto {
     width: 60% !important;
 }
+
 .tab-header {
     height: 35px;
 }
