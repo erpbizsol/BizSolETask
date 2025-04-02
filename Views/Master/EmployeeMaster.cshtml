@@ -3,8 +3,8 @@
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link href="~/assets/css/filter.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="~/assets/script/employeemaster.js"></script>
+<script src="~/assets/js/xlsx.full.min.js"></script>
 <style>
     .tabs {
         width: 100%;
@@ -49,13 +49,13 @@
                                     <input type="hidden" id="hftxtCode" value="0" />
                                     Employee Id-Card <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" id="txtEmployeeId" name="txtEmployeeId" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Enter Employee Id-Card..." maxlength="9">
+                                <input type="text" id="txtEmployeeId" name="txtEmployeeId" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Enter Employee Id-Card..." maxlength="4">
                             </div>
                             <div class="col-md-3  col-sm-6" id="dvEmployeeName" style="display:block">
                                 <label for="txtEmployeeName" class="col-form-label-sm fw-bold">
                                     Employee Name <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" id="txtEmployeeName" name="txtEmployeeName" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Enter Employee Name.." maxlength="100">
+                                <input type="text" id="txtEmployeeName" name="txtEmployeeName" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Enter Employee Name.." maxlength="50">
                             </div>
                             <div class="col-md-3  col-sm-6" id="dvEmailId" style="display:block">
                                 <label for="txtEmailId" class="col-form-label-sm fw-bold">
@@ -67,7 +67,7 @@
                                 <label for="txtMobileNo" class="col-form-label-sm fw-bold">
                                     Mobile No <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" id="txtMobileNo" name="txtMobileNo" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Enter Mobile No.." maxlength="100">
+                                <input type="text" id="txtMobileNo" name="txtMobileNo" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Enter Mobile No.." maxlength="15">
                             </div>
                             <div class="col-md-3  col-sm-6" id="dvPassword" style="display:block">
                                 <label for="txtPassword" class="col-form-label-sm fw-bold">
@@ -106,14 +106,14 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-4  col-sm-6">
-                                <a herf="#" style="color:blue">Download Excel Template</a><br/>
-                                <a herf="#" style="color:blue">Download Excel Template Sample</a>
+                                <a herf="#" style="color:blue;cursor:pointer;" onclick="GetExcelTemplate('N')">Download Excel Template</a><br />
+                                 <a herf="#" style="color:blue;cursor:pointer;" onclick="GetExcelTemplate('Y')">Download Excel Template Sample</a>
                             </div>
                             <div class="col-md-4  col-sm-6">
-                              <input type="file" id="txtfile" name="txtfile" autocomplete="off" class="form-control form-control-sm box_border">
+                                        <input type="file" id="txtExcelFile" name="txtExcelFile" autocomplete="off" class="form-control form-control-sm box_border" accept=".xlsx, .xls">
                             </div>
                              <div class="col-md-4 col-sm-6 ">
-                                <input type="button" class="btn btn-primary btn-height" value="Upload Excel" />
+                                <input type="button" class="btn btn-primary btn-height" id="btnUpload" value="Upload Excel" />
                             </div>
                         </div>
                     </div>

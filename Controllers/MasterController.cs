@@ -8,5 +8,13 @@ namespace Bizsol_ETask.Controllers
         {
             return View();
         }
+        public IActionResult StatusMaster()
+        {
+            return View();
+        }
+        public IActionResult WorkTypeMaster()
+        {
+            return View();
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace Bizsol_ETask.Controllers
         public IActionResult Dashboard()
         {
             string newconnectionStrings = HttpContext.Session.GetString("ConnectionString");
-            string UserMaster_Code = HttpContext.Session.GetString("UserMaster_Code");
+            string UserMaster_Code = HttpContext.Session.GetString("Code");
             string UserID = HttpContext.Session.GetString("MobileNo");
             string UserName = HttpContext.Session.GetString("EmployeeName");
             string UserType = HttpContext.Session.GetString("EmployeeType");
