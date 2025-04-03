@@ -422,7 +422,11 @@ function GetExcelTemplate(WithData){
         },
         success: function (response) {
             if (response.length > 0) {
-                ExportToExcel(response);
+                if (WithData == 'N') {
+                    ExportToExcel(response, 'EmployeeMaster_Tamplate.xlsx');
+                } else {
+                    ExportToExcel(response, 'EmployeeMaster_Tamplate_Sample.xlsx');
+                }
             } else {
                     toastr.error("Record not found...!");
             }
@@ -433,12 +437,12 @@ function GetExcelTemplate(WithData){
     });
 
 }
-function ExportToExcel(data) {
+function ExportToExcel(data,Name) {
     let ws = XLSX.utils.json_to_sheet(data);
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-    XLSX.writeFile(wb, "EmployeeMaster.xlsx");
+    XLSX.writeFile(wb, Name);
 }
 function Import(event) {
     const file = event.target.files[0];

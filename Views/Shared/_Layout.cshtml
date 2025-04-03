@@ -474,6 +474,14 @@
         }
         // });
         $("#ERPUserName").text(sessionStorage.getItem('UserName'));
+        $(document).on('select2:open', function () {
+            if ($('.select2-search__field').length > 1) {
+                $('.select2-search__field')[1].focus()
+            }
+            else {
+                $('.select2-search__field')[0].focus();
+            }
+        });
     </script>
     <script src="~/assets/script/logout.js"></script>
     <script src="~/assets/js/menu.js"></script>
