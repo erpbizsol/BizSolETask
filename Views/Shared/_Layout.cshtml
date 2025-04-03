@@ -74,19 +74,20 @@
                         </a>
                     </div>
 
-                    <button type="button" class="btn btn-sm px-3 font-size-16 header-item toggleBtn"
+                    <button type="button" class="btn btn-sm px-3 font-size-13 header-item toggleBtn"
                             id="vertical-menu-btn">
                         <i class="fa fa-fw fa-bars"></i>
                     </button>
 
-                    <div class="pt-4" style="padding-top: 20px;">
-                        <h4 class="mb-sm-0 font-size-16" id="ERPHeading">Dashboard</h4>
+                    <div class="dropdown d-inline-block pt-1-1">
+                        <h4 class="mb-sm-0 font-size-13" id="ERPHeading">Dashboard</h4>
                     </div>
 
                 </div>
 
                 <div class="d-flex">
-                    <div class="dropdown d-inline-block d-lg-none ms-2">
+                    
+                    @* <div class="dropdown d-inline-block d-lg-none ms-2">
                         <button type="button" class="btn header-item" id="page-header-search-dropdown"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i data-feather="search" class="icon-lg"></i>
@@ -106,7 +107,7 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div> *@
 
                     <div class="dropdown d-none d-sm-inline-block">
                         <div class="dropdown-menu dropdown-menu-end">
@@ -137,12 +138,13 @@
                         </div>
                     </div>
 
-                    <div class="dropdown d-inline-block">
+                    <div class="dropdown d-inline-block font-size-13">
                         <button type="button" class="btn header-item bg-light-subtle"
                                 id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                                 aria-expanded="false">
                             <img class="rounded-circle header-profile-user" src="~/assets/images/users/user.jpg"
                                  alt="Header User">
+                            <span class="d-xl-inline-block fw-medium font-size-13">User</span>
                             @* <span class="d-none d-xl-inline-block ms-1 fw-medium">User</span>
                             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i> *@
                         </button>
@@ -152,10 +154,19 @@
                                 <i class='bx bxs-user align-middle userIcon me-1'></i> <span>Profile</span>
                             </a>
                             <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" onclick="">
+                                <i class="bx bxs-lock-open align-middle me-1 userIcon"></i> <span>Change Password</span>
+                            </a>
+
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" onclick="logoutUser()">
                                 <i class="bx bx-log-out align-middle me-1 userIcon"></i> <span>Logout</span>
                             </a>
                         </div>
+                    </div>
+                    <div class="dropdown d-inline-block me-2 pt-1-1 font-size-13">
+                        Total Time :
+                        <span>0</span>
                     </div>
                 </div>
             </div>
@@ -252,14 +263,14 @@
         <footer class="footer">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-4 text-left">
+                   @*  <div class="col-md-4 text-left">
                         <div>
                             <span class="userTextBig" id="ERPUserName">ANKIT BIZSOL</span>
                             <span class="userTextSmall" id="ERPCompanyCode">(BizSol e-SMS)</span>
                         </div>
-                    </div>
-                    <div class="col-md-8 text-end">
-                        <div><p class="m-0 copyright">Copyright © 2024 <a href="">BizSol Technologies Pvt. Ltd.</a> All rights reserved.</p></div>
+                    </div> *@
+                    <div class="col-md-12 text-center">
+                        <div><p class="m-0 copyright">Copyright © 2025 <a href="">BizSol Technologies Pvt. Ltd.</a> All rights reserved.</p></div>
                     </div>
 
                 </div>

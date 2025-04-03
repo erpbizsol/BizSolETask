@@ -199,11 +199,16 @@ i:hover {
     font-size: 8pt;
 }
 
-    .paginator button {
-        margin: 0 5px;
-        padding: 1px 5px;
-        cursor: pointer;
-    }
+.paginator button:hover{
+    background-color: #0ba4af;
+}
+
+.paginator button {
+    margin: 0 5px;
+    padding: 1px 5px;
+    cursor: pointer;
+    background-color: #0ba4af;
+}
 
 .page-info {
     margin: 0 15px;
