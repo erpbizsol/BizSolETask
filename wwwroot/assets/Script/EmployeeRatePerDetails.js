@@ -41,7 +41,9 @@ function ShowDetailList(Code) {
                     ...item,
                     EffectiveDate: `<input type="text" oninput="GetValidDateFormet(this)" id="txtDate_${item.Code}" class="txtDate form-control form-control-sm box_border" value="${item.EffectiveDate}" />`,
                     RatePerHour: `<input type="text" onkeyup="OnlyNumeric(this)" id="txtRatePerHour_${item.Code}" class="txtRatePerHour Number form-control form-control-sm box_border" value="${item.RatePerHour}" />`,
-                    Action: `<button class="btn btn-danger icon-height mb-1" title="Delete" onclick="deleteItem('${item.Code}','${item[`Item Code`]}',this)"><i class="fa-regular fa-circle-xmark"></i></button>`
+                    Action: `<button class="btn btn-success icon-height mb-1"  title="Edit" onclick="Edit('${item.Code}')"><i class="fas fa-save"></i></button>
+                    <button class="btn btn-danger icon-height mb-1"  title="Delete" onclick="Delete('${item.Code}')"><i class="fa-solid fa-trash"></i></button>
+                    `
                 }));
                 BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
                 addNewRow();
@@ -144,7 +146,7 @@ function addNewRow() {
     newRow.innerHTML = `
         <td><input type="text" id="txtDate_0" oninput="GetValidDateFormet(this)" class="txtDate form-control form-control-sm box_border"/></td>
         <td><input type="text" id="txtRatePerHour_0" onkeyup="OnlyNumeric(this)" class="txtRatePerHour Number form-control form-control-sm box_border"/></td>
-        <td><button class="btn btn-success icon-height mb-1 Save" title="Save"><i class="fas fa-save"></i></button></td>`;
+        <td><button class="btn btn-success icon-height mb-1 Save" onclick="SaveData(0)" title="Save"><i class="fas fa-save"></i></button></td>`;
 
     tableBody.appendChild(newRow);
     DatePicker();
@@ -214,4 +216,65 @@ function GetValidDateFormet(event) {
         } else {
             $(event).val(value);
         }
+}
+function Save(EffectiveDate, RatePerHour, EmployeeMaster_Code, Code) {
+    const payload = {
+        Code: Code,
+        EffectiveDate: EffectiveDate,
+        RatePerHour: RatePerHour,
+        EmployeeMaster_Code: EmployeeMaster_Code,
+        UserMaster_Code: UserMaster_Code
+    };
+    $.ajax({
+        url: `${appBaseURL}/api/Master/SaveEmployeeRatePerHourDetails`,
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify(payload),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Auth-Key", authKeyData);
+        },
+        success: function (response) {
+            if (response[0].Status === "Y") {
+                toastr.success(response[0].Msg);
+                ShowDetailList($("#ddlEmployeeName").val());
+            } else if (response[0].Status === "N") {
+                toastr.error(response[0].Msg);
+            } else {
+                toastr.error(response.Msg);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", xhr.responseText);
+            toastr.error("An error occurred while saving the data.");
+        },
+    });
+}
+
+function SaveData(Code) {
+    var EffectiveDate = $("#txtDate_" + Code).val();
+    var RatePerHour = $("#txtRatePerHour_" + Code).val();
+    var EmployeeMaster_Code = $("#ddlEmployeeName").val();
+    var Code = Code
+    if (EmployeeMaster_Code == '0') {
+        toastr.error('Please select employee name.!');
+        $("#ddlEmployeeName").focus();
+        return;
+    } else if (EffectiveDate == '' || EffectiveDate == null) {
+        toastr.error('Please select effective date.!');
+        $("#txtDate_" + Code).focus();
+        return;
+    } else if (RatePerHour == '' || RatePerHour == '0') {
+        toastr.error('Please enter rate per hour.!');
+        $("#txtRatePerHour_" + Code).focus();
+        return;
+    } else {
+        Save(convertDateFormat(EffectiveDate), RatePerHour, EmployeeMaster_Code, Code);
+    }
+}
+function convertDateFormat(dateString) {
+    const [day, month, year] = dateString.split('/');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthAbbreviation = monthNames[parseInt(month) - 1];
+    return `${day}-${monthAbbreviation}-${year}`;
 }
