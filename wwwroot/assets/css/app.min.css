@@ -851,9 +851,17 @@ body[data-layout=horizontal] .footer {
 
 #side-menu .active {
     border-radius: 4px;
-    color: #1c1b1b !important;
+    color: #fbfcff !important;
     font-family: Arial;
-    background-color: #ebeff1;
+    background-color: #0c666e;
+}
+
+#side-menu .active > .iconBg i {
+    color: #0c666e;
+}
+
+#side-menu .active .iconBg {
+   background-color: #fbfcff;
 }
 
 #side-menu .mm-active > a {
