@@ -3,7 +3,7 @@ let UserMaster_Code = authKeyData.UserMaster_Code;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
     $("#ERPHeading").text("Employee Rate/Hour Details");
-    ShowDetailList(0);
+    ShowDetailList(0,'Load');
    
     GetEmployeeMasterList();
     $('#txtItemBarCode').on('keydown', function (e) {
@@ -17,7 +17,7 @@ $(document).ready(function () {
         }
     });
 });
-function ShowDetailList(Code) {
+function ShowDetailList(Code,Type) {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeRatePerHourDetails?EmployeeMaster_Code=${Code}`,
         type: 'GET',
@@ -33,23 +33,29 @@ function ShowDetailList(Code) {
                 const Button = false;
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["Code","EmployeeMaster_Code"];
+                const hiddenColumns = ["Code", "EmployeeMaster_Code", "TodayDate","IsPastDate"];
                 const ColumnAlignment = {
-                    "Opening Balance": "right"
                 };
-                const updatedResponse = response.map(item => ({
-                    ...item,
-                    EffectiveDate: `<input type="text" oninput="GetValidDateFormet(this)" id="txtDate_${item.Code}" class="txtDate form-control form-control-sm box_border" value="${item.EffectiveDate}" />`,
-                    RatePerHour: `<input type="text" onkeyup="OnlyNumeric(this)" id="txtRatePerHour_${item.Code}" class="txtRatePerHour Number form-control form-control-sm box_border" value="${item.RatePerHour}" />`,
-                    Action: `<button class="btn btn-success icon-height mb-1"  title="Edit" onclick="Edit('${item.Code}')"><i class="fas fa-save"></i></button>
-                    <button class="btn btn-danger icon-height mb-1"  title="Delete" onclick="Delete('${item.Code}')"><i class="fa-solid fa-trash"></i></button>
-                    `
-                }));
+                const updatedResponse = response.map(item => {
+                    const isFuture = item.IsPastDate === 'N';
+
+                    return {
+                        ...item,
+                        "Effective Date": `<input type="text" oninput="GetValidDateFormet(this)" autocomplete="off" id="txtDate_${item.Code}" class="txtDate form-control form-control-sm box_border" value="${item['Effective Date']}" ${isFuture ? '' : 'disabled'} />`,
+                        "Rate Per Hour": `<input type="text" onkeyup="OnlyNumeric(this)" autocomplete="off" id="txtRatePerHour_${item.Code}" class="txtRatePerHour Number form-control form-control-sm box_border" value="${item['Rate Per Hour']}" ${isFuture ? '' : 'disabled'} />`,
+                        Action: isFuture
+                            ? `<button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
+                            <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}')"><i class="fa-solid fa-trash"></i></button>`
+                            : ''
+                    };
+                });
                 BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
                 addNewRow();
             } else {
                 addNewRow();
-                toastr.error("Record not found...!");
+                if (Type == 'Get') {
+                    toastr.error("Record not found...!");
+                }
             }
         },
         error: function (xhr, status, error) {
@@ -87,24 +93,10 @@ function GetEmployeeMasterList() {
         }
     });
 }
-async function deleteItem(Code, ItemCode, button) {
-    let tr = button.closest("tr");
-    tr.classList.add("highlight");
-    const { hasPermission, msg } = await CheckOptionPermission('Delete', UserMaster_Code, UserModuleMaster_Code);
-    if (hasPermission == false) {
-        toastr.error(msg);
-        $('tr').removeClass('highlight');
-        return;
-    }
-    const { Status, msg1 } = await CheckRelatedRecord(Code, 'ItemOpeningBalance');
-    if (Status == true) {
-        toastr.error(msg1);
-        $('tr').removeClass('highlight');
-        return;
-    }
-    if (confirm(`Are you sure you want to delete this  ${ItemCode}.?`)) {
+async function Delete(Code) {
+    if (confirm(`Are you sure you want to delete this.?`)) {
         $.ajax({
-            url: `${appBaseURL}/api/OrderMaster/DeleteOpeningBalance?Code=${Code}&UserMaster_Code=${UserMaster_Code}`,
+            url: `${appBaseURL}/api/Master/DeleteEmployeeRatePerHourDetails?Code=${Code}`,
             type: 'POST',
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -112,8 +104,7 @@ async function deleteItem(Code, ItemCode, button) {
             success: function (response) {
                 if (response[0].Status === 'Y') {
                     toastr.success(response[0].Msg);
-                    ShowItemOpeningBalancelist();
-
+                    ShowDetailList($("#ddlEmployeeName").val(), 'Get');
                 } else {
                     toastr.error("Unexpected response format.");
                 }
@@ -124,10 +115,6 @@ async function deleteItem(Code, ItemCode, button) {
             }
         });
     }
-    else {
-        $('tr').removeClass('highlight');
-    }
-    $('tr').removeClass('highlight');
 }
 function addNewRow() {
     const table = document.getElementById("table");
@@ -144,8 +131,8 @@ function addNewRow() {
     }
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
-        <td><input type="text" id="txtDate_0" oninput="GetValidDateFormet(this)" class="txtDate form-control form-control-sm box_border"/></td>
-        <td><input type="text" id="txtRatePerHour_0" onkeyup="OnlyNumeric(this)" class="txtRatePerHour Number form-control form-control-sm box_border"/></td>
+        <td><input type="text" id="txtDate_0" oninput="GetValidDateFormet(this)" autocomplete="off" class="txtDate form-control form-control-sm box_border"/></td>
+        <td><input type="text" id="txtRatePerHour_0" onkeyup="OnlyNumeric(this)" autocomplete="off" class="txtRatePerHour Number form-control form-control-sm box_border"/></td>
         <td><button class="btn btn-success icon-height mb-1 Save" onclick="SaveData(0)" title="Save"><i class="fas fa-save"></i></button></td>`;
 
     tableBody.appendChild(newRow);
@@ -159,7 +146,7 @@ function ClearData() {
 }
 function GetEmployeeRateDetails(event) {
    var Code = $(event).val();
-    ShowDetailList(Code);
+    ShowDetailList(Code, 'Get');
 }
 function validateFromDate(value, event) {
     let regex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -237,7 +224,7 @@ function Save(EffectiveDate, RatePerHour, EmployeeMaster_Code, Code) {
         success: function (response) {
             if (response[0].Status === "Y") {
                 toastr.success(response[0].Msg);
-                ShowDetailList($("#ddlEmployeeName").val());
+                ShowDetailList($("#ddlEmployeeName").val(), 'Get');
             } else if (response[0].Status === "N") {
                 toastr.error(response[0].Msg);
             } else {
@@ -250,7 +237,6 @@ function Save(EffectiveDate, RatePerHour, EmployeeMaster_Code, Code) {
         },
     });
 }
-
 function SaveData(Code) {
     var EffectiveDate = $("#txtDate_" + Code).val();
     var RatePerHour = $("#txtRatePerHour_" + Code).val();
@@ -278,3 +264,19 @@ function convertDateFormat(dateString) {
     const monthAbbreviation = monthNames[parseInt(month) - 1];
     return `${day}-${monthAbbreviation}-${year}`;
 }
+
+$(document).on('keydown', '#table input', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        let currentInput = $(this);
+        let currentRow = currentInput.closest('tr')[0];
+
+        let lastRow = $('#table #table-body tr').last();
+        
+        let inputs = $('#table').find('input:not([disabled])');
+        let currentIndex = inputs.index(currentInput);
+        if (currentIndex + 1 < inputs.length) {
+            inputs.eq(currentIndex + 1).focus();
+        }
+    }
+});
