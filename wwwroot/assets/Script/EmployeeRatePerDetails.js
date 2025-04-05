@@ -65,7 +65,7 @@ function ShowDetailList(Code,Type) {
 }
 function GetEmployeeMasterList() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmployeeMasterList`,
+        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive='A'&EmployeeType=''`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -89,7 +89,7 @@ function GetEmployeeMasterList() {
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
-            $('#txtWarehouse').empty();
+            $('#ddlEmployeeName').empty();
         }
     });
 }
