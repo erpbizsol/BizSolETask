@@ -65,7 +65,7 @@ function ShowDetailList(Code,Type) {
 }
 function GetEmployeeMasterList() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive='A'&EmployeeType=''`,
+        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -75,7 +75,7 @@ function GetEmployeeMasterList() {
                 let option = '<option value="0">Select</option>';
                 $.each(response, function (key, val) {
 
-                    option += '<option value="' + val.Code + '">' + val["Emp Name"] + '</option>';
+                    option += '<option value="' + val.Code + '">' + val["EmployeeName"] + '</option>';
                 });
 
                 $('#ddlEmployeeName')[0].innerHTML = option;

@@ -369,13 +369,13 @@ function validateExcelFormat(data) {
     }
 
     const headers = data[0].map(header => header.replace(/[\s.]+/g, ''));
-    const requiredColumns = ['Client Master','Default Emails'];
+    const requiredColumns = ['ClientName','DefaultEmails'];
 
     const missingColumns = requiredColumns.filter(col => !headers.includes(col));
     if (missingColumns.length > 0) {
         return { isValid: false, message: `Missing required columns: ${missingColumns.join(', ')}` };
     }
-    const emailIndex = headers.indexOf("Default Emails");
+    const emailIndex = headers.indexOf("DefaultEmails");
     const requiredIndexes = requiredColumns.map(col => headers.indexOf(col));
     const errors = [];
     for (let i = 1; i < data.length; i++) {
