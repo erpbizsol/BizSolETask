@@ -48,9 +48,16 @@
         margin: auto;
     }
 
+    .navbar-header .font-size-13 {
+        font-size: 12px !important;
+    }
+
 }
 
 @media (min-width: 320px) and (max-width:  480px) {
+    .navbar-header .font-size-13 {
+        font-size: 12px!important;
+    }
 }
 
 
@@ -64,6 +71,9 @@
 
     .sidebar-overlay-n {
         display: none;
+    }
+    .navbar-header .font-size-13 {
+        font-size: 11px !important;
     }
 }
 

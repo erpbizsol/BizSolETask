@@ -100,6 +100,10 @@ body {
         display: none
     }
 
+.LogoLg {
+    margin-bottom: 4px;
+}
+
 .svg {
     color: #fff;
 }
@@ -856,13 +860,13 @@ body[data-layout=horizontal] .footer {
     background-color: #0c666e;
 }
 
-#side-menu .active > .iconBg i {
-    color: #0c666e;
-}
+    #side-menu .active > .iconBg i {
+        color: #0c666e;
+    }
 
-#side-menu .active .iconBg {
-   background-color: #fbfcff;
-}
+    #side-menu .active .iconBg {
+        background-color: #fbfcff;
+    }
 
 #side-menu .mm-active > a {
     color: #0d6efd;
@@ -1010,6 +1014,7 @@ body[data-sidebar-size=sm] {
                 transition: none;
                 padding: .4rem;
                 border-radius: 5px;
+                height: 37px;
             }
 
                 body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li > a:active,
@@ -1030,7 +1035,7 @@ body[data-sidebar-size=sm] {
         }
 
         body[data-sidebar-size=sm] .vertical-menu #sidebar-menu ul li:hover .iconBg {
-            padding: 3px 5px;
+            padding: 0px 6px;
         }
 
         body[data-sidebar-size=sm] .vertical-menu #sidebar-menu ul li a .iconBg .side-menu-icon {
@@ -1064,15 +1069,17 @@ body[data-sidebar-size=sm] {
         body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li:hover > a {
             position: relative;
             width: calc(190px + 70px);
-            color: #fff !important;
+            color: #000 !important;
             /*background-color: var(--bs-sidebar-bg);*/
-            background-color: #607d8b;
+            background-color: #d6f4f6;
             -webkit-transition: none;
-            transition: none
+            transition: none;
         }
 
             body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li:hover > a i {
-                color: #5156be
+                color: #5156be;
+                margin-left: 0px;
+                padding: 1px 0px;
             }
 
             body[data-sidebar-size=sm] .vertical-menu #sidebar-menu > ul > li:hover > a svg {
@@ -6001,10 +6008,10 @@ table, th, td, tr {
     background-color: #4ba6ef;
 }
 
-.btn-primary:hover {
-    background: #388dd2;
-    border-radius: 7px !important;
-}
+    .btn-primary:hover {
+        background: #388dd2;
+        border-radius: 7px !important;
+    }
 
 
 .paginator .btn.disabled, .btn:disabled, fieldset:disabled .btn {
@@ -6349,7 +6356,7 @@ th, .filter-table-heading {
 
 
 .pt-1-1 {
-    padding-top: .9rem;
+    padding-top: 1.1rem;
     color: #fff;
 }
 
