@@ -24,5 +24,9 @@ namespace Bizsol_ETask.Controllers
         {
             return View();
         }
+        public IActionResult TimeSheetMaster()
+        {
+            return View();
+        }
     }
 }
