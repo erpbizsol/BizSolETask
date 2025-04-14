@@ -104,6 +104,7 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-3 col-sm-6">
+                                <input type="hidden" id="hftxtCode" value="0" />
                                 <label for="ddlEmployeeName" class="col-form-label-sm fw-bold">Employee Name</label>
                                 <select id="ddlEmployeeName" class="form-control form-control-sm box_border">
                                 </select>
@@ -137,7 +138,7 @@
                                     <tfoot>
                                         <tr role="row" id="trAddBtn" style="font-weight:bold">
                                             <td colspan="3" class="text-right">TOTAL :</td>
-                                            <td id="txtBillQtyBox" class="text-right">0.00</td>
+                                            <td id="txttotalMinutes" class="text-right">0.00</td>
 
                                         </tr>
                                     </tfoot>
@@ -150,7 +151,7 @@
                 </div>
                 <div class="p-2">
                     <label>Department Pending work remark</label>
-                    <input class="remarks-box form-control-sm box_border" type="text">
+                    <input class="remarks-box form-control-sm box_border" type="text" id="Remarks">
                 </div>
                 <div class="summary-section p-2">
                     <div class="summary-title">Summary</div>
