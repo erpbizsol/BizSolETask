@@ -200,7 +200,7 @@ function addNewRow() {
         id="txtddlWorkType_0" autocomplete="off"> </select></td>
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="200" /></td>
         <td>
-         <button class="btn btn-success icon-height mb-1" title = "Edit" onclick="SaveData(0)"> <i class="fas fa-save"></i></button>
+         <button class="btn btn-success icon-height mb-1" title ="Edit" onclick="SaveData(0)"> <i class="fas fa-save"></i></button>
          <button class="btn btn-danger icon-height mb-1"  title="Delete" id="deleteRow"><i class="fa-solid fa-trash"></i></button>
         </td>`;
     tableBody.appendChild(newRow);
@@ -228,6 +228,7 @@ function GetEmpDateList() {
                 const StringdoubleFilterColumn = [];
                 const hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time (in Mins)","Remarks1"];
                 const ColumnAlignment = {
+                    Action: "center",
                 };
                 
                 const updatedResponse = response.map(item => {
