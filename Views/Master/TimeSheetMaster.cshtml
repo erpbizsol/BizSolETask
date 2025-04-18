@@ -22,7 +22,7 @@
         display: none;
     }
 
- 
+
 
     .active {
         background-color: #0ba4af;
@@ -120,27 +120,16 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="table-wrapper" style="overflow: auto;">
-                            
-                                <table id="tblorderbooking" class="table fixed-width-table">
-                                    <thead role="rowgroup" class="text-sm-center">
-                                        <tr role="row">
-                                            <th class="lead-Date width_cust" role="columnheader">Department<span class="text-danger">*</span></th>
-                                            <th class="lead-Date width_cust" role="columnheader">From Hr</th>
-                                            <th class="lead-text width_cust" role="columnheader">To Hr</th>
-                                            <th class="lead-text width_cust" role="columnheader">Time in Minutes</th>
-                                            <th class="lead-text width_cust" role="columnheader">Work Type<span class="text-danger">*</span></th>
-                                            <th class="lead-text width_cust" role="columnheader">Remarks</th>
-                                            <th class="lead-text width_cust" role="columnheader">Action</th>
-                                        </tr>
-                                        <!-- end table row-->
+                                <table id="table" class="table">
+                                    <thead id="table-header">
                                     </thead>
-                                    <tbody id="Orderdata" role="rowgroup"></tbody>
+                                    <tbody id="table-body"></tbody>
                                     <tfoot>
-                                        <tr role="row" id="trAddBtn" style="font-weight:bold">
-                                            <td colspan="3" class="text-right">TOTAL :</td>
-                                            <td id="txttotalMinutes" class="text-right">0.00</td>
 
-                                        </tr>
+                                    <th colspan="3" style="text-align:center">Total :</th>
+                                    <th id="footerTotalMinutes"></th>
+                                    <th colspan="3"></th>
+
                                     </tfoot>
                                 </table>
                             </div>
@@ -151,43 +140,46 @@
                 </div>
                 <div class="p-2">
                     <label>Department Pending work remark</label>
-                    <input class="remarks-box form-control-sm box_border" type="text" id="Remarks">
+                    <input class="remarks-box form-control-sm box_border" type="text" id="Remarks" autocomplete="off">
                 </div>
                 <div class="summary-section p-2">
                     <div class="summary-title">Summary</div>
                     <div class="row">
                         <div class="col-sm-6">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Department</th>
-                                        <th>Time (in Mins)</th>
 
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <td>Total:</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <div class="table-wrapper" style="overflow: auto;">
+                                <table id="table1" class="table">
+                                    <thead id="table-header1">
+                                    <th>Department</th>
+                                    <th>Time (in Mins)</th>
+                                    </thead>
+                                    <tbody id="table-body1"></tbody>
+                                    <tfoot>
+                                    <th style="text-align:center">Total :</th>
+                                    <th id="footerTotalMinutes1"></th>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="paginator" id="paginator-table1">
+                            </div>
+
                         </div>
-                        <div class="col-sm-6">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Work Type</th>
-                                        <th>Time (in Mins)</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <td>Total:</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                        <div class="col-md-6">
+                            <div class="table-wrapper" style="overflow: auto;">
+                                <table id="table2" class="table">
+                                    <thead id="table-header2">
+                                    <th>Work Type</th>
+                                    <th>Time (in Mins)</th>
+                                    </thead>
+                                    <tbody id="table-body2"></tbody>
+                                    <tfoot>
+                                    <th style="text-align:center">Total :</th>
+                                    <th id="footerTotalMinutes2"></th>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="paginator" id="paginator-table2">
+                            </div>
                         </div>
 
                     </div>
