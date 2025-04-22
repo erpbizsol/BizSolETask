@@ -17,6 +17,7 @@ $(document).ready(async function () {
         document.getElementById("footerTotalMinutes1").textContent = 0;
         document.getElementById("footerTotalMinutes2").textContent = 0;
         GetEmpDateList();
+        ClearData();
     });
 
 });
@@ -205,7 +206,7 @@ function addNewRow() {
         id="txtddlWorkType_0" autocomplete="off"> </select></td>
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="200" /></td>
         <td>
-         <button class="btn btn-success icon-height mb-1" title = "Edit" onclick="SaveData(0)"> <i class="fas fa-save"></i></button>
+         <button class="btn btn-success icon-height mb-1" title ="Edit" onclick="SaveData(0)"> <i class="fas fa-save"></i></button>
          <button class="btn btn-danger icon-height mb-1"  title="Delete" id="deleteRow"><i class="fa-solid fa-trash"></i></button>
         </td>`;
     tableBody.appendChild(newRow);
@@ -548,6 +549,4 @@ async function updateTimeSheetRemark() {
 }
 function ClearData() {
     $("#txtRemarks").val("");
-   
-   
 }
