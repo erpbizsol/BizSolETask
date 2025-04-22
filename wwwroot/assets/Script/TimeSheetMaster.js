@@ -1,6 +1,7 @@
 ﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
 var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
+let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 let G_DepartmentList = [];
 let G_WorkTypeList = [];
@@ -18,7 +19,13 @@ $(document).ready(async function () {
         document.getElementById("footerTotalMinutes2").textContent = 0;
         GetEmpDateList();
         ClearData();
-    });
+    }); 
+    if (UserTypes === "A") {
+        $("#ddlEmployeeName").prop('disabled', false);
+    } else {
+        $("#ddlEmployeeName").prop('disabled', true);  
+    }
+
 
 });
 function GetEmployeeMasterList() {
