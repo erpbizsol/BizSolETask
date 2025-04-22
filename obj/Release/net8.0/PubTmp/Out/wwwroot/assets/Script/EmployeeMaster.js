@@ -1,8 +1,10 @@
 ﻿
 var authKeyData = sessionStorage.getItem('authKey');
-let UserMaster_Code = authKeyData.UserMaster_Code;
-let UserModuleMaster_Code = 0;
+var jsonObject = JSON.parse(authKeyData);
+let UserMaster_Code = jsonObject.UserMaster_Code;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
+let G_JsonData = [];
+let G_Edit =false;
 $(document).ready(function () {
     $("#ERPHeading").text("Employee Master");
     $('#txtEmployeeId').on('keydown', function (e) {
@@ -22,7 +24,11 @@ $(document).ready(function () {
     });
     $('#txtMobileNo').on('keydown', function (e) {
         if (e.key === "Enter") {
-            $("#txtPassword").focus();
+            if (G_Edit == false) {
+                $("#txtPassword").focus();
+            } else {
+                $('#txtEmployeeType').focus();
+            }
         }
     });
     $('#txtPassword').on('keydown', function (e) {
@@ -47,6 +53,12 @@ $(document).ready(function () {
         EmployeeChangePassword();
     });
     ShowEmployeeMaster('Load');
+    $("#txtExcelFile").change(function (e) {
+        Import(e);
+    });
+    $("#btnUpload").click(function (e) {
+        UploadExcel();
+    });
 });
 function ShowEmployeeMaster(Type) {
     $.ajax({
@@ -66,11 +78,10 @@ function ShowEmployeeMaster(Type) {
                 const StringdoubleFilterColumn = [];
                 const hiddenColumns = ["Code", "Color","Change Password"];
                 const ColumnAlignment = {
-                    "CreatedOn": 'center',
-                    "Digit After Decimal": 'right',
+                    "CreatedOn": 'center'
                 };
                 const updatedResponse = response.map(item => ({
-                    ...item, 'Action': `<button class="btn btn-primary icon-height mb-1"  title="Change Password" onclick="ChangePassword('${item.Code}')">Change Password</button>
+                    ...item, 'Action': `<button class="btn btn-primary icon-height mb-1 btn-width-100px"  title="Change Password" onclick="ChangePassword('${item.Code}')">Change Password</button>
                     <button class="${item.Color} icon-height mb-1"  title="Active/DeActive" onclick="ChangeStaus('${item.Code}')">${item.Action}</i></button>
                     <button class="btn btn-primary icon-height mb-1"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`
                     //'Edit': `<button class="btn btn-primary icon-height mb-1"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`,
@@ -254,6 +265,7 @@ function Back() {
     ClearData();
 }
 function Edit(code) {
+    G_Edit = true;
     $("#tab1").text("EDIT");
     $("#txtListpage").hide();
     $("#txtCreatepage").show();
@@ -316,13 +328,8 @@ function ClearData() {
     $("#txtPassword").val("");
     $("#txtConfirmPassword").val("");
     $("#txtEmployeeType").val("A");
-}
-function GetModuleMasterCode() {
-    var Data = JSON.parse(sessionStorage.getItem('UserModuleMaster'));
-    const result = Data.find(item => item.ModuleDesp === "Employee Master");
-    if (result) {
-        UserModuleMaster_Code = result.Code;
-    }
+    $("#txtExcelFile").val("");
+    G_Edit = false;
 }
 function ActionStatus(code) {
     swal({
@@ -384,26 +391,6 @@ function IsMobileNumber(txtMobId) {
     }
     return true;
 }
-function ChangeStaus(Code) {
-    $.ajax({
-        url: ` ${appBaseURL}/api/Master/ChangeEmployeeStatus?Code=${code}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response) {
-                
-            } else {
-                toastr.error("Record not found...!");
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            toastr.error("Failed to fetch data. Please try again.");
-        }
-    });
-}
 function ChangeStaus(code) {
     if (confirm(`Are you sure you want change status !`)) {
         $.ajax({
@@ -426,5 +413,204 @@ function ChangeStaus(code) {
         });
     }
 }
+function GetExcelTemplate(WithData){
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetExcelTemplate?Mode=EmployeeMaster&WithData=${WithData}'`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                if (WithData == 'N') {
+                    ExportToExcel(response, 'EmployeeMaster_Tamplate.xlsx');
+                } else {
+                    ExportToExcel(response, 'EmployeeMaster_Tamplate_Sample.xlsx');
+                }
+            } else {
+                    toastr.error("Record not found...!");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
 
+}
+function ExportToExcel(data,Name) {
+    let ws = XLSX.utils.json_to_sheet(data);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
+    XLSX.writeFile(wb, Name);
+}
+function Import(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        alert("Please select an Excel file.");
+        return;
+    }
+
+    const allowedExtensions = ['xlsx', 'xls'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+        alert("Invalid file type. Please upload an Excel file (.xlsx or .xls).");
+        event.target.value = '';
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            if (workbook.SheetNames.length === 0) {
+                alert("Invalid Excel file: No sheets found.");
+                event.target.value = '';
+                return;
+            }
+
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            const validationResult = validateExcelFormat(jsonData);
+            if (!validationResult.isValid) {
+                alert(`Invalid Excel format: ${validationResult.message}`);
+                event.target.value = '';
+                return;
+            }
+
+            const formattedData = convertToKeyValuePairs(jsonData);
+            G_JsonData = formattedData;
+            console.log(G_JsonData);
+        } catch (error) {
+            alert("Error reading the Excel file. Ensure it is a valid Excel format.");
+            console.error(error);
+            event.target.value = '';
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+function convertToKeyValuePairs(data) {
+    if (data.length < 2) return [];
+    const headers = data[0].map(header => header.replace(/[\s.]+/g, ''));
+    const rows = data.slice(1);
+    const mappedData = rows.map(row => {
+        let obj = {};
+        headers.forEach((header, index) => {
+            let value = row[index] !== undefined ? row[index] : null;
+            if (header.toLowerCase().includes('date') && value) {
+                value = convertDateFormat1(value);
+            }
+
+            obj[header] = value;
+        });
+        return obj;
+    });
+    const uniqueData = [];
+    const seenRows = new Set();
+
+    mappedData.forEach(row => {
+        const uniqueKey = headers.map(header => row[header]).join('|');
+
+        if (!seenRows.has(uniqueKey)) {
+            seenRows.add(uniqueKey);
+            uniqueData.push(row);
+        }
+    });
+
+    uniqueData.sort((a, b) => {
+        const invoiceA = a["MobileNo"];
+        const invoiceB = b["MobileNo"];
+        if (typeof invoiceA === "string" && typeof invoiceB === "string") {
+            return invoiceA.localeCompare(invoiceB, undefined, { numeric: true });
+        }
+
+        return invoiceA - invoiceB;
+    });
+
+    return uniqueData;
+}
+function UploadExcel() {
+    if (G_JsonData.length == 0) {
+        toastr.error("Please select xlx file !");
+        $("#txtExcelFile").focus();
+        return;
+    };
+    const requestData = G_JsonData;
+    $.ajax({
+        url: `${appBaseURL}/api/Master/ImportEmployeeMaster?UserMaster_Code=${UserMaster_Code}`,
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify(requestData),
+        success: function (response) {
+            if (response[0].Status === 'Y') {
+                toastr.success(response[0].Msg);
+                $("#txtExcelFile").val("");
+                G_JsonData = [];
+                ShowEmployeeMaster("Get");
+                Back();
+            } else {
+                toastr.error("Record not found...!");
+                $("#txtExcelFile").val("");
+                G_JsonData = [];
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            toastr.error("Failed to fetch data. Please try again.");
+        }
+    });
+}
+function validateExcelFormat(data) {
+    if (data.length < 2) {
+        return { isValid: false, message: "The Excel file is empty or missing data rows." };
+    }
+
+    const headers = data[0].map(header => header.replace(/[\s.]+/g, ''));
+    const requiredColumns = ['Status', 'EmployeeCard', 'EmployeeName', 'Password', 'Email', 'MobileNo', 'EmployeeType'];
+
+    const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+    if (missingColumns.length > 0) {
+        return { isValid: false, message: `Missing required columns: ${missingColumns.join(', ')}` };
+    }
+
+    const emailIndex = headers.indexOf("Email");
+    const mobileIndex = headers.indexOf("MobileNo");
+    const requiredIndexes = requiredColumns.map(col => headers.indexOf(col));
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    const errors = [];
+    for (let i = 1; i < data.length; i++) {
+        requiredIndexes.forEach((index, colIndex) => {
+            if (index !== -1) {
+                const cellValue = data[i][index];
+                if (cellValue === undefined || cellValue === null || cellValue.toString().trim() === '') {
+                    errors.push(`Row ${i + 1}: ${requiredColumns[colIndex]} is required.`);
+                }
+            }
+        });
+        if (emailIndex !== -1) {
+            const emailValue = data[i][emailIndex];
+            if (emailValue && !emailRegex.test(emailValue.trim())) {
+                errors.push(`Row ${i + 1}: Invalid Email format (${emailValue}).`);
+            }
+        }
+        if (mobileIndex !== -1) {
+            const mobileValue = data[i][mobileIndex];
+            if (mobileValue && !mobileRegex.test(mobileValue.toString().trim())) {
+                errors.push(`Row ${i + 1}: Invalid Mobile Number (${mobileValue}).`);
+            }
+        }
+    }
+    if (errors.length > 0) {
+        return { isValid: false, message: `Validation errors:\n${errors.join('\n')}` };
+    }
+    return { isValid: true, message: "Excel format is valid." };
+}

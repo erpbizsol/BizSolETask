@@ -18,6 +18,8 @@
     .btnAuto {
         width: 100% !important;
     }
+
+   
 }
 
 @media (min-width: 1025px) and (max-width: 1280px) {
@@ -48,10 +50,23 @@
         margin: auto;
     }
 
+    .navbar-header .font-size-13 {
+        font-size: 12px !important;
+    }
+    #txtCreatepage .table {
+        width: 180% !important;
+    }
 }
 
 @media (min-width: 320px) and (max-width:  480px) {
+    .navbar-header .font-size-13 {
+        font-size: 12px!important;
+    }
+    #txtCreatepage .table {
+        width: 220% !important;
+    }
 }
+
 
 
 
@@ -64,6 +79,13 @@
 
     .sidebar-overlay-n {
         display: none;
+    }
+    .navbar-header .font-size-13 {
+        font-size: 11px !important;
+    }
+
+    #txtCreatepage .table {
+        width: 220% !important;
     }
 }
 
