@@ -203,18 +203,18 @@ function addNewRow() {
     newRow.innerHTML = `
        <td>
        <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
-        id="txtddlDipartment_0" autocomplete="off">
+        id="txtddlDipartment_0" autocomplete="off" maxlength="50">
         </select>
         </td>
-        <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm text-right" autocomplete="off" maxlength="15" /></td>
-        <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm text-right" autocomplete="off" maxlength="15"/></td>
+        <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
+        <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
         <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="15"></td>
         <td><select class="txtddlWorkType mandatory form-control form-control-sm box_border"
-        id="txtddlWorkType_0" autocomplete="off"> </select></td>
-        <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="200" /></td>
-        <td>
-         <button class="btn btn-success icon-height mb-1" title ="Edit" onclick="SaveData(0)"> <i class="fas fa-save"></i></button>
-         <button class="btn btn-danger icon-height mb-1"  title="Delete" id="deleteRow"><i class="fa-solid fa-trash"></i></button>
+        id="txtddlWorkType_0" autocomplete="off" maxlength="50"> </select></td>
+        <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
+        <td style="text-align:left">
+            <button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData(0)"><i class="fas fa-save"></i></button>
+            <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete"><i class="fa-solid fa-trash"></i></button>
         </td>`;
     tableBody.appendChild(newRow);
     BindSelect2('txtddlDipartment_0', G_DepartmentList);
@@ -257,11 +257,11 @@ async function GetEmpDateList() {
                 ...item,
                 "Department": `
                     <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
-                        id="txtddlDipartment_${item.Code}" autocomplete="off"></select>`,
-                "From Hr": `<input type="time" autocomplete="off" id="txtfromHr_${item.Code}" class="txtfromHr form-control form-control-sm box_border" value="${item['From Hr']}"/>`,
-                "To Hr": `<input type="time" autocomplete="off" id="txttoHr_${item.Code}" class="txttoHr form-control form-control-sm box_border" value="${item['To Hr']}"/>`,
-                "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" disabled value="${item['Time in Minutes']}"/>`,
-                "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off"></select>`,
+                        id="txtddlDipartment_${item.Code}" autocomplete="off" maxlength="50"></select>`,
+                "From Hr": `<input type="time" autocomplete="off" id="txtfromHr_${item.Code}" class="txtfromHr form-control form-control-sm box_border" value="${item['From Hr']}" maxlength="15"/>`,
+                "To Hr": `<input type="time" autocomplete="off" id="txttoHr_${item.Code}" class="txttoHr form-control form-control-sm box_border" value="${item['To Hr']}" maxlength="15"/>`,
+                "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" disabled value="${item['Time in Minutes']}" maxlength="15"/>`,
+                "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off" maxlength="50"></select>`,
                 "Remarks": `<input type="text" autocomplete="off" id="txtRemarks1_${item.Code}" class="txtRemarks1 form-control form-control-sm box_border" value="${item.Remarks || ''}"/>`,
                 "Action": `
                     <button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
@@ -548,7 +548,7 @@ async function updateTimeSheetRemark() {
 
     if (response[0].Status === 'Y') {
         toastr.success(response[0].Msg);
-        ClearData();
+      
     } else {
         toastr.error("Unexpected response format.");
     }
