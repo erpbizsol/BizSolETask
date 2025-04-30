@@ -10,19 +10,28 @@
 
 <style>
     .datepicker td, .datepicker th {
-        border-radius: 20px !important;
+        /* border-radius: 20px !important; */
+        border: 1px solid #0c666e;
     }
 
     .datepicker table tr td, .datepicker table tr td {
-        padding: 8px 9px !important;
+        padding: 6px 9px !important;
         height: 16px !important;
+    }
+
+    .datepicker thead, th {
+        background-color: #0ba4af;
+        color: white;
+    }
+
+    :is(.datepicker thead .prev, .datepicker thead .next, .datepicker thead .datepicker-switch) {
+        text-align: center;
+        padding: 2px 2px 5px 2px !important;
     }
 
     .datepicker table tfoot {
         display: none;
     }
-
-
 
     .active {
         background-color: #0ba4af;
@@ -54,17 +63,13 @@
         padding: 0.7rem;
     }
 
-    th, td {
+    /* th, td {
         border: 1px solid #2e6c7b;
         padding: 10px;
         text-align: center;
     }
-
-    th {
-        background-color: #0ba4af;
-        color: white;
-    }
-
+    */
+   
     tfoot td {
         background-color: #e6f2f5;
         font-weight: bold;

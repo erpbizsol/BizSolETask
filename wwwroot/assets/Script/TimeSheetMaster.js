@@ -190,11 +190,11 @@ function addNewRow() {
     if (!tableHead.querySelector("tr")) {
         const headerRow = document.createElement("tr");
         headerRow.innerHTML = `
-        <th>Department<span class="text-danger">*</span></th>
+        <th style= "width:150px;">Department<span class="text-danger">*</span></th>
         <th>From Hr</th>
         <th>To Hr</th>
         <th>Time in Minutes</th>
-        <th>Work Type<span class="text-danger">*</span></th>
+        <th style= "width:200px;">Work Type<span class="text-danger">*</span></th>
         <th>Remarks</th>
         <th>Action</th>`;
         tableHead.appendChild(headerRow);
@@ -212,7 +212,7 @@ function addNewRow() {
         <td><select class="txtddlWorkType mandatory form-control form-control-sm box_border"
         id="txtddlWorkType_0" autocomplete="off" maxlength="50"> </select></td>
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
-        <td style="text-align:left">
+        <td style="text-align:center;">
             <button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData(0)"><i class="fas fa-save"></i></button>
             <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete"><i class="fa-solid fa-trash"></i></button>
         </td>`;
@@ -251,7 +251,15 @@ async function GetEmpDateList() {
             const showButtons = [];
             const StringdoubleFilterColumn = [];
             const hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time (in Mins)", "Remarks1"];
-            const ColumnAlignment = {};
+            const ColumnAlignment = {
+                "Department": 'left;width:15%',
+                "From Hr": 'center;width: 25px',
+                "To Hr": 'center;width: 25px',
+                "Time in Minutes": 'center;width: 30px',
+                "Work Type": 'left;width: 28%',
+                "Remarks": 'left;width: 300px',
+                "Action": 'center;width: 100px',
+            };
 
             const updatedResponse = result.map(item => ({
                 ...item,
