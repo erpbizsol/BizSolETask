@@ -373,7 +373,12 @@ function calculateTimeDifference(code) {
 
     const fromMinutes = fh * 60 + fm;
     const toMinutes = th * 60 + tm;
-
+    
+    if (toMinutes < fromMinutes) {
+        toastr.warning("To Hr must be greater than From Hr or Equal !");
+        $("#txttimeInMinutes_" + code).val("");
+        return;
+    }
     // prevent negative
     const diff = Math.max(0, toMinutes - fromMinutes);
 
