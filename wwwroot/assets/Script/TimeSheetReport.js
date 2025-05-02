@@ -3,40 +3,70 @@ var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
 let G_ReportType = "";
-
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
-    if (UserTypes === "A") {
-        $("#ddlEmployeeName").prop('disabled', false);
-       
-    } else {
-        $("#ddlEmployeeName").prop('disabled', true);
-        SelectOptionByText('ddlEmployeeName', UserName);
-    }
     $("#ERPHeading").text("Time Sheet Report");
+    $('#txtFromDate').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtToDate").focus();
+        }
+    });
+    $('#txtToDate').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#ddlEmployeeName").focus();
+        }
+    });
+    $('#ddlEmployeeName').on('keydown', function (e) {
+        alert(e.key)
+        if (e.key === "Enter") {
+            $("#ddlWorkType").focus();
+        }
+    });
+    $('#ddlWorkType').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#ddlClientName").focus();
+        }
+    });
+    $('#ddlClientName').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#ddlReportType").focus();
+        }
+    });
+    $('#ddlReportType').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtShow").focus();
+        }
+    });
     DatePicker();
     GetEmployeeMasterList();
     GetWorkTypeList();
     GetClientList();
     $("#txtShow").click(async function () {
-        var reportType = $("#ddlReportType").val(); 
+        var reportType = $("#ddlReportType").val();
 
         if (reportType === "Default") {
             await GetTimeSheetReport();
             await GetClientType();
             await GetWorkType();
             await GetEmployeeType();
-            $("#txtSummary").show(); 
+            $("#txtSummary").show();
         } else {
             await GetTimeSheetReport();
             $("#txtSummary").hide();
         }
-     
+
     });
+    if (UserTypes === "A") {
+        $("#ddlEmployeeName").prop('disabled', false);
+
+    } else {
+        $("#ddlEmployeeName").prop('disabled', true);
+        SelectOptionByText('ddlEmployeeName', UserName);
+    }
 });
 function DatePicker() {
     const today = new Date();
-    const defaultDate =  formatDateToString(today);
+    const defaultDate = formatDateToString(today);
     $('#txtFromDate,#txtToDate').val(defaultDate);
     $('#txtFromDate,#txtToDate').datepicker({
         format: 'dd/mm/yyyy',
@@ -95,7 +125,7 @@ function GetEmployeeMasterList() {
         success: function (response) {
             if (response.length > 0) {
                 const $select = $('#ddlEmployeeName');
-                $select.empty();
+                $select.empty(); 
 
                 $.each(response, function (key, val) {
                     $select.append(new Option(val.EmployeeName, val.Code));
@@ -106,12 +136,10 @@ function GetEmployeeMasterList() {
                     closeOnSelect: false,
                     placeholder: "Select Employee...",
                     allowClear: true
-                  
+
                 });
-                
-               
             } else {
-                $('#ddlEmployeeName').empty();
+                $select.empty();
             }
         },
         error: function (xhr, status, error) {
@@ -240,7 +268,7 @@ function GetTimeSheetReport() {
             } else {
                 toastr.error("Record not Found !..");
                 $("#AllTable").hide();
-            }   
+            }
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -267,7 +295,7 @@ function GetClientType() {
                 const Button = false;
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["TimeInMinutes", "RatePerHr", "Amount","TimeInHours"];
+                const hiddenColumns = ["TimeInMinutes", "RatePerHr", "Amount", "TimeInHours"];
                 const ColumnAlignment = {};
                 BizsolCustomFilterGrid.CreateDataTable(
                     "table-headerClient",
@@ -276,7 +304,7 @@ function GetClientType() {
                 );
                 const totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time (in Hrs)"]) || 0), 0);
                 document.getElementById("footerTotalMinutesClient").textContent = totalMinutes;
-                
+
             } else {
                 $("#txtSummary").hide();
             }
@@ -368,8 +396,7 @@ function GetEmployeeType() {
         }
     });
 }
-function Reset()
-{
+function Reset() {
     $('#ddlWorkType').val("").trigger('change');
     //$('#ddlEmployeeName').val("").trigger('change');
     $('#ddlClientName').val("").trigger('change');
@@ -409,55 +436,8 @@ function DataExport() {
     });
 
 }
-//function Export(jsonData) {
-//    const columnsToRemove = ["Code"];
-//    if (!Array.isArray(columnsToRemove)) {
-//        console.error("columnsToRemove should be an array");
-//        return;
-//    }
-//    const filteredData = jsonData.filter(row =>
-//        Object.fromEntries(Object.entries(row).filter(([key]) => !columnsToRemove.includes(key)))
-//    );
-//    if (ReportType = "Default") {
-//        let totalRow = {};
-       
-//        const numericKeys = ["Time In Minutes"];
-//        for (let key of Object.keys(filteredData[0])) {
-//            if (numericKeys.includes(key)) {
-//                totalRow[key] = filteredData.reduce((sum, row) => sum + (parseFloat(row[key]) || 0), 0);
-//                totalRow[key] = "Total:";
-//            }else {
-//                totalRow[key] = "";
-//            }
-//        }
-//        filteredData.push(totalRow);
-//        const ws = XLSX.utils.json_to_sheet(filteredData);
-//        const wb = XLSX.utils.book_new();
-//        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-//        XLSX.writeFile(wb, "TimeSheetReport.xlsx");
-//    }
-//    else {
-//        let totalRow = {};
-//        const numericKeys = ["Time(in Hrs)"];
-//        for (let key of Object.keys(filteredData[0])) {
-//            if (numericKeys.includes(key)) {
-//                totalRow[key] = filteredData.reduce((sum, row) => sum + (parseFloat(row[key]) || 0), 0);
-//            } else if (key.toLowerCase().includes("name")) {
-//                totalRow[key] = "Total:";
-//            } else {
-//                totalRow[key] = "";
-//            }
-//        }
-//        filteredData.push(totalRow);
-//        const ws = XLSX.utils.json_to_sheet(filteredData);
-//        const wb = XLSX.utils.book_new();
-//        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-//        XLSX.writeFile(wb, "TimeSheetReport.xlsx");
-//    }
-//}
-
 function Export(jsonData) {
-    const columnsToRemove = [""];  
+    const columnsToRemove = [""];
 
     const filteredData = jsonData.map(row =>
         Object.fromEntries(Object.entries(row).filter(([key]) => !columnsToRemove.includes(key)))

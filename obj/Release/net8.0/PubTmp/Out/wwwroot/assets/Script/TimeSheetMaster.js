@@ -1,17 +1,32 @@
 ﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
+var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
+let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 let G_DepartmentList = [];
 let G_WorkTypeList = [];
-
-$(document).ready(function () {
+let G_TimeSheetMaster_Code = 0;
+let G_Remark_Code = 0;
+$(document).ready(async function () {
     $("#ERPHeading").text("Time Sheet");
-    GetEmployeeMasterList();
-    GetDipatmentList();
-    GetWorkTypeList();
+    await GetEmployeeMasterList();
+    await GetWorkTypeList();
     setupDateInputFormatting();
-    //addNewRow();
     DatePicker();
+    $("#txtFromDate,#ddlEmployeeName").on("change", function () {
+        document.getElementById("footerTotalMinutes").textContent = 0;
+        document.getElementById("footerTotalMinutes1").textContent = 0;
+        document.getElementById("footerTotalMinutes2").textContent = 0;
+        GetEmpDateList();
+        ClearData();
+    }); 
+    if (UserTypes === "A") {
+        $("#ddlEmployeeName").prop('disabled', false);
+    } else {
+        $("#ddlEmployeeName").prop('disabled', true);  
+    }
+
+
 });
 function GetEmployeeMasterList() {
     $.ajax({
@@ -27,12 +42,12 @@ function GetEmployeeMasterList() {
 
                     option += '<option value="' + val.Code + '">' + val["EmployeeName"] + '</option>';
                 });
-
                 $('#ddlEmployeeName')[0].innerHTML = option;
-
                 $('#ddlEmployeeName').select2({
                     width: '-webkit-fill-available'
                 });
+                SelectOptionByText('ddlEmployeeName',UserName);
+          
             } else {
                 $('#ddlEmployeeName').empty();
             }
@@ -43,35 +58,38 @@ function GetEmployeeMasterList() {
         }
     });
 }
-function GetDipatmentList() {
-    $.ajax({
-        url: `${appBaseURL}/api/Master/GetClientList`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response.length > 0) {
-                G_DepartmentList = response;
-                G_DepartmentList=G_DepartmentList.map((item) => ({ Code: item.Code, Name: item.ClientName }));
-                //$('.txtddlDipartment').html(option);
-                //if ($('.txtddlDipartment').length > 0) {
-                //    $('.txtddlDipartment').select2({
-                //        width: '100%'
-                //    });
-                //}
-              //  addNewRow();
+async function GetDepartmentList(EmployeeName) {
+    try {
+        const response = await fetch(`${appBaseURL}/api/Master/GetClientList?EmployeeName=${encodeURIComponent(EmployeeName)}`, {
+            method: 'GET',
+            headers: {
+                'Auth-Key': authKeyData
             }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            $('.txtddlDipartment').empty();
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-    });
+
+        const data = await response.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+            G_DepartmentList = data.map(item => ({
+                Code: item.Code,
+                Name: item.ClientName
+            }));
+        } else {
+            G_DepartmentList = [];
+        }
+
+    } catch (error) {
+        console.error("Error fetching department list:", error);
+        $('.txtddlDipartment').empty();
+    }
 }
 function GetWorkTypeList() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetWorkTypeList`,  
+        url: `${appBaseURL}/api/Master/GetWorkTypeList`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -82,7 +100,7 @@ function GetWorkTypeList() {
                 G_WorkTypeList = G_WorkTypeList.map((item) => ({ Code: item.Code, Name: item['WorkType'] }));
                 addNewRow();
 
-            } 
+            }
         },
         error: function (xhr, status, error) {
             console.error("AJAX Error:", error);
@@ -92,7 +110,7 @@ function GetWorkTypeList() {
 }
 function DatePicker(date) {
     const today = new Date();
-    const defaultDate = date || formatDateToString(today); 
+    const defaultDate = date || formatDateToString(today);
 
     $('#txtFromDate').val(defaultDate);
     $('#txtFromDate').datepicker({
@@ -142,7 +160,7 @@ function validateDate(value) {
         $('#txtFromDate').val('');
     }
 }
-$(document).on("click", "#deleteRow", function () {
+$("#deleteRow").on("click", function () {
     const row = $(this).closest("tr");
     const table = document.getElementById("table").querySelector("tbody");
 
@@ -153,22 +171,17 @@ $(document).on("click", "#deleteRow", function () {
     }
 });
 function convertToDayMonthYear(dateStr) {
-  
-    const parts = dateStr.split('/'); 
+
+    const parts = dateStr.split('/');
     if (parts.length !== 3) return null;
-    const day = parts[0];  
-    const month = parts[1];  
-    const year = parts[2];  
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     if (parseInt(month) < 1 || parseInt(month) > 12) return null;
     const monthName = months[parseInt(month) - 1];
     return `${day}-${monthName}-${year}`;
 }
-$(document).on("change", '#ddlEmployeeName, #txtFromDate', function () {
-    GetEmpDateList();
-    GetEmpDateList1();
-    GetEmpDateList2();
-});
 function addNewRow() {
     const table = document.getElementById("table");
     const tableHead = table.querySelector("thead");
@@ -190,176 +203,151 @@ function addNewRow() {
     newRow.innerHTML = `
        <td>
        <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
-        id="txtddlDipartment_0" autocomplete="off">
+        id="txtddlDipartment_0" autocomplete="off" maxlength="50">
         </select>
         </td>
-        <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm text-right" autocomplete="off" maxlength="15" /></td>
-        <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm text-right" autocomplete="off" maxlength="15"/></td>
+        <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
+        <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
         <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="15"></td>
         <td><select class="txtddlWorkType mandatory form-control form-control-sm box_border"
-        id="txtddlWorkType_0" autocomplete="off"> </select></td>
-        <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="200" /></td>
-        <td>
-         <button class="btn btn-success icon-height mb-1" title = "Edit" onclick="SaveData(0)"> <i class="fas fa-save"></i></button>
-         <button class="btn btn-danger icon-height mb-1"  title="Delete" id="deleteRow"><i class="fa-solid fa-trash"></i></button>
+        id="txtddlWorkType_0" autocomplete="off" maxlength="50"> </select></td>
+        <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
+        <td style="text-align:left">
+            <button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData(0)"><i class="fas fa-save"></i></button>
+            <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete"><i class="fa-solid fa-trash"></i></button>
         </td>`;
     tableBody.appendChild(newRow);
     BindSelect2('txtddlDipartment_0', G_DepartmentList);
-    BindSelect3('txtddlWorkType_0', G_WorkTypeList);
-}
-function GetEmpDateList() {
-    let emp = $('#ddlEmployeeName').val();
-    let rawDate = $('#txtFromDate').val();
-    let formattedDate = convertToDayMonthYear(rawDate);
-    $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmpDateList?EmployeeName=${emp}&WorkDate=${formattedDate}`,
-        type: 'POST',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            $("#table-body").empty();
-            if (response.length > 0) {
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time (in Mins)","Remarks1"];
-                const ColumnAlignment = {
-                };
-                
-                const updatedResponse = response.map(item => {
-                    return {
-                        ...item,
-                        "Department": `
-                        <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
-                        id="txtddlDipartment_${item.Code}" autocomplete="off">
-                        </select>`,
-                        "From Hr": `<input type="time" autocomplete="off" id="txtfromHr_${item.Code}" class="txtfromHr form-control form-control-sm box_border" value="${item['From Hr']}"/>`,
-                        "To Hr": `<input type="time" autocomplete="off" id="txttoHr_${item.Code}" class="txttoHr form-control form-control-sm box_border" value="${item['To Hr']}"/>`,
-                        "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" disabled value="${item['Time in Minutes']}"/>`,
-                        "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off"></select>`,
-                        "Remarks": `<input type="text" autocomplete="off" id="txtRemarks1_${item.Code}" class="txtRemarks1 form-control form-control-sm box_border" value="${item.Remarks || ''}"/>`,
-                        "Action":
-                        `<button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
-                         <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.TimeSheetMaster_Code}')"><i class="fa-solid fa-trash"></i></button>`
-                        };
-                });
-                
-                let totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time in Minutes"]) || 0), 0);
-                BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
-                document.getElementById("footerTotalMinutes").textContent = totalMinutes;
+    BindSelect2('txtddlWorkType_0', G_WorkTypeList);
 
-                updatedResponse.forEach(item => {
-                    BindSelect2(`txtddlDipartment_${item.Code}`, G_DepartmentList);
-                    $(`#txtddlDipartment_${item.Code}`).val(item.ClientMaster_Code)
-                    $(`#txtddlDipartment_${item.Code}`).select2({
-                        width: '100%'
-                    });
-                });
-                updatedResponse.forEach(item => {
-                    BindSelect3(`txtddlWorkType_${item.Code}`, G_WorkTypeList);
-                    $(`#txtddlWorkType_${item.Code}`).val(item.WorkTypeMaster_Code)
-                    $(`#txtddlWorkType_${item.Code}`).select2({
-                        width: '100%'
-                    });
-                });
-                addNewRow();
-                calculateTimeDifference(response.Code);
-            } else {
-                addNewRow();
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-        }
-    });
 }
-function GetEmpDateList1() {
-    let emp = $('#ddlEmployeeName').val();
-    let rawDate = $('#txtFromDate').val();
-    let formattedDate = convertToDayMonthYear(rawDate);
-    $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmpDateList?EmployeeName=${emp}&WorkDate=${formattedDate}`,
-        type: 'POST',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response1) {
+async function GetEmpDateList() {
+    const emp = $('#ddlEmployeeName').val();
+    const rawDate = $('#txtFromDate').val();
+    const formattedDate = convertToDayMonthYear(rawDate);
+
+    try {
+        const response = await fetch(`${appBaseURL}/api/Master/GetEmpDateList?EmployeeName=${encodeURIComponent(emp)}&WorkDate=${formattedDate}`, {
+            method: 'POST',
+            headers: {
+                'Auth-Key': authKeyData
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        $("#table-body").empty();
+        G_TimeSheetMaster_Code = 0;
+
+        if (result.length > 0) {
+            const StringFilterColumn = [];
+            const NumericFilterColumn = [];
+            const DateFilterColumn = [];
+            const Button = false;
+            const showButtons = [];
+            const StringdoubleFilterColumn = [];
+            const hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time (in Mins)", "Remarks1"];
+            const ColumnAlignment = {};
+
+            const updatedResponse = result.map(item => ({
+                ...item,
+                "Department": `
+                    <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
+                        id="txtddlDipartment_${item.Code}" autocomplete="off" maxlength="50"></select>`,
+                "From Hr": `<input type="time" autocomplete="off" id="txtfromHr_${item.Code}" class="txtfromHr form-control form-control-sm box_border" value="${item['From Hr']}" maxlength="15"/>`,
+                "To Hr": `<input type="time" autocomplete="off" id="txttoHr_${item.Code}" class="txttoHr form-control form-control-sm box_border" value="${item['To Hr']}" maxlength="15"/>`,
+                "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" disabled value="${item['Time in Minutes']}" maxlength="15"/>`,
+                "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off" maxlength="50"></select>`,
+                "Remarks": `<input type="text" autocomplete="off" id="txtRemarks1_${item.Code}" class="txtRemarks1 form-control form-control-sm box_border" value="${item.Remarks || ''}"/>`,
+                "Action": `
+                    <button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
+                    <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}','${item.TimeSheetMaster_Code}')"><i class="fa-solid fa-trash"></i></button>`
+            }));
+            $("#txtRemarks").val(result[0].Remarks1)
+            G_TimeSheetMaster_Code = result[0].TimeSheetMaster_Code;
+
+            const totalMinutes = result.reduce((sum, item) => sum + (parseInt(item["Time in Minutes"]) || 0), 0);
+            document.getElementById("footerTotalMinutes").textContent = totalMinutes;
+
+            BizsolCustomFilterGrid.CreateDataTable(
+                "table-header",
+                "table-body",
+                updatedResponse,
+                Button,
+                showButtons,
+                StringFilterColumn,
+                NumericFilterColumn,
+                DateFilterColumn,
+                StringdoubleFilterColumn,
+                hiddenColumns,
+                ColumnAlignment,
+                false
+            );
+
+            // Await department list before binding
+            await GetDepartmentList(emp);
+
+            // Bind department and work type dropdowns
+            updatedResponse.forEach(item => {
+                BindSelect2(`txtddlDipartment_${item.Code}`, G_DepartmentList);
+                $(`#txtddlDipartment_${item.Code}`).val(item.ClientMaster_Code).select2({ width: '100%' });
+            });
+
+            updatedResponse.forEach(item => {
+                BindSelect2(`txtddlWorkType_${item.Code}`, G_WorkTypeList);
+                $(`#txtddlWorkType_${item.Code}`).val(item.WorkTypeMaster_Code).select2({ width: '100%' });
+            });
+
+            addNewRow();
+            calculateTimeDifference(result.Code);
+            GetDepartmentTable(result);
+            GetWorktypeTable(result);
+            G_Remark_Code = result[0].TimeSheetMaster_Code;
+        } else {
+            await GetDepartmentList(emp);
+            addNewRow();
             $("#table-body1").empty();
-            if (response1.length > 0) {
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time in Minutes", "From Hr", "To Hr", "Work Type", "Remarks", "Remarks1"];
-                const ColumnAlignment = {
-                };
-                let totalMinutes1 = response1.reduce((sum, item) => sum + (parseInt(item["Time (in Mins)"]) || 0), 0);
-                BizsolCustomFilterGrid.CreateDataTable("table-header1", "table-body1", response1, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
-                document.getElementById("footerTotalMinutes1").textContent = totalMinutes1;
-                calculateTimeDifference(response1.Code);
-            } else {
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-        }
-    });
-}
-function GetEmpDateList2() {
-    let emp = $('#ddlEmployeeName').val();
-    let rawDate = $('#txtFromDate').val();
-    let formattedDate = convertToDayMonthYear(rawDate);
-    $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmpDateList?EmployeeName=${emp}&WorkDate=${formattedDate}`,
-        type: 'POST',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response2) {
             $("#table-body2").empty();
-            if (response2.length > 0) {
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["Code", "Department", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "From Hr", "To Hr", "Time in Minutes", "Remarks", "Remarks1"];
-                const ColumnAlignment = {
-                };
-                let totalMinutes2 = response2.reduce((sum, item) => sum + (parseInt(item["Time (in Mins)"]) || 0), 0);
-                BizsolCustomFilterGrid.CreateDataTable("table-header2", "table-body2", response2, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
-                document.getElementById("footerTotalMinutes2").textContent = totalMinutes2;
-                calculateTimeDifference(response2.Code);
-            } else {
-               
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
         }
-    });
+    } catch (error) {
+        console.error("Error loading employee date list:", error);
+    }
 }
-function BindSelect2(elementId,list) {
-    let option = '<option value="0">Select</option>';
-    $.each(list, function (key, val) {
-
-        option += '<option value="' + val.Code + '">' + val.Name + '</option>';
-    });
-
-    $('#' + elementId)[0].innerHTML = option;
-
-    $('#' + elementId).select2({
-           width: '100%'
-      });
+function GetDepartmentTable(Data) {
+    const StringFilterColumn = [];
+    const NumericFilterColumn = [];
+    const DateFilterColumn = [];
+    const Button = false;
+    const showButtons = [];
+    const StringdoubleFilterColumn = [];
+    const hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time in Minutes", "From Hr", "To Hr", "Work Type", "Remarks", "Remarks1"];
+    const ColumnAlignment = {
+    };
+    let totalMinutes1 = Data.reduce((sum, item) => sum + (parseInt(item["Time (in Mins)"]) || 0), 0);
+    BizsolCustomFilterGrid.CreateDataTable("table-header1", "table-body1", Data, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
+    document.getElementById("footerTotalMinutes1").textContent = totalMinutes1;
+    calculateTimeDifference(Data.Code);
 }
-function BindSelect3(elementId, list) {
+function GetWorktypeTable(Data) {
+    const StringFilterColumn = [];
+    const NumericFilterColumn = [];
+    const DateFilterColumn = [];
+    const Button = false;
+    const showButtons = [];
+    const StringdoubleFilterColumn = [];
+    const hiddenColumns = ["Code", "Department", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "From Hr", "To Hr", "Time in Minutes", "Remarks", "Remarks1"];
+    const ColumnAlignment = {
+    };
+    let totalMinutes2 = Data.reduce((sum, item) => sum + (parseInt(item["Time (in Mins)"]) || 0), 0);
+    BizsolCustomFilterGrid.CreateDataTable("table-header2", "table-body2", Data, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
+    document.getElementById("footerTotalMinutes2").textContent = totalMinutes2;
+    calculateTimeDifference(Data.Code);
+}
+function BindSelect2(elementId, list) {
     let option = '<option value="0">Select</option>';
     $.each(list, function (key, val) {
 
@@ -372,6 +360,11 @@ function BindSelect3(elementId, list) {
         width: '100%'
     });
 }
+$(document).on("change", "[id^='txtfromHr_'], [id^='txttoHr_']", function () {
+    const code = this.id.split("_")[1];
+    calculateTimeDifference(code);
+
+});
 function calculateTimeDifference(code) {
     const fromHr = $("#txtfromHr_" + code).val() || "00:00";
     const toHr = $("#txttoHr_" + code).val() || "00:00";
@@ -385,10 +378,7 @@ function calculateTimeDifference(code) {
     const diff = Math.max(0, toMinutes - fromMinutes);
 
     $("#txttimeInMinutes_" + code).val(diff);
-    $("#footerTotalMinutes" + code).text(diff);
-    $("#footerTotalMinutes1" + code).text(diff);
-    $("#footerTotalMinutes2" + code).text(diff);
-    updateTotalMinutes();
+
 }
 function updateTotalMinutes() {
     let total = 0;
@@ -396,17 +386,10 @@ function updateTotalMinutes() {
         const v = parseInt($(this).val(), 10);
         if (!isNaN(v)) total += v;
     });
-
-    // write into your footer cell
     $("#footerTotalMinutes").text(total);
     $("#footerTotalMinutes1").text(total);
     $("#footerTotalMinutes2").text(total);
 }
-$(document).on("change", "[id^='txtfromHr_'], [id^='txttoHr_']", function () {
-    const code = this.id.split("_")[1];
-    calculateTimeDifference(code);
-    updateTotalMinutes();
-});
 function convertToISO(dateStr) {
     let day, month, year;
 
@@ -432,53 +415,64 @@ function convertToISO(dateStr) {
 function SaveData(Code) {
     const EmployeeName = $("#ddlEmployeeName").val();
     const Remarks = $("#Remarks").val();
-    const Date = convertToISO($("#txtFromDate").val());
+    const FromDate = convertToISO($("#txtFromDate").val());
     const clientName = $("#txtddlDipartment_" + Code).val();
     const fromHr = $("#txtfromHr_" + Code).val() || "00:00";
     const toHr = $("#txttoHr_" + Code).val() || "00:00";
     const timeinMinutes = parseInt($("#txttimeInMinutes_" + Code).val()) || 0;
     const workType = $("#txtddlWorkType_" + Code).val();
-    const remarks1 = $("#txtRemarks1_" + Code).val() || "";
+    const remarks = $("#txtRemarks1_" + Code).val() || "";
 
-    if (!EmployeeName) {
+    if (EmployeeName == '') {
         toastr.error("Please select Employee Name!");
         $("#ddlEmployeeName").focus();
         return;
     }
-    else if (!Date) {
+    else if (FromDate == '') {
         toastr.error("Please select Date!");
         $("#txtFromDate").focus();
         return;
     }
-    else if (!clientName) {
+    else if (clientName == '0') {
         toastr.error("Please select Department!");
         $("#txtddlDipartment_" + Code).focus();
         return;
     }
-    else if (!workType) {
+    else if (fromHr == '00:00') {
+        toastr.error("Please select from Hr!");
+        $("#txtfromHr_" + Code).focus();
+        return;
+    }
+    else if (toHr == '00:00') {
+        toastr.error("Please select to Hr!");
+        $("#txttoHr_" + Code).focus();
+        return;
+    }
+    else if (workType == '0') {
         toastr.error("Please select work Type!");
         $("#txtddlWorkType_" + Code).focus();
         return;
     }
     else {
         const timeSheetDetails = [{
-            clientName: clientName,
+            code: Code,
+            clientMaster_Code: clientName,
             fromHr: fromHr,
             toHr: toHr,
             timeinMinutes: timeinMinutes,
-            workType: workType,
-            remarks1: remarks1
+            workTypeMaster_Code: workType,
+            remarks: remarks
 
         }];
-       
+
         const payload = {
-            timeSheetMastre: {
-                code: Code,
+            timeSheetMaster: [{
+                code: G_TimeSheetMaster_Code,
                 employeeName: EmployeeName,
-                date: Date,
+                date: FromDate,
                 remarks: Remarks,
                 userMaster_Code: UserMaster_Code,
-            },
+            }],
             TimeSheetDetail: timeSheetDetails
         };
         $.ajax({
@@ -494,8 +488,8 @@ function SaveData(Code) {
                 if (response[0].Status === "Y") {
                     toastr.success(response[0].Msg);
                     GetEmpDateList();
-                    //addNewRow();
-                } else {
+                }
+                else {
                     toastr.error(response.Msg);
                 }
             },
@@ -504,12 +498,12 @@ function SaveData(Code) {
                 toastr.error("An error occurred while saving the data.");
             }
         });
-    }  
+    }
 }
-async function Delete(TimeSheetMaster_Code) {
+async function Delete(Code, TimeSheetMaster_Code) {
     if (confirm(`Are you sure you want to delete this.?`)) {
         $.ajax({
-            url: `${appBaseURL}/api/Master/Delete?Code=${TimeSheetMaster_Code}`,
+            url: `${appBaseURL}/api/Master/Delete?Code=${TimeSheetMaster_Code}&TimeSheetDetail_Code=${Code}`,
             type: 'POST',
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -528,4 +522,38 @@ async function Delete(TimeSheetMaster_Code) {
             }
         });
     }
+}
+$(document).on("focusout", "#txtRemarks", function () {
+    const table = document.getElementById("table").querySelector("tbody");
+    const rowCount = table.querySelectorAll("tr").length;
+
+    if (rowCount > 1) {
+        const row = $(this).closest("tr");
+        const code = row.data("code");
+        const remark = $(this).val();
+        updateTimeSheetRemark(code, remark);
+    } else {
+        console.log("Only one row exists. Remark not updated.");
+    }
+});
+async function updateTimeSheetRemark() {
+    var Remarks = $("#txtRemarks").val();
+    const response = await $.ajax({
+        url: `${appBaseURL}/api/Master/TimeSheetRemark?Code=${G_Remark_Code}&Remark=${Remarks}`,
+        type: 'POST',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        }
+    });
+
+    if (response[0].Status === 'Y') {
+        toastr.success(response[0].Msg);
+      
+    } else {
+        toastr.error("Unexpected response format.");
+    }
+
+}
+function ClearData() {
+    $("#txtRemarks").val("");
 }
