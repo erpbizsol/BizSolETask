@@ -36,7 +36,6 @@ $(document).ready(async function () {
     });
     
 });
-
 function GetDate() {
     const emp = $('#ddlEmployeeName').val();
     $.ajax({
@@ -59,37 +58,6 @@ function GetDate() {
         }
     });
 }
-
-//function DatePicker() {
-//    const today = new Date();
-//    const defaultDate = formatDateToString(today);
-
-//    $('#txtFromDate').val(defaultDate);
-//    $('#txtFromDate').datepicker({
-//        format: 'dd/mm/yyyy',
-//        autoclose: true,
-//        todayHighlight: true,
-//        endDate: today,
-//        beforeShowDay: function (date) {
-//            const formatted = formatDateToString(date);
-//            if (highlightedDates.includes(formatted)) {
-//                return {
-//                    classes: 'highlighted-date',
-//                    tooltip: 'Data exists'
-//                };
-//            }
-//            return true;
-//        }
-//    }).on('changeDate', function (e) {
-//        const selectedDate = e.date;
-//        const today = new Date();
-//        if (selectedDate > today) {
-//            alert("Future date not allowed..!");
-//            $('#txtFromDate').val(defaultDate);
-//        }
-//    }).datepicker('update', defaultDate);
-//}
-
 function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
