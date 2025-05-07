@@ -36,9 +36,17 @@
             background-color: #FFD700 !important; /* Gold color */
             color: black !important;
         }
+
+        .login-img {
+            background-image: url('./assets/images/p3.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 90vh;
+        }
     </style>
 </head>
-<body>
+<body class="login-img">
 
     <!--toastr-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
@@ -53,10 +61,16 @@
     toastr.success(resdata.Msg);
     toastr.error(resdata.Msg);
     toastr.warning(resdata.Msg); *@
-
-    <div>
+    <section >
+        <div class="container-fluid">
+            <div>
+                @RenderBody()
+            </div>
+        </div>
+    </section>
+    @* <div class="login-img">
         @RenderBody()
-    </div>
+    </div> *@
 </body>
 </html>
 

@@ -19,6 +19,7 @@
 
 #btnValidateCompany, #btnProceed {
     width: 100%;
+    background-color: #0c666e;
 }
 
 .Esms-logo {
@@ -45,9 +46,62 @@
     margin-bottom:20px;
 }
 
+/* Login page design  */
+.login-img {
+    background-image: url('./assets/images/p3.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 90vh;
+}
+
+
+.login-container {
+    color: #ef6c00;
+    border-radius: 10px;
+    /* box-shadow: 0 0 11px 1px #999999; */
+    margin: 0 auto;
+    margin-top: 2rem;
+    font-size: 13px;
+    width: 760px;
+}
+
+.heading-h2 {
+    font-size: 1.6rem;
+    color: #0c666e;
+    font-weight: 600;
+}
+
+.login-card {
+    box-shadow: 0 0 11px 1px #999999;
+}
+
+    .login-form {
+        padding: 11px 15px;
+    }
+
+    .login-sec1 {
+        border-radius: 0 4rem 4rem 0;
+        background: #0c666e;
+        color: #fff;
+    }
+
+    .login-heading {
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+    .login-sec1Row {
+        display: flex;
+        justify-content: center; /* Horizontal centering */
+        align-items: center; /* Vertical centering */
+        text-align: center;
+        height: 70vh;
+    }
+
 </style>
 
-<div class="login-containers card">
+@* <div class="login-containers card">
     <div class="modal-header">
         <h4 class="modal-title center text-bold">
             <img style="height: 40px; vertical-align: bottom" src="~/assets/images/bizsol-logo-small.gif" />
@@ -90,16 +144,16 @@
                 <input id="txtForgetCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" autocomplete="off" maxlength="15">
                 <input id="hfOtp" class="login-test-field form-control login-form-text" type="hidden" required autocomplete="off">
             </div>
-                <div class="mt-2" id="txtU">
+            <div class="mt-2" id="txtU">
                 <input id="txtForgetUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="text" maxlength="15" autocomplete="off">
-                </div>
-                <div class="mt-2" id="dvOTP" style="display:none">
+            </div>
+            <div class="mt-2" id="dvOTP" style="display:none">
                 <input id="txtOtp" class="login-test-field form-control login-form-text" placeholder="Enter OTP" type="text" maxlength="4" autocomplete="off">
+            </div>
+            <div class="row">
+                <div class="col-sm-6 mt-1">
+                    <span style="color:blue;font-size:12px;cursor:pointer;" id="btnBack">GO TO BACK ?</span>
                 </div>
-                <div class="row">
-                    <div class="col-sm-6 mt-1">
-                        <span style="color:blue;font-size:12px;cursor:pointer;" id="btnBack">GO TO BACK ?</span>
-                    </div>
                 <div class="col-sm-6 text-right">
                     <div id="dvAfterGetOtp" style="display:none;">
                         <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnSubmit" value="Submit" />
@@ -110,11 +164,100 @@
                     </div>
                 </div>
                 <level id="txtMsg" style="color:red"></level>
+            </div>
+        </div>
+    </form>
+</div> *@
+
+<div class="container-fluid login-container">
+    <div class="card login-card">
+        <div class="row">
+            <div class="col-md-6 login-sec1">
+                <div class="row login-sec1Row">
+                    <div class="col-md-12">
+                        <div class="loginForm-logo mb-3">
+                            <img style="height: 100px; vertical-align: bottom" src="~/assets/images/e-task.png" />
+                        </div>
+                        <div>
+                            <h2 class="login-heading">Welcome to <span>BizSol e-Task</span></h2>
+                            <p>
+                                Your Smart Task Manager is Just a Step Away !
+                                <br />
+                                Enter your details to get started.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-    </form>
-</div>
+            <div class="col-md-6">
+                <form class="login-form">
+                   <div class="row">
+                       <div class="col-md-12">
+                           <h2 class="heading-h2">Login</h2>
+                       </div>
+                        <div class="col-md-12">
+                            <label for="txtCompanyCode" class="form-label login-form-text">User Login</label>
+                            <input id="txtCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" maxlength="15" autocomplete="off">
+                        </div>
+                        <div class="col-md-12" id="txtU">
+                            <input id="txtUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="text" maxlength="15" autocomplete="off">
+                        </div>
+                        <div class="col-md-12" id="txtP">
+                            <input id="txtPassword" name="Password" class="login-test-field form-control login-form-text" placeholder="Enter Password" autocomplete="off" type="password" maxlength="15">
+                        </div>
 
+                        <div class="col-md-12" style="color: #0c666e">
+                            <input type="checkbox" id="chkIsRememberMe" checked="checked" />
+                            Remember Me ?
+                        </div>
+                        <div class="col-md-12">
+                            <input type="button" class="login-test-field btn btn-primary login-form-text mt-3" id="btnProceed" value="Login" />
+                        </div>
+                        <div class="col-sm-12 text-right">
+                            <a><span id="forgotpassword" style="cursor: pointer; color: #0c666e;">Forgot Password ?</span></a>
+                        </div>
+                   </div>
+
+                    <div class="row" id="dvForgetPassword" style="display:none">
+                        <div class="col-md-12">
+                            <label for="txtForgetCompanyCode" class="form-label login-form-text">User Login</label>
+                            <input id="txtForgetCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text"
+                                   placeholder="Enter Company Code" type="text" autocomplete="off" maxlength="15">
+                            <input id="hfOtp" class="login-test-field form-control login-form-text" type="hidden" required
+                                   autocomplete="off">
+                        </div>
+                        <div class="col-md-12" id="txtU">
+                            <input id="txtForgetUserID" name="UserID" class="login-test-field form-control login-form-text"
+                                   placeholder="Enter User ID" type="text" maxlength="15" autocomplete="off">
+                        </div>
+                        <div class="col-md-12" id="dvOTP" style="display:none">
+                            <input id="txtOtp" class="login-test-field form-control login-form-text" placeholder="Enter OTP" type="text"
+                                   maxlength="4" autocomplete="off">
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 mt-1">
+                                <span style="color:blue;font-size:12px;cursor:pointer;" id="btnBack">GO TO BACK ?</span>
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                <div id="dvAfterGetOtp" style="display:none;">
+                                    <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnSubmit"
+                                           value="Submit" />
+                                    <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnGetOtp1"
+                                           value="Re-Send OTP" />
+                                </div>
+                                <div id="dvBeforeGetOtp">
+                                    <input type="button" class="login-test-field btn btn-primary login-form-text" id="btnGetOtp"
+                                           value="GET OTP" />
+                                </div>
+                            </div>
+                            <level id="txtMsg" style="color:red"></level>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
