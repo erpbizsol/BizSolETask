@@ -7,27 +7,123 @@ let G_DepartmentList = [];
 let G_WorkTypeList = [];
 let G_TimeSheetMaster_Code = 0;
 let G_Remark_Code = 0;
+let highlightedDates = []
 $(document).ready(async function () {
+    DatePicker();
     $("#ERPHeading").text("Time Sheet");
     await GetEmployeeMasterList();
     await GetWorkTypeList();
     setupDateInputFormatting();
-    DatePicker();
-    $("#txtFromDate,#ddlEmployeeName").on("change", function () {
+    if (UserTypes === "A") {
+        $("#ddlEmployeeName").prop('disabled', false);
+    } else {
+        $("#ddlEmployeeName").prop('disabled', true);
+    }
+    $('#ddlEmployeeName').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtFromDate").focus();
+        }
+    });
+    $("#ddlEmployeeName,#txtFromDate").on("change", function () {
         document.getElementById("footerTotalMinutes").textContent = 0;
         document.getElementById("footerTotalMinutes1").textContent = 0;
         document.getElementById("footerTotalMinutes2").textContent = 0;
         GetEmpDateList();
         ClearData();
-    }); 
-    if (UserTypes === "A") {
-        $("#ddlEmployeeName").prop('disabled', false);
-    } else {
-        $("#ddlEmployeeName").prop('disabled', true);  
-    }
-
-
+    });
+    $("#ddlEmployeeName").on("change", function () {
+        GetDate();
+    });
+    
 });
+
+function GetDate() {
+    const emp = $('#ddlEmployeeName').val();
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetDate?EmployeeName=${emp}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                const dateArray = response.map(item => item.EntryDate);
+                const formattedDates = dateArray;
+                highlightedDates = formattedDates;
+                $('#txtFromDate').datepicker('refresh');
+               
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+}
+
+//function DatePicker() {
+//    const today = new Date();
+//    const defaultDate = formatDateToString(today);
+
+//    $('#txtFromDate').val(defaultDate);
+//    $('#txtFromDate').datepicker({
+//        format: 'dd/mm/yyyy',
+//        autoclose: true,
+//        todayHighlight: true,
+//        endDate: today,
+//        beforeShowDay: function (date) {
+//            const formatted = formatDateToString(date);
+//            if (highlightedDates.includes(formatted)) {
+//                return {
+//                    classes: 'highlighted-date',
+//                    tooltip: 'Data exists'
+//                };
+//            }
+//            return true;
+//        }
+//    }).on('changeDate', function (e) {
+//        const selectedDate = e.date;
+//        const today = new Date();
+//        if (selectedDate > today) {
+//            alert("Future date not allowed..!");
+//            $('#txtFromDate').val(defaultDate);
+//        }
+//    }).datepicker('update', defaultDate);
+//}
+
+function DatePicker() {
+    const today = new Date();
+    const defaultDate = formatDateToString(today);
+
+    $('#txtFromDate').val(defaultDate);
+    $('#txtFromDate').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true,
+        endDate: today,
+        beforeShowDay: function (date) {
+            const formatted = formatDateToString(date);
+            if (highlightedDates.includes(formatted)) {
+                return {
+                    classes: 'highlighted-date',
+                    tooltip: 'Data exists'
+                };
+            }
+            return true;
+        }
+    }).on('changeDate', function (e) {
+        const selectedDate = e.date;
+        const now = new Date();
+
+        // Reset time to 00:00:00 for comparison
+        selectedDate.setHours(0, 0, 0, 0);
+        now.setHours(0, 0, 0, 0);
+
+        if (selectedDate > now) {
+            alert("Future date not allowed!");
+            $('#txtFromDate').datepicker('update', defaultDate);
+        }
+    });
+}
 function GetEmployeeMasterList() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
@@ -107,17 +203,6 @@ function GetWorkTypeList() {
             $('.txtddlWorkType').html('<option value="0">Error loading data</option>');
         }
     });
-}
-function DatePicker(date) {
-    const today = new Date();
-    const defaultDate = date || formatDateToString(today);
-
-    $('#txtFromDate').val(defaultDate);
-    $('#txtFromDate').datepicker({
-        format: 'dd/mm/yyyy',
-        autoclose: true,
-        todayHighlight: true
-    }).datepicker('update', defaultDate);
 }
 function formatDateToString(dateObj) {
     const day = String(dateObj.getDate()).padStart(2, '0');
@@ -260,7 +345,7 @@ async function GetEmpDateList() {
                 "Remarks": 'left;width: 300px',
                 "Action": 'center;width: 100px',
             };
-
+  
             const updatedResponse = result.map(item => ({
                 ...item,
                 "Department": `
@@ -277,7 +362,7 @@ async function GetEmpDateList() {
             }));
             $("#txtRemarks").val(result[0].Remarks1)
             G_TimeSheetMaster_Code = result[0].TimeSheetMaster_Code;
-
+           
             const totalMinutes = result.reduce((sum, item) => sum + (parseInt(item["Time in Minutes"]) || 0), 0);
             document.getElementById("footerTotalMinutes").textContent = totalMinutes;
 
@@ -315,6 +400,7 @@ async function GetEmpDateList() {
             GetDepartmentTable(result);
             GetWorktypeTable(result);
             G_Remark_Code = result[0].TimeSheetMaster_Code;
+        
         } else {
             await GetDepartmentList(emp);
             addNewRow();
@@ -503,7 +589,7 @@ function SaveData(Code) {
                     GetEmpDateList();
                 }
                 else {
-                    toastr.error(response.Msg);
+                    toastr.error(response[0].Msg);
                 }
             },
             error: function (xhr) {
