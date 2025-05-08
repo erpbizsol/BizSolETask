@@ -3,16 +3,13 @@ var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
-let AttachmentDetail = [{
-    CallTicketMaster_Code: [],
-    attachment: [],
-    attachmentFileName: [],
+const fileInput = document.getElementById('txtAttachment');
 
+let AttachmentDetail = [{
+    CallTicketMaster_Code: 0,
+    attachment: [],
+    attachmentFileName: ".png",
 }];
-//let Assigned;
-//let ProjectClient;
-//let WorkType;
-//let TaskType;
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
     $(".Number").keyup(function (e) {
@@ -27,9 +24,8 @@ $(document).ready(async function () {
     await GetAssigneds();
     $("#txtTaskType").change(function () {
         var selectedValue = $(this).val();
-        if (selectedValue === "Fresh") {
+        if (selectedValue === "1") {
             $("#txtTaskNoDiv").hide();
-
         } else {
             $("#txtTaskNoDiv").show();
         }
@@ -46,16 +42,8 @@ function GetTicketType() {
         success: function (response) {
             const $select = $('#txtTaskType');
             $select.empty();
-            if (response && response.length > 0) {
-                $.each(response, function (index, item) {
-                    $select.append(new Option(item.TicketType, item.TicketType));
-                });
-            }
-            $select.select2({
-                width: '100%',
-                closeOnSelect: false,
-                placeholder: "Select Ticket Type..",
-                allowClear: true
+            $.each(response, function (index, item) {
+                $select.append(`<option value="${item.Code}">${item.TicketType}</option>`);
             });
         },
         error: function (xhr, status, error) {
@@ -103,17 +91,9 @@ function GetPriorityDetails() {
         success: function (response) {
             const $select = $('#txtPriority');
             $select.empty();
-            if (response && response.length > 0) {
-                $select.append(new Option("Select Priority...", true, true));
-                $.each(response, function (index, item) {
-                    $select.append(new Option(item.Priority, item.Code));
-                });
-            }
-            $select.select2({
-                width: '100%',
-                closeOnSelect: false,
-                placeholder: "Select Priority...",
-                allowClear: true
+            $select.append('<option value="">Select Priority</option>');
+            $.each(response, function (index, item) {
+                $select.append(`<option value="${item.Code}">${item.Priority}</option>`);
             });
         },
         error: function (xhr, status, error) {
@@ -152,9 +132,9 @@ function GetClientMasterDetails() {
             if (response && response.length > 0) {
                 $select.append(new Option("Select Project Client..", true, true));
                 $.each(response, function (index, item) {
-                    $select.append(new Option(item.ClientName, item.Code));
+                    $select.append(`<option value="${item.Code}">${item.ClientName}</option>`);
+                   // $select.append(new Option(item.ClientName, item.Code));
                 });
-
             }
             $select.select2({
                 width: '100%',
@@ -229,6 +209,33 @@ function GetAssigneds() {
         }
     });
 }
+
+$("#txtAttachment").on('change', (event) => {
+    const files = event.target.files;
+    if (files.length > 0) {
+        const fileName = files[0].name;
+        console.log('File name:', fileName);
+    }
+});
+$('#txtAttachment').bind('change', function () {
+    //let fileName = document.getElementById('txtAttachment').files[0].name;
+    $.each($('#txtAttachment')[0].files, function (key, file) {
+
+        // If file size > 500kB, resize such that width <= 1000, quality = 0.9
+        OptimizeImage.reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
+
+            ConvertFileToByteArry(blob).then(function (ByteArray) {
+                AttachmentDetail.push({
+                    CallTicketMaster_Code: 0,
+                    attachment: ByteArray,
+                    attachmentFileName: [],
+                });
+            });
+
+        });
+
+    });
+});
 function ConvertFileToByteArry(File) {
     return new Promise(function (resolve, reject) {
         var fileByteArray = [];
@@ -247,25 +254,10 @@ function ConvertFileToByteArry(File) {
         }
     });
 }
-$('#txtAttachment').bind('change', function () {
-
-    // If file size > 500kB, resize such that width <= 1000, quality = 0.9
-    OptimizeImage.reduceFileSize($('#txtAttachment')[0].files[0], 500 * 1024, 1000, Infinity, 0.9, blob => {
-
-        ConvertFileToByteArry(blob).then(function (ByteArray) {
-            GateEntryImageDetail.push({
-                imgVehicle: ByteArray,
-                imgMaterial: [],
-                imgDoc: [],
-                ImgOther: []
-            });
-        });
-    });
-});
 function SaveData() {
     let Code = $("#hftxtCode").val();
     let TaskType = $("#txtTaskType").val();
-    let UID = $("#txtTaskNo").val();
+    let TicketNo = $("#txtTaskNo").val();
     let Priority = $("#txtPriority").val();
     let LogDate = $("#txtLogDate").val();
     let ProjectClient = $("#txtProjectClient").val();
@@ -301,7 +293,7 @@ function SaveData() {
                 {
                     code: Code,
                     ticketTypeMaster_Code: TaskType,
-                    uid: UID,
+                    TicketNo: TicketNo,
                     employeeMaster_Code: 0,
                     priorityMaster_Code: Priority,
                     logDate: LogDate,
@@ -318,10 +310,9 @@ function SaveData() {
                     commonColumn: 'A',
                     status: 'P',
                     userMaster_Code: UserMaster_Code,
-
                 }
             ],
-            attachmentDetail: AttachmentDetail
+            Attachment: AttachmentDetail
         };
         $.ajax({
             url: `${appBaseURL}/api/Master/SaveGenerateTaskTicket`,
