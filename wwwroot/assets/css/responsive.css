@@ -19,7 +19,9 @@
         width: 100% !important;
     }
 
-   
+    .login-img {
+        background-image: none !important;
+    }
 }
 
 @media (min-width: 1025px) and (max-width: 1280px) {

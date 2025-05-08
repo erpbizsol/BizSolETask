@@ -92,13 +92,21 @@
     }
 
     .login-sec1Row {
-        display: flex;
-        justify-content: center; /* Horizontal centering */
-        align-items: center; /* Vertical centering */
+       /*  display: flex;
+        justify-content: center; 
+        align-items: center; 
         text-align: center;
-        height: 70vh;
+        height: 70vh; */
     }
 
+    .login-sec1COL {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        justify-content: center;
+        text-align: center;
+    }
 </style>
 
 @* <div class="login-containers card">
@@ -172,9 +180,9 @@
 <div class="container-fluid login-container">
     <div class="card login-card">
         <div class="row">
-            <div class="col-md-6 login-sec1">
+            <div class="col-md-6 col-sm-6 col-6 login-sec1">
                 <div class="row login-sec1Row">
-                    <div class="col-md-12">
+                    <div class="col-md-12 login-sec1COL">
                         <div class="loginForm-logo mb-3">
                             <img style="height: 100px; vertical-align: bottom" src="~/assets/images/e-task.png" />
                         </div>
@@ -189,7 +197,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6  col-sm-6 col-6">
                 <form class="login-form">
                    <div class="row">
                        <div class="col-md-12">
@@ -200,7 +208,7 @@
                             <input id="txtCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" maxlength="15" autocomplete="off">
                         </div>
                         <div class="col-md-12" id="txtU">
-                            <input id="txtUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="text" maxlength="15" autocomplete="off">
+                            <input id="txtUserID" name="UserID" class="login-test-field form-control login-form-text" placeholder="Enter User ID" type="password" maxlength="15" autocomplete="off">
                         </div>
                         <div class="col-md-12" id="txtP">
                             <input id="txtPassword" name="Password" class="login-test-field form-control login-form-text" placeholder="Enter Password" autocomplete="off" type="password" maxlength="15">
