@@ -5933,6 +5933,7 @@ table, th, td, tr {
     background-color: #0c666e;
     /*background-image: linear-gradient(#0b6873, #0da9b7);*/
     color: #fff;
+    border: 1px solid #ddd;
 }
 
 .fa-solid {

@@ -60,6 +60,10 @@
     #txtCreatepage .table {
         width: 250% !important;
     }
+
+    .without-label-field {
+        margin-top: 0.2rem !important;
+    }
 }
 
 @media (min-width: 320px) and (max-width:  480px) {
@@ -70,8 +74,11 @@
     #txtCreatepage .table {
         width: 310% !important;
     }
-}
 
+    .without-label-field {
+        margin-top: 0.2rem !important;
+    }
+}
 
 
 
@@ -89,9 +96,6 @@
         font-size: 11px !important;
     }
 
-   /* #txtCreatepage .table {
-        width: 200% !important;
-    }*/
 }
 
 /* End Overlay styles */
