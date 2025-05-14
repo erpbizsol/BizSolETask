@@ -7,7 +7,7 @@ let G_DepartmentList = [];
 let G_WorkTypeList = [];
 let G_TimeSheetMaster_Code = 0;
 let G_Remark_Code = 0;
-let highlightedDates = []
+let highlightedDates = [];
 $(document).ready(async function () {
     DatePicker();
     $("#ERPHeading").text("Time Sheet");
@@ -110,8 +110,15 @@ function GetEmployeeMasterList() {
                 $('#ddlEmployeeName').select2({
                     width: '-webkit-fill-available'
                 });
-                SelectOptionByText('ddlEmployeeName',UserName);
-          
+                SelectOptionByText('ddlEmployeeName', UserName);
+               let selectedCode = $('#ddlEmployeeName').val();
+                if (UserTypes !== "A") {
+                    GetDepartmentList(selectedCode);
+                    GetEmpDateList();
+                   // BindSelect2(`txtddlDipartment_${item.Code}`, G_DepartmentList);
+                   // $(`#txtddlDipartment_${item.Code}`).val(item.ClientMaster_Code).select2({ width: '100%' });
+                }
+               
             } else {
                 $('#ddlEmployeeName').empty();
             }
@@ -266,7 +273,7 @@ function addNewRow() {
         id="txtddlWorkType_0" autocomplete="off" maxlength="50"> </select></td>
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
         <td style="text-align:center;">
-            <button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData(0)"><i class="fas fa-save"></i></button>
+            <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData(0)"><i class="fas fa-save"></i></button>
             <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete"><i class="fa-solid fa-trash"></i></button>
         </td>`;
     tableBody.appendChild(newRow);
@@ -325,7 +332,7 @@ async function GetEmpDateList() {
                 "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off" maxlength="50"></select>`,
                 "Remarks": `<input type="text" autocomplete="off" id="txtRemarks1_${item.Code}" class="txtRemarks1 form-control form-control-sm box_border" value="${item.Remarks || ''}"/>`,
                 "Action": `
-                    <button class="btn btn-success icon-height mb-1" title="Edit" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
+                    <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
                     <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}','${item.TimeSheetMaster_Code}')"><i class="fa-solid fa-trash"></i></button>`
             }));
             $("#txtRemarks").val(result[0].Remarks1)
@@ -425,27 +432,38 @@ function BindSelect2(elementId, list) {
 $(document).on("change", "[id^='txtfromHr_'], [id^='txttoHr_']", function () {
     const code = this.id.split("_")[1];
     calculateTimeDifference(code);
+    calculateTimeDifference1(code);
 
 });
-function calculateTimeDifference(code) {
+function calculateTimeDifference1(code) {
     const fromHr = $("#txtfromHr_" + code).val() || "00:00";
     const toHr = $("#txttoHr_" + code).val() || "00:00";
-    const [fh, fm] = fromHr.split(":").map(Number);
-    const [th, tm] = toHr.split(":").map(Number);
 
-    const fromMinutes = fh * 60 + fm;
-    const toMinutes = th * 60 + tm;
-    
-    if (toMinutes < fromMinutes) {
-        toastr.warning("To Hr must be greater than From Hr or Equal !");
+    if (fromHr === toHr) {
+        toastr.warning("From Hr and To Hr cannot be the same.");
         $("#txttimeInMinutes_" + code).val("");
         return;
     }
-    // prevent negative
+
+}
+function calculateTimeDifference(code) {
+    const fromHr = $("#txtfromHr_" + code).val() || "00:00";
+    const toHr = $("#txttoHr_" + code).val() || "00:00";
+
+   
+    const [fh, fm] = fromHr.split(":").map(Number);
+    const [th, tm] = toHr.split(":").map(Number);
+    const fromMinutes = fh * 60 + fm;
+    const toMinutes = th * 60 + tm;
+
+    if (toMinutes < fromMinutes) {
+        toastr.warning("To Hr must be greater than From Hr or Equal!");
+        $("#txttimeInMinutes_" + code).val("");
+        return;
+    }
+   
     const diff = Math.max(0, toMinutes - fromMinutes);
-
     $("#txttimeInMinutes_" + code).val(diff);
-
 }
 function updateTotalMinutes() {
     let total = 0;

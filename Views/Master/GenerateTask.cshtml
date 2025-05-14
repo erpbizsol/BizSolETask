@@ -122,8 +122,8 @@
                             <input type="text" id="txtLogDate" name="txtLogDate" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Log Date.." maxlength="15">
                         </div>
                        
-                    </div>
-                    <div class="row">
+                  
+                    
                         <div class="col-md-3 col-sm-6">
                             <label for="txtProjectClient" class="col-form-label-sm fw-bold">Project / Client </label>
                             <select id="txtProjectClient" name="txtProjectClient" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Project / Client..." maxlength="10">
@@ -139,14 +139,13 @@
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <label for="txtDescription" class="col-form-label-sm fw-bold">Description</label>
-                            <input type="text" id="txtDescription" name="txtDescription" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Description.." maxlength="15">
+                            <input type="text" id="txtDescription" name="txtDescription" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Description.." maxlength="500">
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <label for="txtAttachment" class="col-form-label-sm fw-bold">Attachment</label>
                             <input type="file" id="txtAttachment" name="txtAttachment" autocomplete="off" class="form-control form-control-sm box_border" accept=".jpg, .png, .jpeg" multiple>
                         </div>
-                    </div>
-                    <div class="row">
+                   
                      
                         <div class="col-md-3 col-sm-6">
                             <label for="txtAssigned" class="col-form-label-sm fw-bold">Assigned</label>
@@ -164,7 +163,7 @@
                             <input type="text" id="txtEstimatedTime" name="txtEstimatedTime" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Estimated Time.." maxlength="15">
                         </div>
                         <div class="col-md-3 col-sm-6" style="margin-top: 30px;">
-                            <button type="button" class="btn btn-primary btn-height" title="Show" onclick="SaveData()">Sumbit</button>
+                            <button type="button" class="btn btn-primary btn-height" title="Show" onclick="SaveData()" style="background:#216c4a">Save</button>
                         </div>
                     </div>
                 </div>
@@ -172,6 +171,55 @@
         </div>
         <div class="summary-section p-2">
             <div class="summary-title">Task Records</div>
+            <div class="row">
+                <div class="col s4 m4">
+                    <strong>User</strong>
+                    <div class="col s6 m4">
+                        <label>
+                            <input type="radio" name="ticktOrder" class="with-gap" checked="checked" value="UsWise" />
+                            <span class="font-size1-3rem">User wise </span>
+                        </label>
+                        <label>
+                            <input type="radio" name="ticktOrder" class="with-gap" value="allUser" />
+                            <span class="font-size1-3rem">All User </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col s4 m4">
+                    <strong>Status</strong>
+                    <div class="col s6 m4">
+                        <label>
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" checked="checked" value="P" />
+                            <span class="font-size1-3rem">Pending</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="PR" />
+                            <span class="font-size1-3rem">Re-Assigned </span>
+                        </label>
+
+                    </div>
+                </div>
+                <div class="col s4">
+                  <label></label>
+                    <div class="col s6 m4">
+                    <label>
+                        <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" />
+                        <span class="font-size1-3rem">Completed </span>
+                    </label>
+                    <label>
+                        <input type="radio" name="ticktOrderStatus" class="with-gap" value="LC" />
+                        <span class="font-size1-3rem">Last 30 day Completed </span>
+                    </label>
+
+                    <label>
+                        <input type="radio" name="ticktOrderStatus" class="with-gap" value="A" />
+                        <span class="font-size1-3rem">All  </span>
+                    </label>
+                    <input id="hfDataattach" type="hidden" value="" />
+                    </div>
+                </div>
+            </div>
             <div class="row" id="txtSummary">
                 <div class="col-sm-12">
                     <div class="table-wrapper" style="overflow: auto;">
