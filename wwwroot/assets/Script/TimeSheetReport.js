@@ -5,57 +5,43 @@ let UserTypes = authKeyData.UserType;
 let G_ReportType = "";
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
-    $("#ERPHeading").text("Time Sheet Report");
-    $('#txtFromDate').on('keydown', function (e) {
-        if (e.key === "Enter") {
-            $("#txtToDate").focus();
-        }
-    });
-    $('#txtToDate').on('keydown', function (e) {
-        if (e.key === "Enter") {
-            $("#ddlEmployeeName").focus();
-        }
-    });
-    $('#ddlEmployeeName').on('keydown', function (e) {
-        alert(e.key)
-        if (e.key === "Enter") {
-            $("#ddlWorkType").focus();
-        }
-    });
-    $('#ddlWorkType').on('keydown', function (e) {
-        if (e.key === "Enter") {
-            $("#ddlClientName").focus();
-        }
-    });
-    $('#ddlClientName').on('keydown', function (e) {
-        if (e.key === "Enter") {
-            $("#ddlReportType").focus();
-        }
-    });
-    $('#ddlReportType').on('keydown', function (e) {
-        if (e.key === "Enter") {
-            $("#txtShow").focus();
-        }
-    });
     DatePicker();
     GetEmployeeMasterList();
     GetWorkTypeList();
     GetClientList();
-    $("#txtShow").click(async function () {
-        var reportType = $("#ddlReportType").val();
-
-        if (reportType === "Default") {
-            await GetTimeSheetReport();
-            await GetClientType();
-            await GetWorkType();
-            await GetEmployeeType();
-            $("#txtSummary").show();
-        } else {
-            await GetTimeSheetReport();
-            $("#txtSummary").hide();
+    $("#ERPHeading").text("Time Sheet Report");
+    $("#txtFromDate").on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtToDate").focus();
         }
-
     });
+    $("#txtToDate").on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#ddlWorkType").focus();
+        }
+    });
+    //$("#ddlEmployeeName").on('keydown', function (e) {
+    //    alert(e.key)
+    //    if (e.key === "Enter") {
+    //        $("#ddlWorkType").focus();
+    //    }
+    //});
+    $("#ddlWorkType").on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#ddlClientName").focus();
+        }
+    });
+    $("#ddlClientName").on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#ddlReportType").focus();
+        }
+    });
+    $("#ddlReportType").on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtShow").focus();
+        }
+    });
+   
     if (UserTypes === "A") {
         $("#ddlEmployeeName").prop('disabled', false);
 
@@ -63,6 +49,21 @@ $(document).ready(function () {
         $("#ddlEmployeeName").prop('disabled', true);
         SelectOptionByText('ddlEmployeeName', UserName);
     }
+});
+$("#txtShow").click(async function () {
+    var reportType = $("#ddlReportType").val();
+
+    if (reportType === "Default") {
+        await GetTimeSheetReport();
+        await GetClientType();
+        await GetWorkType();
+        await GetEmployeeType();
+        $("#txtSummary").show();
+    } else {
+        await GetTimeSheetReport();
+        $("#txtSummary").hide();
+    }
+
 });
 function DatePicker() {
     const today = new Date();
