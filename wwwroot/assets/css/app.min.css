@@ -6367,3 +6367,83 @@ th, .filter-table-heading {
 .btn-width-100px {
     width: 100px;
 }
+
+/*LOGIN PAGE
+*/
+
+
+#btnValidateCompany, #btnProceed {
+    width: 100%;
+    background-color: #0c666e;
+}
+
+.login-form-text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+}
+
+.login-test-field {
+    padding: 4px .75rem 0.59rem .75rem;
+    margin-bottom: 20px;
+}
+
+/* Login page design  */
+.login-img {
+    background-image: url('./assets/images/p3.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 90vh;
+}
+
+.login-container {
+    color: #ef6c00;
+    border-radius: 10px;
+    margin: 0 auto;
+    margin-top: 2rem;
+    font-size: 13px;
+      width: 70%; 
+}
+
+.heading-icon {
+    display: none;
+}
+
+.heading-h2 {
+    font-size: 1.6rem;
+    color: #0c666e;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.login-card {
+    box-shadow: 0 0 11px 1px #999999;
+    border-radius: 15px;
+}
+
+.login-form {
+    padding: 11px 15px;
+}
+
+.login-sec1 {
+    border-radius: 0 4rem 4rem 0;
+    background: #0c666e;
+    color: #fff;
+}
+
+.login-heading {
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.login-sec1COL {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    justify-content: center;
+    text-align: center;
+}
+
+/* End Login page design  */
