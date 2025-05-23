@@ -22,6 +22,10 @@
     .login-img {
         background-image: none !important;
     }
+
+    .login-container {
+        width: 100%;
+    }
 }
 
 @media (min-width: 1025px) and (max-width: 1280px) {
@@ -32,7 +36,7 @@
 
 @media (min-width: 768px) and (max-width: 1024px) {
 
-    
+  
 
 }
 
@@ -41,7 +45,8 @@
  /*   #txtCreatepage .table {
         width: 310% !important;
     }*/
-
+ 
+    
 }
 
 @media (min-width: 481px) and (max-width: 767px) {
@@ -57,6 +62,7 @@
     .navbar-header .font-size-13 {
         font-size: 12px !important;
     }
+
     #txtCreatepage .table {
         width: 250% !important;
     }
@@ -64,9 +70,30 @@
     .without-label-field {
         margin-top: 0.2rem !important;
     }
+
+    .login-sec1 {
+        display: none !important;
+    }
+
+    .circle-icon {
+        border: 4px solid;
+        padding: 10px;
+        font-size: 2rem;
+        border-radius: 50px;
+        color: #0c666e;
+        background-color: #fffbff;
+    }
+
+    .heading-icon {
+        display: block;
+    }
+
+    .heading-h2 {
+        font-size: 1.5rem;
+    }
 }
 
-@media (min-width: 320px) and (max-width:  480px) {
+@media (min-width: 320px) and (max-width: 480px) {
     .navbar-header .font-size-13 {
         font-size: 12px!important;
     }
@@ -78,12 +105,32 @@
     .without-label-field {
         margin-top: 0.2rem !important;
     }
+
+    .login-sec1 {
+        display: none !important;
+    }
+
+    .circle-icon {
+        border: 4px solid;
+        padding: 10px;
+        font-size: 2rem;
+        border-radius: 50px;
+        color: #0c666e;
+        background-color: #fffbff;
+    }
+
+    .heading-icon {
+        display: block;
+    }
+
+    .heading-h2 {
+        font-size: 1.5rem;
+    }
 }
 
 
 
 /* Overlay styles */
-
 @media (max-width: 991.98px) {
     .sidebar-overlay-b {
         display: block !important;
@@ -92,9 +139,17 @@
     .sidebar-overlay-n {
         display: none;
     }
+
     .navbar-header .font-size-13 {
         font-size: 11px !important;
     }
+
+    login-sec1 {
+        display: none !important;
+    }
+    /*.login-sec1 {
+        display: none !important;
+    }*/
 
 }
 

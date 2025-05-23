@@ -3,6 +3,9 @@
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="~/assets/script/login.js"></script>
+<!-- App Css-->
+<link href="~/assets/css/app.min.css" rel="stylesheet" />
+<link href="~/assets/css/responsive.css" rel="stylesheet" />
 
 <title>Login ESMS</title>
 <style>
@@ -30,76 +33,7 @@
     height: 50px;
 } */
 
-
-#btnValidateCompany, #btnProceed {
-    width: 100%;
-    background-color: #0c666e;
-}
-
-.login-form-text {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    font-size: 1rem !important;
-    font-weight: 400 !important;
-}
-
-.login-test-field {
-    padding: 4px .75rem 0.59rem .75rem;
-    margin-bottom:20px;
-}
-
-/* Login page design  */
-.login-img {
-    background-image: url('./assets/images/p3.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 90vh;
-}
-
-
-.login-container {
-    color: #ef6c00;
-    border-radius: 10px;
-    /* box-shadow: 0 0 11px 1px #999999; */
-    margin: 0 auto;
-    margin-top: 2rem;
-    font-size: 13px;
-    width: 760px;
-}
-
-.heading-h2 {
-    font-size: 1.6rem;
-    color: #0c666e;
-    font-weight: 600;
-}
-
-.login-card {
-    box-shadow: 0 0 11px 1px #999999;
-}
-
-    .login-form {
-        padding: 11px 15px;
-    }
-
-    .login-sec1 {
-        border-radius: 0 4rem 4rem 0;
-        background: #0c666e;
-        color: #fff;
-    }
-
-    .login-heading {
-        color: #fff;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    }
-
-    .login-sec1COL {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        justify-content: center;
-        text-align: center;
-    }
+   
 </style>
 
 @* <div class="login-containers card">
@@ -174,28 +108,27 @@
     <div class="card login-card">
         <div class="row">
             <div class="col-md-6 col-sm-6 col-6 login-sec1">
-                <div class="row">
-                    <div class="col-md-12 login-sec1COL">
-                        <div class="loginForm-logo mb-3">
-                            <img style="height: 100px; vertical-align: bottom" src="~/assets/images/e-task.png" />
-                        </div>
-                        <div>
-                            <h2 class="login-heading">Welcome to <span>BizSol e-Task</span></h2>
-                            <p>
-                                Your Smart Task Manager is Just a Step Away !
-                                <br />
-                                Enter your details to get started.
-                            </p>
-                        </div>
+                <div class="col-md-12 login-sec1COL">
+                    <div class="loginForm-logo mb-3">
+                        <img style="height: 100px; vertical-align: bottom" src="~/assets/images/e-task.png" />
+                    </div>
+                    <div>
+                        <h2 class="login-heading">Welcome to <span>BizSol e-Task</span></h2>
+                        <p>
+                            Your Smart Task Manager is Just a Step Away !
+                            <br />
+                            Enter your details to get started.
+                        </p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6  col-sm-6 col-6">
+            <div class="col-md-6  col-sm-12 col-12">
                 <form class="login-form">
                    <div class="row">
-                       <div class="col-md-12">
-                           <h2 class="heading-h2">Login</h2>
-                       </div>
+                       <div class="col-md-12 text-center">
+                            <div class="heading-icon text-center"><span><i class="fa fa-user-circle circle-icon" aria-hidden="true"></i></span></div>
+                            <h2 class="heading-h2 mt-2"><span>Log in</span></h2>
+                        </div>
                         <div class="col-md-12">
                             <label for="txtCompanyCode" class="form-label login-form-text">User Login</label>
                             <input id="txtCompanyCode" name="CompanyCode" class="login-test-field form-control login-form-text" placeholder="Enter Company Code" type="text" maxlength="15" autocomplete="off">
