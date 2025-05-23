@@ -3,10 +3,10 @@
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link href="~/assets/css/filter.css" rel="stylesheet" />
-@* <script src="~/assets/script/generatetask.js"></script> *@
 <!-- Bootstrap Datepicker JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 <script src="~/assets/js/xlsx.full.min.js"></script>
+
 <style>
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #ede8e8 !important;
@@ -37,7 +37,6 @@
         z-index: 10;
         display: block;
     }
-
     .tabs {
         width: 100%;
         max-width: 2000px;
@@ -47,14 +46,14 @@
         padding: 0.7rem;
     }
 
-    .tabs {
+ /*    .tabs {
         width: 100%;
         max-width: 2000px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
         border-radius: 8px;
         overflow: hidden;
         padding: 0.7rem;
-    }
+    } */
 
     th, td {
         border: 1px solid #2e6c7b;
@@ -116,9 +115,9 @@
         padding: 6px 10px;
     }
 
-        .btn-danger i {
-            font-size: 16px;
-        }
+    .btn-danger i {
+        font-size: 16px;
+    }
 
     a {
         text-decoration: none;
@@ -132,7 +131,6 @@
         <div id="attachmentContainer" style="margin-top: 20px;"></div>
         <table class="table table-bordered" id="attachmentIndexTable">
             <thead>
-             
             </thead>
             <tbody>
                 <!-- Filled by JS -->
@@ -148,81 +146,68 @@
 
 <div id="txtCreatepage">
     <div class="card shadow-sm">
-        <div class="tabs">
+         <div class="tabs" id="txtpage" style="display:none">
             <div class="row p-2">
                 <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-3 col-sm-6">
-                            <input  type="hidden" id="hftxtCode" value="0"/>
-                            <label for="txtTaskType" class="col-form-label-sm fw-bold">Task Type</label>
-                            <select id="txtTaskType" name="txtTaskType" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Task Type..." maxlength="10">
-                                
+                            <input type="hidden" id="hftxtCode" value="0" />
+                            <label for="txtStatus" class="col-form-label-sm fw-bold">Status</label>
+                            <select id="txtStatus" name="txtStatus" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Status..." maxlength="10">
+                               
                             </select>
                         </div>
-                        <div class="col-md-3 col-sm-6" id="txtTaskNoDiv" style="display:none">
-                            <label for="txtTaskNo" class="col-form-label-sm fw-bold"> Task No </label>
-                            <select id="txtTaskNo" name="txtTaskNo" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Task No..." maxlength="10">
+                        <div class="col-md-3 col-sm-6" style="display:none" id="txtTotalResolutionM1">
+                        <label for="txtTotalResolutionM" class="col-form-label-sm fw-bold"> Resolution Time (minutes) </label>
+                            <input type ="text" id="txtTotalResolutionM" name="txtTotalResolutionM" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Total Resolution..." maxlength="10">
+                           
+                        </div>
+                        <div class="col-md-3 col-sm-6" style="display:none" id="txtResolutionDate">
+                            <label for="txtResolutionDates" class="col-form-label-sm fw-bold">Resolution Date</label>
+                            <input type="text" id="txtResolutionDates" name="txtResolutionDates" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Resolution Date.." maxlength="15">
+                            
+                        </div>
+  
+                        <div class="col-md-3 col-sm-6" style="display:none" id="txtReAssign1">
+                        <label for="txtReAssign" class="col-form-label-sm fw-bold">Re-Assign</label>
+                            <select id="txtReAssign" name="txtReAssign" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Re-Assign..." maxlength="10">
                             </select>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtPriority" class="col-form-label-sm fw-bold">Priority</label>
-                            <select id="txtPriority" name="txtPriority" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Priority..." maxlength="10">
-                                <option>Select Priority</option>
-                                
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtLogDate" class="col-form-label-sm fw-bold">Log Date</label>
-                            <input type="text" id="txtLogDate" name="txtLogDate" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Log Date.." maxlength="15" disabled>
-                        </div>
-                    
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtProjectClient" class="col-form-label-sm fw-bold">Project / Client </label>
-                            <select id="txtProjectClient" name="txtProjectClient" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Project / Client..." maxlength="10">
 
+                        <div class="col-md-3 col-sm-6" style="display:none" id="txtResolvedBy1">
+                            <label for="txtResolvedBy" class="col-form-label-sm fw-bold">Resolved By </label>
+                            <select id="txtResolvedBy" name="txtResolvedBy" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Resolved By..." maxlength="10">
                             </select>
-                            @* <input type="text" id="txtProjectClient" name="txtProjectClient" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Project / Client.." maxlength="15"> *@
+                          
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtWorkType" class="col-form-label-sm fw-bold">Work Type</label>
-                            <select id="txtWorkType" name="txtWorkType" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Work Type..." maxlength="10">
+                        <div class="col-md-3 col-sm-6" style="display:none" id="txtUpdateBy">
+                         <label for="txtUpdateBy" class="col-form-label-sm fw-bold">Update By</label>
+                            <select id="txtUpdateBy" class="form-control form-control-sm box_border" autocomplete="off">
+                            <option value="0">Please Select</option>
+                            <option value="1">Yes</option>
+                            <option value="2">No</option>
                             </select>
-                            @* <input type="text" id="txtWorkType" name="txtWorkType" autocomplete="off" class="form-control form-control-sm box_border" maxlength="15"> *@
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtDescription" class="col-form-label-sm fw-bold">Description</label>
-                            <input type="text" id="txtDescription" name="txtDescription" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Description.." maxlength="500">
-                        </div>
-                        <div class="col-md-3 col-sm-6">
+                      
+                        <div class="col-md-3 col-sm-6" style="display:none" id="txtAttachment">
                             <label for="txtAttachment" class="col-form-label-sm fw-bold">Attachment</label>
                             <input type="file" id="txtAttachment" name="txtAttachment" autocomplete="off" class="form-control form-control-sm box_border" accept=".jpg, .png, .jpeg" multiple>
                         </div>
-                   
-                     
                         <div class="col-md-3 col-sm-6">
-                            <label for="txtAssigned" class="col-form-label-sm fw-bold">Assigned</label>
-                            @* <input type="text" id="txtAssigned" name="txtAssigned" autocomplete="off" class="form-control form-control-sm box_border" maxlength="15"> *@
-                            <select id="txtAssigned" name="txtAssigned" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Assigned..." maxlength="10">
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtCommittedDate" class="col-form-label-sm fw-bold">Committed Date</label>
-                            <input type="text" id="txtCommittedDate" name="txtCommittedDate" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Committed Date.." maxlength="15">
-                        </div>
-
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtEstimatedTime" class="col-form-label-sm fw-bold">Estimated Time (minutes)</label>
-                            <input type="text" id="txtEstimatedTime" name="txtEstimatedTime" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Estimated Time.." maxlength="15">
+                            <label for="txtRemarks" class="col-form-label-sm fw-bold">Remarks</label>
+                            <input type="text" id="txtRemarks" name="txtRemarks" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Remarks.." maxlength="15">
                         </div>
                         <div class="col-md-3 col-sm-6" style="margin-top: 30px;">
-                            <button type="button" class="btn btn-primary btn-height" title="Show" onclick="SaveData()" style="background:#216c4a">Save</button>
+                            <button type="button" class="btn btn-primary btn-height" title="UPDATE"  style="background:#216c4a">UPDATE</button>
+                            <button type="button" class="btn btn-danger btn-height" id="txtBack" title="Back" style="background:#216c4a">Back</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div> 
+       
         <div class="summary-section p-2">
-            <div class="summary-title">Task Records</div>
+            <div class="summary-title" style="text-align:center">Task Records</div>
             <div class="row">
                 <div class="col s4 m4">
                     <strong>User</strong>
@@ -231,10 +216,21 @@
                             <input type="radio" name="ticktOrder" class="with-gap" checked="checked" value="UsWise" />
                             <span class="font-size1-3rem">User wise </span>
                         </label>
-                        <label>
+                        @{
+                            var employeeType = Context.Session.GetString("EmployeeType");
+                        }
+
+                        @if (employeeType == "A")
+                        {
+                            <label>
+                                <input type="radio" name="ticktOrder" class="with-gap" value="allUser" />
+                                <span>All User</span>
+                            </label>
+                        }
+                     @*    <label>
                             <input type="radio" name="ticktOrder" class="with-gap" value="allUser" />
                             <span class="font-size1-3rem">All User </span>
-                        </label>
+                        </label> *@
                     </div>
                 </div>
 
@@ -253,22 +249,22 @@
                     </div>
                 </div>
                 <div class="col s4">
-                  <label></label>
+                    <label></label>
                     <div class="col s6 m4">
-                    <label>
-                        <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" />
-                        <span class="font-size1-3rem">Completed </span>
-                    </label>
-                    <label>
-                        <input type="radio" name="ticktOrderStatus" class="with-gap" value="LC" />
-                        <span class="font-size1-3rem">Last 30 day Completed </span>
-                    </label>
+                        <label>
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" />
+                            <span class="font-size1-3rem">Completed </span>
+                        </label>
+                        <label>
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="LC" />
+                            <span class="font-size1-3rem">Last 30 day Completed </span>
+                        </label>
 
-                    <label>
-                        <input type="radio" name="ticktOrderStatus" class="with-gap" value="A" />
-                        <span class="font-size1-3rem">All  </span>
-                    </label>
-                    <input id="hfDataattach" type="hidden" value="" />
+                        <label>
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="A" />
+                            <span class="font-size1-3rem">All  </span>
+                        </label>
+                        <input id="hfDataattach" type="hidden" value="" />
                     </div>
                 </div>
             </div>
@@ -276,8 +272,8 @@
                 <div class="col-sm-12">
                     <div class="table-wrapper" style="overflow: auto;">
                         <table id="table" class="table">
-                           <thead id="table-header">
-                           <th>Ticket No</th>
+                            <thead id="table-header">
+                            <th>Ticket No</th>
                             <th>Project / Client</th>
                             <th>Log Date</th>
                             <th>Work Type</th>
@@ -297,4 +293,4 @@
     </div>
 </div>
 <script src="~/assets/js/filter.js"></script>
-<script src="~/assets/script/generatetask.js"></script>
+<script src="~/assets/script/pendingtask.js"></script>

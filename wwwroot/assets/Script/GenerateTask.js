@@ -5,12 +5,12 @@ let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 let IsLoad = true;
 let fileName;
-let AttachmentDetail = [{
-    CallTicketMaster_Code: 0,
-    attachment: [],
-    attachmentFileName: "",
-}];
-
+let AttachmentDetail = [];
+let G_WorkTypeList = [];
+let G_EmployeeNameList = [];
+let G_ProjectList = [];
+let G_TicketTypetList = [];
+let G_PriorityList = [];
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
     $(".Number").keyup(function (e) {
@@ -32,12 +32,15 @@ $(document).ready(async function () {
         }
     });
     $('input[type=radio][name=ticktOrder]').change(function () {
-        GetGenerateTaskTicketDateList();
+        GetGenerateTaskTicketDateList('Load');
     });
     $('input[type=radio][name=ticktOrderStatus]').change(function () {
         GetGenerateTaskTicketDateList(this.value);
 
     });
+       
+        
+  
 });
 function GetTicketType() {
     $.ajax({
@@ -52,7 +55,14 @@ function GetTicketType() {
             $.each(response, function (index, item) {
                 $select.append(`<option value="${item.Code}">${item.TicketType}</option>`);
             });
-            
+            if (Array.isArray(response) && response.length > 0) {
+                G_TicketTypetList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.TicketType
+                }));
+            } else {
+                G_TicketTypetList = [];
+            }
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -104,7 +114,14 @@ function GetPriorityDetails() {
             $.each(response, function (index, item) {
                 $select.append(`<option value="${item.Code}">${item.Priority}</option>`);
             });
-            
+            if (Array.isArray(response) && response.length > 0) {
+                G_PriorityList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.Priority
+                }));
+            } else {
+                G_PriorityList = [];
+            }
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -143,7 +160,7 @@ function GetClientMasterDetails() {
                 $select.append(new Option("Select Project Client..", true, true));
                 $.each(response, function (index, item) {
                     $select.append(`<option value="${item.Code}">${item.ClientName}</option>`);
-                   // $select.append(new Option(item.ClientName, item.Code));
+
                 });
             }
             $select.select2({
@@ -152,6 +169,14 @@ function GetClientMasterDetails() {
                 placeholder: "Select Project Client...",
                 allowClear: true
             });
+            if (Array.isArray(response) && response.length > 0) {
+                G_ProjectList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.ClientName
+                }));
+            } else {
+                G_ProjectList = [];
+            }
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -167,6 +192,14 @@ function GetWorkTypes() {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_WorkTypeList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.WorkType
+                }));
+            } else {
+                G_WorkTypeList = [];
+            }
             const $select = $('#txtWorkType');
             $select.empty();
             if (response && response.length > 0) {
@@ -197,6 +230,14 @@ function GetAssigneds() {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_EmployeeNameList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.EmployeeName
+                }));
+            } else {
+                G_EmployeeNameList = [];
+            }
             const $select = $('#txtAssigned');
             $select.empty();
             if (response && response.length > 0) {
@@ -224,14 +265,11 @@ $("#txtAttachment").on('change', (event) => {
     const files = event.target.files;
     if (files.length > 0) {
         fileName = files[0].name;
-        AttachmentDetail[0].attachmentFileName = fileName;
-        console.log('File name:', fileName);
     }
 });
 $('#txtAttachment').bind('change', function () {
+    
     $.each($('#txtAttachment')[0].files, function (key, file) {
-
-        // If file size > 500kB, resize such that width <= 1000, quality = 0.9
         reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
 
             ConvertFileToByteArry(blob).then(function (ByteArray) {
@@ -381,15 +419,15 @@ function SaveData() {
         toastr.error('Please select Priority.');
         $("#txtPriority").focus();
         return;
-    } else if (ProjectClient == "") {
+    } else if (ProjectClient == "0") {
         toastr.error('Please select Project / Client.');
         $("#txtProjectClient").focus();
         return;
-    } else if (WorkType == "") {
+    } else if (WorkType == "0") {
         toastr.error('Please select Work Type.');
         $("#txtWorkType").focus();
         return;
-    } else if (Assigned == "") {
+    } else if (Assigned == "0") {
         toastr.error('Please select Assigned.');
         $("#txtAssigned").focus();
         return;
@@ -412,7 +450,7 @@ function SaveData() {
                     description: Description,
                     reAssign_Code: Assigned,
                     commitedDate: CommittedDate,
-                    estimatedTime: EstimatedTime,
+                    estimatedTime: EstimatedTime ||0,
                     statusMaster_Code: 1,
                     commonColumn: 'A',
                     status: 'P',
@@ -433,6 +471,8 @@ function SaveData() {
             success: function (response) {
                 if (response[0].Status === "Y") {
                     toastr.success(response[0].Msg);
+                    ClearData();
+                    GetGenerateTaskTicketDateList('Get');
                 }
                 else {
                     toastr.error(response[0].Msg);
@@ -494,14 +534,16 @@ function GetGenerateTaskTicketDateList(Type) {
                     const Button = false;
                     const showButtons = [];
                     const StringdoubleFilterColumn = [];
-                    const hiddenColumns = ["ResolutionTime","Remarks","ResolvedDate","RaisedBy","Module","Source","FirstCheckBy","CommitedDate","ContactNo","Status","EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType","ContactEMail","ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code","EmployeeMaster_Code","Code"];
+                    const hiddenColumns = ["ACode","Attachment","CallTicketMaster_Code","AttachmentFileName","ResolutionTime","Remarks","ResolvedDate","RaisedBy","Module","Source","FirstCheckBy","CommitedDate","ContactNo","Status","EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType","ContactEMail","ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code","EmployeeMaster_Code","Code"];
                     const ColumnAlignment = {
                     };
                     const updatedResponse = response.map(item => ({
-                        ...item, 'Action': `
-                    <button class="btn btn-danger icon-height mb-1" style="background:#2da5ae" title="View" onclick="View('${item.Code}')"><i class="fa-solid fa-eye"></i></button>
+                        ...item, 'Action':
+                           `
+                    <a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
                     <button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`
                     }));
+                   
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
 
                 } else {
@@ -518,8 +560,19 @@ function GetGenerateTaskTicketDateList(Type) {
             }
         });
     }
-  
-   
+}
+function BindSelect2(elementId, list) {
+    let option = '<option value="0">Select</option>';
+    $.each(list, function (key, val) {
+
+        option += '<option value="' + val.Code + '">' + val.Name + '</option>';
+    });
+
+    $('#' + elementId)[0].innerHTML = option;
+
+    $('#' + elementId).select2({
+        width: '100%'
+    });
 }
 function Edit(code) {
     $.ajax({
@@ -533,22 +586,47 @@ function Edit(code) {
                 $("#hftxtCode").val(response[0].Code);
                 $("#txtTaskType").val(response[0].TicketType);
                 $("#txtTaskNo").val(response[0].TicketNo);
-                $("#txtPriority").val(response[0].Priority);
                 $("#txtLogDate").val(response[0].LogDate);
-                $("#txtProjectClient").val(response[0].ClientMaster_Code);
-                $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
                 $("#txtDescription").val(response[0].Description);
-                $("#txtAssigned").val(response[0].EmployeeMaster_Code);
                 $("#txtCommittedDate").val(response[0].CommitedDate);
                 $("#txtEstimatedTime").val(response[0].EstimatedTime);
-                //response.forEach(item => {
-                //    BindSelect2(`#txtPriority_${item.Code}`, G_DepartmentList);
-                //    $(`#txtddlDipartment_${item.Code}`).val(item.ClientMaster_Code).select2({ width: '100%' });
-                //});
-
-                //response.forEach(item => {
-                //    BindSelect2(`txtddlWorkType_${item.Code}`, G_WorkTypeList);
-                //    $(`#txtddlWorkType_${item.Code}`).val(item.WorkTypeMaster_Code).select2({ width: '100%' });
+                $("#txtProjectClient").val(response[0].ProjectClient);
+                $("#txtWorkType").val(response[0].WorkType);
+                $("#txtAssigned").val(response[0].Assigned);
+                $("#txtPriority").val(response[0].Priority);
+                response.forEach(item => {
+                    BindSelect2(`txtProjectClient`, G_ProjectList);
+                    $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
+                });
+                response.forEach(item => {
+                    BindSelect2(`txtWorkType`, G_WorkTypeList);
+                    $(`#txtWorkType`).val(item.WorkTypeMaster_Code).select2({ width: '100%' });
+                });
+                response.forEach(item => {
+                    BindSelect2(`txtAssigned`, G_EmployeeNameList);
+                    $(`#txtAssigned`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
+                });
+                response.forEach(item => {
+                    BindSelect2(`txtTaskType`, G_TicketTypetList);
+                    $(`#txtTaskType`).val(item.TicketTypeMaster_Code).select2({ width: '100%' });
+                });
+                response.forEach(item => {
+                    BindSelect2(`txtPriority`, G_PriorityList);
+                    $(`#txtPriority`).val(item.PriorityMaster_Code).select2({ width: '100%' });
+                });
+                //$('#txtAttachment').off('change').on('change', function () {
+                //    $.each(this.files, function (key, file) {
+                //        const fileName = file.name;
+                //        reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
+                //            ConvertFileToByteArry(blob).then(function (ByteArray) {
+                //                AttachmentDetail.push({
+                //                    CallTicketMaster_Code: 0,
+                //                    attachment: ByteArray,
+                //                    attachmentFileName: fileName,
+                //                });
+                //            });
+                //        });
+                //    });
                 //});
             } else {
                 toastr.error("Record not found...!");
@@ -560,16 +638,154 @@ function Edit(code) {
         }
     });
 }
-//function BindSelect2(elementId, list) {
-//    let option = '<option value="0">Select</option>';
-//    $.each(list, function (key, val) {
+// Attach delete logic (only bind once)
+//$(document).off('click', '.delete-btn').on('click', '.delete-btn', function () {
+//    const fileToDelete = $(this).data('filename');
+//    const codeToDelete = $(this).data('code');
 
-//        option += '<option value="' + val.Code + '">' + val.Name + '</option>';
-//    });
+//    if (confirm(`Are you sure you want to delete ${fileToDelete}?`)) {
+//        $.ajax({
+//            url: `${appBaseURL}/api/Master/DeleteAttachment`,
+//            type: 'POST',
+//            data: JSON.stringify({ Code: codeToDelete, FileName: fileToDelete }),
+//            contentType: 'application/json',
+//            beforeSend: function (xhr) {
+//                xhr.setRequestHeader('Auth-Key', authKeyData);
+//            },
+//            success: function () {
+//                toastr.success("Attachment deleted successfully.");
+//                ViewAttachment(codeToDelete); // Refresh the attachment list
+//            },
+//            error: function () {
+//                toastr.error("Failed to delete attachment.");
+//            }
+//        });
+//    }
+//});
+function ViewAttachment(code) {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetAttachment?Code=${code}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            const container = $('#attachmentContainer');
+            container.empty();
 
-//    $('#' + elementId)[0].innerHTML = option;
+            if (response && Array.isArray(response) && response.length > 0) {
+                response.forEach(item => {
+                    const fileName = item.AttachmentFileName;
+                    const attachmentCode = item.Code;
+                    const attachmentBase64 = item.Attachment; // base64 string
 
-//    $('#' + elementId).select2({
-//        width: '100%'
-//    });
-//}
+                    const row = `
+                        <div class="attachment-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding: 10px 0;">
+                            <a href="#" style="color: #007bff;" onclick="onAttachmentClick('${fileName}', '${attachmentBase64}','${attachmentCode}','Y')">${fileName}</a>
+                        </div>
+                    `;
+                    container.append(row);
+                });
+
+                $('#attachmentModal').show();
+            } else {
+                container.append('<p>No attachments found.</p>');
+                toastr.warning("No attachment found.");
+            }
+        },
+        error: function () {
+            toastr.error("Failed to retrieve attachments.");
+        }
+    });
+}
+function onAttachmentClick(fileName, base64Data, code, download) {
+    let isOpen = false;
+
+    // Remove data URL prefix if exists
+    if (base64Data.startsWith("data:")) {
+        base64Data = base64Data.split(',')[1];
+    }
+    // Decode Base64 to binary
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+
+    // Infer MIME type
+    const extension = fileName.split('.').pop().toLowerCase();
+    const mimeTypes = {
+        txt: 'text/plain',
+        png: 'image/png',
+        gif: 'image/gif',
+        jpeg: 'image/jpeg',
+        jpg: 'image/jpeg'
+    };
+    const mimeType = mimeTypes[extension] || 'application/octet-stream';
+
+    const blob = new Blob([byteArray], { type: mimeType });
+
+    const viewableTypes = ['txt', 'png', 'gif', 'jpeg', 'jpg'];
+    const url = URL.createObjectURL(blob);
+    if (viewableTypes.includes(extension)) {
+        const newTab = window.open();
+        if (newTab) {
+            newTab.document.write(`<img src="${url}" style="max-width: 50%; display: block; margin: auto;">`);
+            newTab.document.close();
+        } else {
+            window.open(url, '_blank');
+        }
+        // Delay revoking to allow loading
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+    } else {
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+}
+function ClearData() {
+    $("#hftxtCode").val("0");
+    $("#txtTaskType").val("");
+    $("#txtTaskNo").val("");
+    $("#txtPriority").val("");
+    $("#txtLogDate").val("");
+    $("#txtProjectClient").val(null).trigger('change');
+    $("#txtWorkType").val(null).trigger('change');
+    $("#txtDescription").val("");
+    $("#txtAssigned").val(null).trigger('change');
+    $("#txtCommittedDate").val("");
+    $("#txtEstimatedTime").val("");
+    $("#txtAttachment").val("");
+}
+function GetAllDetailsTicketNo() {
+   var TicketNo=$("#txtTaskNo").val();
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetTicketsDetails?TicketNo=${TicketNo}`,
+        type: 'POST',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            $("#txtLogDate").val(response[0].LogDate);
+            $("#txtDescription").val(response[0].Description);
+            $("#txtWorkType").val(response[0].ProjectClient); 
+            response.forEach(item => {
+                BindSelect2(`txtProjectClient`, G_ProjectList);
+                $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtWorkType').empty();
+        }
+    });
+}
+$("#txtTaskNo").on('change', function () {
+    GetAllDetailsTicketNo();
+})

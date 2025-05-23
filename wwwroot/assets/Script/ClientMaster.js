@@ -54,7 +54,7 @@ function ShowClientMaster(Type) {
                 const DateFilterColumn = [];
                 const Button = false;
                 const showButtons = [];
-                const StringdoubleFilterColumn = ["Users"];
+                const StringdoubleFilterColumn = [];
                 const hiddenColumns = ["Code","Employee_Codes"];
                 const ColumnAlignment = {
                 };

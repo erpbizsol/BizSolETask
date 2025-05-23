@@ -32,8 +32,11 @@ namespace Bizsol_ETask.Controllers
         {
             return View();
         }
-
         public IActionResult GenerateTask() 
+        {
+            return View();
+        }
+        public IActionResult PendingTask()
         {
             return View();
         }
