@@ -7,6 +7,9 @@ let IsLoad = true;
 let G_StatussList = [];
 let G_ResolvedByList = [];
 let G_ReAssignList = [];
+let fileName;
+let AttachmentDetail = [];
+let G_Code;
 $(document).ready(async function () {
     $("#ERPHeading").text("Pending Task");
     $(".Number").keyup(function (e) {
@@ -23,32 +26,34 @@ $(document).ready(async function () {
     DatePicker();
     
 });
+
 $("#txtStatus").on('change', function () {
     var Status = $("#txtStatus").val();
-    if (Status == 2) {
+    if (Status == "2") {
         $("#txtTotalResolutionM1").show();
         $("#txtResolutionDate").show();
         $("#txtResolvedBy1").show();
-        $("#txtUpdateBy").show();
-        $("#txtAttachment").show();
+        $("#txtUpdateBy1").show();
+        $("#txtAttachment1").show();
         $("#txtReAssign1").hide();
-        StatusType();
         GetResolvedBy();
-    } else if (Status == 4) {
+        StatusType();
+        
+    } else if (Status == "4") {
         $("#txtTotalResolutionM1").show();
         $("#txtResolutionDate").show();
         $("#txtReAssign1").show();
-        $("#txtAttachment").show();
+        $("#txtAttachment1").show();
         $("#txtResolvedBy1").hide();
-        $("#txtUpdateBy").hide();
+        $("#txtUpdateBy1").hide();
         StatusType();
         GetReAssign();
     } else {
         $("#txtTotalResolutionM1").hide();
         $("#txtResolutionDate").hide();
         $("#txtResolvedBy1").hide();
-        $("#txtUpdateBy").hide();
-        $("#txtAttachment").hide();
+        $("#txtUpdateBy1").hide();
+        $("#txtAttachment1").hide();
         $("#txtReAssign1").hide();
     }
 
@@ -251,12 +256,11 @@ $("#txtBack").click(function () {
     $("#txtTotalResolutionM1").hide();
     $("#txtResolutionDate").hide();
     $("#txtReAssign1").hide();
-    $("#txtAttachment").hide();
+    $("#txtAttachment1").hide();
     $("#txtResolvedBy1").hide();
-    $("#txtUpdateBy").hide();
+    $("#txtUpdateBy1").hide();
  
 });
-
 function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
@@ -297,7 +301,7 @@ function GetResolvedBy() {
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
-                Assigned = response.Code;
+              
             }
             $select.select2({
                 width: '100%',
@@ -335,7 +339,7 @@ function GetReAssign() {
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
-                Assigned = response.Code;
+             
             }
             $select.select2({
                 width: '100%',
@@ -364,7 +368,7 @@ function BindSelect2(elementId, list) {
     });
 }
 function StatusType(code) {
-  
+    var Status = $("#txtStatus").val();
     $.ajax({
         url: `${appBaseURL}/api/Master/GetStatusType?Code=36`,
         type: 'POST',
@@ -373,23 +377,19 @@ function StatusType(code) {
         },
         success: function (response) {
             if (response) {
-               // $("#txtStatus").val(response[0].Statuss);
-                const item = response[0];
-
-                // Text fields
+                const item = response[0];  // Define item properly
                 $("#txtTotalResolutionM").val(item.Times);
-                $("#txtResolutionDates").val(item.Dates.split('T')[0]); // trim time
+                $("#txtResolutionDates").val(item.Dates.split('T')[0]);
                 $("#txtRemarks").val(item.Remarks);
-
-                // Bind dropdowns
-                BindSelect2("txtResolvedBy", G_ResolvedByList);
-                $(`#txtResolvedBy`).val(item.EmployeeMaster_Code).trigger('change');
-
-                BindSelect2("txtReAssign", G_ReAssignList);
-                $(`#txtReAssign`).val(item.EmployeeMaster_Code).trigger('change');
-                //BindSelect2("txtStatus", G_StatussList);
-                //$(`#txtStatus`).val(item.StatusDescription).trigger('change');
-
+                $("#txtResolvedBy").val(item.Name);
+                $("#txtReAssign").val(item.Name);
+                if (Status == "2") {
+                    response.forEach(item => {
+                        BindSelect2(`txtResolvedBy`, G_ResolvedByList);
+                        $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
+                    });
+                }
+                
             } else {
                 toastr.error("Record not found...!");
             }
@@ -399,70 +399,216 @@ function StatusType(code) {
             toastr.error("Failed to fetch data. Please try again.");
         }
     });
+}
+
+$("#txtAttachment").on('change', (event) => {
+    const files = event.target.files;
+    if (files.length > 0) {
+        fileName = files[0].name;
+    }
+});
+$('#txtAttachment').bind('change', function () {
+
+    $.each($('#txtAttachment')[0].files, function (key, file) {
+        reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
+
+            ConvertFileToByteArry(blob).then(function (ByteArray) {
+                AttachmentDetail.push({
+                    CallTicketMaster_Code: 0,
+                    attachment: ByteArray,
+                    attachmentFileName: fileName,
+                });
+            });
+
+        });
+
+    });
+});
+function ConvertFileToByteArry(File) {
+    return new Promise(function (resolve, reject) {
+        var fileByteArray = [];
+        var reader = new FileReader();
+
+        reader.readAsArrayBuffer(File);
+        reader.onloadend = function (evt) {
+            if (evt.target.readyState == FileReader.DONE) {
+                var arrayBuffer = evt.target.result,
+                    array = new Uint8Array(arrayBuffer);
+                for (var i = 0; i < array.length; i++) {
+                    fileByteArray.push(array[i]);
+                }
+                resolve(fileByteArray);
+            }
+        }
+    });
+}
+function reduceFileSize(file, acceptFileSize, maxWidth, maxHeight, quality, callback) {
+    if (file.size <= acceptFileSize) {
+        callback(file);
+        return;
+    }
+    let img = new Image();
+    img.onerror = function () {
+        URL.revokeObjectURL(this.src);
+        callback(file);
+    };
+    img.onload = function () {
+        URL.revokeObjectURL(this.src);
+        getExifOrientation(file, function (orientation) {
+            let w = img.width, h = img.height;
+            let scale = (orientation > 4 ?
+                Math.min(maxHeight / w, maxWidth / h, 1) :
+                Math.min(maxWidth / w, maxHeight / h, 1));
+            h = Math.round(h * scale);
+            w = Math.round(w * scale);
+
+            let canvas = imgToCanvasWithOrientation(img, w, h, orientation);
+            canvas.toBlob(function (blob) {
+                console.log("Resized image to " + w + "x" + h + ", " + (blob.size >> 10) + "kB");
+                callback(blob);
+            }, 'image/jpeg', quality);
+        });
+    };
+    img.src = URL.createObjectURL(file);
+}
+function getExifOrientation(file, callback) {
+    // Suggestion from http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/:
+    if (file.slice) {
+        file = file.slice(0, 131072);
+    } else if (file.webkitSlice) {
+        file = file.webkitSlice(0, 131072);
+    }
+
+    let reader = new FileReader();
+    reader.onload = function (e) {
+        let view = new DataView(e.target.result);
+        if (view.getUint16(0, false) != 0xFFD8) {
+            callback(-2);
+            return;
+        }
+        let length = view.byteLength, offset = 2;
+        while (offset < length) {
+            let marker = view.getUint16(offset, false);
+            offset += 2;
+            if (marker == 0xFFE1) {
+                if (view.getUint32(offset += 2, false) != 0x45786966) {
+                    callback(-1);
+                    return;
+                }
+                let little = view.getUint16(offset += 6, false) == 0x4949;
+                offset += view.getUint32(offset + 4, little);
+                let tags = view.getUint16(offset, little);
+                offset += 2;
+                for (let i = 0; i < tags; i++)
+                    if (view.getUint16(offset + (i * 12), little) == 0x0112) {
+                        callback(view.getUint16(offset + (i * 12) + 8, little));
+                        return;
+                    }
+            }
+            else if ((marker & 0xFF00) != 0xFF00) break;
+            else offset += view.getUint16(offset, false);
+        }
+        callback(-1);
+    };
+    reader.readAsArrayBuffer(file);
+}
+function imgToCanvasWithOrientation(img, rawWidth, rawHeight, orientation) {
+    let canvas = document.createElement('canvas');
+    if (orientation > 4) {
+        canvas.width = rawHeight;
+        canvas.height = rawWidth;
+    } else {
+        canvas.width = rawWidth;
+        canvas.height = rawHeight;
+    }
+
+    if (orientation > 1) {
+        console.log("EXIF orientation = " + orientation + ", rotating picture");
+    }
+
+    let ctx = canvas.getContext('2d');
+    switch (orientation) {
+        case 2: ctx.transform(-1, 0, 0, 1, rawWidth, 0); break;
+        case 3: ctx.transform(-1, 0, 0, -1, rawWidth, rawHeight); break;
+        case 4: ctx.transform(1, 0, 0, -1, 0, rawHeight); break;
+        case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+        case 6: ctx.transform(0, 1, -1, 0, rawHeight, 0); break;
+        case 7: ctx.transform(0, -1, -1, 0, rawHeight, rawWidth); break;
+        case 8: ctx.transform(0, -1, 1, 0, 0, rawWidth); break;
+    }
+    ctx.drawImage(img, 0, 0, rawWidth, rawHeight);
+    return canvas;
 }
 function Edit(code) {
     $("#txtpage").show();
-
-    $.ajax({
-        url: ` ${appBaseURL}/api/Master/GetGenerateTaskTicketByCode?Code=${code}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response) {
-                $("#hftxtCode").val(response[0].Code);
-                $("#txtTaskType").val(response[0].TicketType);
-                $("#txtTaskNo").val(response[0].TicketNo);
-                $("#txtLogDate").val(response[0].LogDate);
-                $("#txtDescription").val(response[0].Description);
-                $("#txtCommittedDate").val(response[0].CommitedDate);
-                $("#txtEstimatedTime").val(response[0].EstimatedTime);
-                $("#txtProjectClient").val(response[0].ProjectClient);
-                $("#txtWorkType").val(response[0].WorkType);
-                $("#txtAssigned").val(response[0].Assigned);
-                $("#txtPriority").val(response[0].Priority);
-                //response.forEach(item => {
-                //    BindSelect2(`txtProjectClient`, G_ProjectList);
-                //    $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
-                //});
-                //response.forEach(item => {
-                //    BindSelect2(`txtWorkType`, G_WorkTypeList);
-                //    $(`#txtWorkType`).val(item.WorkTypeMaster_Code).select2({ width: '100%' });
-                //});
-                //response.forEach(item => {
-                //    BindSelect2(`txtAssigned`, G_EmployeeNameList);
-                //    $(`#txtAssigned`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
-                //});
-                //response.forEach(item => {
-                //    BindSelect2(`txtTaskType`, G_TicketTypetList);
-                //    $(`#txtTaskType`).val(item.TicketTypeMaster_Code).select2({ width: '100%' });
-                //});
-                //response.forEach(item => {
-                //    BindSelect2(`txtPriority`, G_PriorityList);
-                //    $(`#txtPriority`).val(item.PriorityMaster_Code).select2({ width: '100%' });
-                //});
-                //$('#txtAttachment').off('change').on('change', function () {
-                //    $.each(this.files, function (key, file) {
-                //        const fileName = file.name;
-                //        reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
-                //            ConvertFileToByteArry(blob).then(function (ByteArray) {
-                //                AttachmentDetail.push({
-                //                    CallTicketMaster_Code: 0,
-                //                    attachment: ByteArray,
-                //                    attachmentFileName: fileName,
-                //                });
-                //            });
-                //        });
-                //    });
-                //});
-            } else {
-                toastr.error("Record not found...!");
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            toastr.error("Failed to fetch data. Please try again.");
-        }
-    });
+    G_Code = code;
 }
+function Save(){
+    let Status = $("#txtStatus").val();
+    let TotalResolutionM = $("#txtTotalResolutionM").val();
+    let ResolutionDates = $("#txtResolutionDates").val();
+    let ReAssign = $("#txtReAssign").val();
+    let ResolvedBy = $("#txtResolvedBy").val();
+    let UpdateBy = $("#txtUpdateBy").val();
+    let Remarks = $("#txtRemarks").val();
+    if (Status == "") {
+        toastr.error('Please select Status.');
+        $("#txtStatus").focus();
+        return;
+    } else {
+        let Postdata =
+        {
+            pendingTask: [
+                {
+                    code: parseInt(G_Code),
+                    status: parseInt(Status),
+                    totalResolutionM: parseInt(TotalResolutionM || 0),
+                    resolutiondDate: ResolutionDates,
+                    reAssign: ReAssign||0,
+                    resolvedBy: parseInt(ResolvedBy||0),
+                    updateBy: parseInt(UpdateBy||0),
+                    remarks: Remarks,
+                    userMaster_Code: parseInt(UserMaster_Code ||0),
+                }
+            ],
+            Attachment: AttachmentDetail
+        };
+        $.ajax({
+            url: `${appBaseURL}/api/Master/SavePendingTask`,
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify(Postdata),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Auth-Key", authKeyData);
+            },
+            success: function (response) {
+                if (response[0].Status === "Y") {
+                    toastr.success(response[0].Msg);
+                    ClearData();
+                    GetGenerateTaskTicketDateList('Get');
+                }
+                else {
+                    toastr.error(response[0].Msg);
+                }
+            },
+            error: function (xhr) {
+                console.error("Error:", xhr.responseText);
+                toastr.error("An error occurred while saving the data.");
+            }
+        });
+    }
+}
+
+function ClearData() {
+    $("#hftxtCode").val("0");
+    $("#txtStatus").val('0').trigger('change');
+    $("#txtTotalResolutionM").val("");
+    $("#txtResolutionDates").val("");
+    $("#txtReAssign").val(null).trigger('change');
+    $("#txtResolvedBy").val(null).trigger('change');
+    $("#txtUpdateBy").val('0').trigger('change');
+    $("#txtRemarks").val("");
+   
+}
+
