@@ -1,0 +1,62 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link href="~/assets/css/filter.css" rel="stylesheet" />
+<script src="~/assets/js/xlsx.full.min.js"></script>
+<script src="~/assets/script/pendingtaskreport.js"></script>
+
+<div id="txtCreatepage">
+    <div class="card shadow-sm">
+        <div class="tabs">
+            <div class="row p-2">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6">
+                            <label style="border: none;" class="col-form-label-sm fw-bold">
+                                <input id="hfStatus" type="hidden"  value="DD" />
+                                <input type="radio" name="ticktOrderStatus" id="DD" value="DD" checked />
+                                <span>Delay Days</span>
+                            </label>
+
+                            <label class="col-form-label-sm fw-bold">
+                                <input type="radio" name="ticktOrderStatus" id="AT" value="AT" />
+                                <span>Assigned to</span>
+                            </label>
+
+                            <label class="col-form-label-sm fw-bold">
+                                <input type="radio" name="ticktOrderStatus" id="PT" value="PT" />
+                                <span>Pending</span>
+                            </label>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+       
+        <div class="summary-section p-2">
+            <div class="row">
+                <div class="col-sm-12">
+
+                    <div class="table-wrapper" style="overflow: auto;">
+                        <table id="table" class="fixed-width-table table">
+                            <thead id="table-header">
+                            </thead>
+                            <tbody id="table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="paginator" id="paginator-table">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="~/assets/js/filter.js"></script>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Bizsol_ETask.Controllers
 {
@@ -40,5 +41,10 @@ namespace Bizsol_ETask.Controllers
         {
             return View();
         }
+        public IActionResult PendingTaskReport()
+        {
+            return View();
+        }
+        
     }
 }
