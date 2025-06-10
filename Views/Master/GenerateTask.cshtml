@@ -167,7 +167,7 @@
                         <div class="col-md-3 col-sm-6">
                             <label for="txtPriority" class="col-form-label-sm fw-bold">Priority</label>
                             <select id="txtPriority" name="txtPriority" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Priority..." maxlength="10">
-                                <option>Select Priority</option>
+                                @* <option>Select Priority</option> *@
                                 
                             </select>
                         </div>
@@ -189,7 +189,7 @@
                             </select>
                             @* <input type="text" id="txtWorkType" name="txtWorkType" autocomplete="off" class="form-control form-control-sm box_border" maxlength="15"> *@
                         </div>
-                        <div class="col-md-3 col-sm-6">
+                        <div class="col-md-9 col-sm-6">
                             <label for="txtDescription" class="col-form-label-sm fw-bold">Description</label>
                             <input type="text" id="txtDescription" name="txtDescription" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Description.." maxlength="500">
                         </div>
@@ -214,8 +214,8 @@
                             <label for="txtEstimatedTime" class="col-form-label-sm fw-bold">Estimated Time (minutes)</label>
                             <input type="text" id="txtEstimatedTime" name="txtEstimatedTime" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Estimated Time.." maxlength="15">
                         </div>
-                        <div class="col-md-3 col-sm-6" style="margin-top: 30px;">
-                            <button type="button" class="btn btn-primary btn-height" title="Show" onclick="SaveData()" style="background:#216c4a">Save</button>
+                        <div class="col-md-3 col-sm-6" style="margin-top: 30px;border-radius:50px;">
+                            <button type="button" class="btn btn-success" title="Save" onclick="SaveData()" id="txtbtn">Save</button>
                         </div>
                     </div>
                 </div>
@@ -228,7 +228,7 @@
                     <strong>User</strong>
                     <div class="col s6 m4">
                         <label>
-                            <input type="radio" name="ticktOrder" class="with-gap" checked="checked" value="UsWise" />
+                            <input type="radio" name="ticktOrder" class="with-gap" checked value="UsWise" />
                             <span class="font-size1-3rem">User wise </span>
                         </label>
                         <label>
@@ -242,7 +242,7 @@
                     <strong>Status</strong>
                     <div class="col s6 m4">
                         <label>
-                            <input type="radio" name="ticktOrderStatus" class="with-gap" checked="checked" value="P" />
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" checked value="P" />
                             <span class="font-size1-3rem">Pending</span>
                         </label>
                         <label>

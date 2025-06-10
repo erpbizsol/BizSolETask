@@ -88,6 +88,11 @@
         border-radius: 50% !important;
         color: black !important;
     }
+
+    .datepicker thead, th {
+        background-color: #195c61 !important;
+        color: white;
+    }
 </style>
 <div id="txtCreatepage">
     <div class="card shadow-sm">
@@ -140,8 +145,8 @@
                 <div class="col-sm-6">
 
                     <div class="table-wrapper" style="overflow: auto;">
-                        <table id="table1" class="table">
-                            <thead id="table-header1">
+                        <table id="table1" class="">
+                            <thead id="table-header1" style="background:#0c666e;">
                             <th>Department</th>
                             <th>Time (in Mins)</th>
                             </thead>
@@ -152,14 +157,16 @@
                             </tfoot>
                         </table>
                     </div>
+
                     <div class="paginator" id="paginator-table1">
                     </div>
 
                 </div>
-                <div class="col-md-6">
+                <div class="col-sm-6">
+                   
                     <div class="table-wrapper" style="overflow: auto;">
-                        <table id="table2" class="table">
-                            <thead id="table-header2">
+                        <table id="table2" class="">
+                            <thead id="table-header2" style="background:#0c666e;">
                             <th>Work Type</th>
                             <th>Time (in Mins)</th>
                             </thead>
@@ -169,7 +176,8 @@
                             <th id="footerTotalMinutes2"></th>
                             </tfoot>
                         </table>
-                    </div>
+                     </div>
+
                     <div class="paginator" id="paginator-table2">
                     </div>
                 </div>

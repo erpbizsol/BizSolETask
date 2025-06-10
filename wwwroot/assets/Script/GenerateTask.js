@@ -16,6 +16,51 @@ $(document).ready(async function () {
     $(".Number").keyup(function (e) {
         if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9]/g, '')
     });
+    $('#txtTaskType').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtPriority").focus();
+        }
+    });
+    $('#txtPriority').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtProjectClient").focus();
+        }
+    });
+    $('#txtProjectClient').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtWorkType").focus();
+        }
+    });
+    $('#txtWorkType').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtDescription").focus();
+        }
+    });
+    $('#txtDescription').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtAttachment").focus();
+        }
+    });
+    $('#txtAttachment').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtAssigned").focus();
+        }
+    });
+    $('#txtAssigned').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtCommittedDate").focus();
+        }
+    });
+    $('#txtCommittedDate').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtEstimatedTime").focus();
+        }
+    });
+    $('#txtEstimatedTime').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtbtn").focus();
+        }
+    });
     DatePicker();
     await GetTicketType();
     await GetTicketNo();
@@ -31,17 +76,15 @@ $(document).ready(async function () {
             $("#txtTaskNoDiv").show();
         }
     });
-    $('input[type=radio][name=ticktOrder]').change(function () {
-        GetGenerateTaskTicketDateList('Load');
-    });
-    $('input[type=radio][name=ticktOrderStatus]').change(function () {
-        GetGenerateTaskTicketDateList(this.value);
 
-    });
-       
-        
+    GetGenerateTaskTicketDateList('Get');
   
 });
+
+$('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
+    GetGenerateTaskTicketDateList('Get');
+});
+
 function GetTicketType() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetTicketType`,
@@ -110,7 +153,7 @@ function GetPriorityDetails() {
         success: function (response) {
             const $select = $('#txtPriority');
             $select.empty();
-            $select.append('<option value="">Select Priority</option>');
+           // $select.append('<option value="">Select Priority</option>');
             $.each(response, function (index, item) {
                 $select.append(`<option value="${item.Code}">${item.Priority}</option>`);
             });
@@ -154,21 +197,6 @@ function GetClientMasterDetails() {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (response) {
-            const $select = $('#txtProjectClient');
-            $select.empty();
-            if (response && response.length > 0) {
-                $select.append(new Option("Select Project Client..", true, true));
-                $.each(response, function (index, item) {
-                    $select.append(`<option value="${item.Code}">${item.ClientName}</option>`);
-
-                });
-            }
-            $select.select2({
-                width: '100%',
-                closeOnSelect: false,
-                placeholder: "Select Project Client...",
-                allowClear: true
-            });
             if (Array.isArray(response) && response.length > 0) {
                 G_ProjectList = response.map(item => ({
                     Code: item.Code,
@@ -177,10 +205,25 @@ function GetClientMasterDetails() {
             } else {
                 G_ProjectList = [];
             }
+            const $select = $('#txtProjectClient');
+            $select.empty();
+            if (response && response.length > 0) {
+                $select.append(new Option("Select Project Client..", "0", true));
+                $.each(response, function (index, item) {
+                    $select.append(new Option(item.ClientName, item.Code));
+                });
+                ClientName = response.Code;
+            }
+            $select.select2({
+                width: '100%',
+                closeOnSelect: false,
+                placeholder: "Select Project Client...",
+                allowClear: true
+            });
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
-            $('#txtProjectClient').empty();
+            $('#txtWorkType').empty();
         }
     });
 }
@@ -412,23 +455,23 @@ function SaveData() {
     let CommittedDate = $("#txtCommittedDate").val();
     let EstimatedTime = $("#txtEstimatedTime").val();
     if (TaskType == "") {
-        toastr.error('Please select Task Type.');
+        toastr.error('Please Select Task Type.');
         $("#txtTaskType").focus();
         return;
     } else if (Priority == "") {
-        toastr.error('Please select Priority.');
+        toastr.error('Please Select Priority.');
         $("#txtPriority").focus();
         return;
-    } else if (ProjectClient == "0") {
-        toastr.error('Please select Project / Client.');
+    } else if (ProjectClient == "0" || ProjectClient == undefined) {
+        toastr.error('Please Select Project / Client.');
         $("#txtProjectClient").focus();
         return;
     } else if (WorkType == "0") {
-        toastr.error('Please select Work Type.');
+        toastr.error('Please Select Work Type.');
         $("#txtWorkType").focus();
         return;
     } else if (Assigned == "0") {
-        toastr.error('Please select Assigned.');
+        toastr.error('Please Select Assigned.');
         $("#txtAssigned").focus();
         return;
     } else {
@@ -486,40 +529,13 @@ function SaveData() {
     }
 }
 function GetGenerateTaskTicketDateList(Type) {
-    
     let EmployeeName = UserName;
     let showBy = $('input[type=radio][name="ticktOrder"]:checked').val();
     let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
-    Status = Status ? Status.value : 0; 
-    let TaskNo1 = "";
-    if (IsLoad) {
-        IsLoad = false;
-        $('input:radio[name=ticktOrderStatus]').filter(function () {
-            this.checked = false;
-
-        });
-        $('input:radio[name=ticktOrder]').filter(function () {
-            this.checked = false;
-
-        });
-
-        $('input:radio[name=ticktOrderStatus]').filter(function () {
-
-            if (this.value == $('#ticktOrderStatus').val())
-                this.checked = true;
-
-        });
-        $('input:radio[name=ticktOrder]').filter(function () {
-            if (this.value == $('#ticktOrder').val())
-                this.checked = true;
-
-        });
-    } else {
-        let showBy = $('input[type=radio][name="ticktOrder"]:checked').val();
-        let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
-
+    let TaskNo = $("#txtTaskNo").val();
+    TaskNo = TaskNo ? TaskNo.value : 0; 
         $.ajax({
-            url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDate?EmployeeName=${EmployeeName}&showBy=${showBy}&Status=${Status}&ticketNo=0`,
+            url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDate?EmployeeName=${EmployeeName}&showBy=${showBy}&Status=${Status}&ticketNo=${TaskNo}`,
             type: 'POST',
             dataType: "json",
             beforeSend: function (xhr) {
@@ -527,7 +543,7 @@ function GetGenerateTaskTicketDateList(Type) {
             },
             success: function (response) {
                 if (response.length > 0) {
-                    $("#Table").show();
+                    $("#txtSummary").show();
                     const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project / Client","Ticket No"];
                     const NumericFilterColumn = [];
                     const DateFilterColumn = ["Log Date"];
@@ -547,19 +563,18 @@ function GetGenerateTaskTicketDateList(Type) {
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
 
                 } else {
-                    $("#Table").hide();
-                    if (Type != 'Load') {
+                    if (Type == 'Get') {
                         toastr.error("Record not found...!");
+                        $("#txtSummary").hide();
                     }
-                   
-                  
+                    
                 }
             },
             error: function (xhr, status, error) {
                 console.error("Error:", error);
             }
         });
-    }
+    
 }
 function BindSelect2(elementId, list) {
     let option = '<option value="0">Select</option>';

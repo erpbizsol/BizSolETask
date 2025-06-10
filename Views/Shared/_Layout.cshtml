@@ -165,13 +165,13 @@
                             </a>
                         </div>
                         <div class="dropdown d-inline-block me-2 pt-1-1 font-size-13">
-                            <span class="d-xl-inline-block fw-medium font-size-13">Useree</span>
+                            <span class="d-xl-inline-block fw-medium font-size-13" id="txtuserName">User</span>
                         </div>
                     </div>
                     
                     <div class="dropdown d-inline-block me-2 pt-1-1 font-size-13">
                         Total Time :
-                        <span>0</span>
+                        <span id="gettime">0</span>
                     </div>
                 </div>
             </div>
@@ -479,6 +479,7 @@
     <script src="~/assets/libs/select2-4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
+       
         // $(document).ready(function () {
         var authKey = '@Html.Raw(ViewBag.AuthKey)';
         if (authKey !== '') {
@@ -487,9 +488,12 @@
             sessionStorage.setItem('AppBaseURLMenu', '@Html.Raw(ViewBag.AppBaseURLMenu)');
             sessionStorage.setItem('UserName', '@Html.Raw(ViewBag.UserName)');
             //window.AppBaseURL='@Html.Raw(ViewBag.AppBaseURL)';
+           
         }
         // });
         $("#ERPUserName").text(sessionStorage.getItem('UserName'));
+        $("#txtuserName").text(sessionStorage.getItem('UserName'));
+        //var UserName = sessionStorage.getItem('UserName');
         $(document).on('select2:open', function () {
             if ($('.select2-search__field').length > 1) {
                 $('.select2-search__field')[1].focus()
@@ -498,6 +502,23 @@
                 $('.select2-search__field')[0].focus();
             }
         });
+       // const appBaseURL = sessionStorage.getItem('AppBaseURL');
+        // function GetWorksTime() {
+        //     $.ajax({
+        //         url: `${appBaseURL}/api/Master/GetWorksTimes`,
+        //         type: "POST",
+        //         data: "{}",
+        //         contentType: "application/json; charset=utf-8",
+        //         dataType: "json",
+        //         success: function (data) {
+        //             var count = data.d;
+        //             $('#gettime').text(count);
+        //         },
+        //         error: function (data) {
+        //         }
+        //     });
+
+        // }
     </script>
     <script src="~/assets/script/logout.js"></script>
     <script src="~/assets/js/menu.js"></script>
