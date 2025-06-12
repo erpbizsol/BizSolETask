@@ -171,7 +171,7 @@
                     
                     <div class="dropdown d-inline-block me-2 pt-1-1 font-size-13">
                         Total Time :
-                        <span id="gettime">0</span>
+                        <span id="gettime"></span>
                     </div>
                 </div>
             </div>
@@ -487,42 +487,37 @@
             sessionStorage.setItem('AppBaseURL', '@Html.Raw(ViewBag.AppBaseURL)');
             sessionStorage.setItem('AppBaseURLMenu', '@Html.Raw(ViewBag.AppBaseURLMenu)');
             sessionStorage.setItem('UserName', '@Html.Raw(ViewBag.UserName)');
+            sessionStorage.setItem('UserMasterCode', '@Html.Raw(ViewBag.UserMasterCode)');
+
             //window.AppBaseURL='@Html.Raw(ViewBag.AppBaseURL)';
            
         }
         // });
         $("#ERPUserName").text(sessionStorage.getItem('UserName'));
         $("#txtuserName").text(sessionStorage.getItem('UserName'));
-        //var UserName = sessionStorage.getItem('UserName');
-        $(document).on('select2:open', function () {
+
+        $(document).on('select2:open', function () { 
             if ($('.select2-search__field').length > 1) {
                 $('.select2-search__field')[1].focus()
             }
             else {
                 $('.select2-search__field')[0].focus();
             }
+            
         });
-       // const appBaseURL = sessionStorage.getItem('AppBaseURL');
-        // function GetWorksTime() {
-        //     $.ajax({
-        //         url: `${appBaseURL}/api/Master/GetWorksTimes`,
-        //         type: "POST",
-        //         data: "{}",
-        //         contentType: "application/json; charset=utf-8",
-        //         dataType: "json",
-        //         success: function (data) {
-        //             var count = data.d;
-        //             $('#gettime').text(count);
-        //         },
-        //         error: function (data) {
-        //         }
-        //     });
-
-        // }
+       $(document).ready(function(){
+           setTimeout(function(){
+               GetWorksTime();
+           },2000)
+           
+       });
     </script>
+ 
     <script src="~/assets/script/logout.js"></script>
     <script src="~/assets/js/menu.js"></script>
     <script src="~/assets/script/common.js"></script>
     <script src="~/assets/js/checkoptionpermission.js"></script>
+    <script src="~/assets/script/worktime.js"></script>
+   
 </body>
 </html>

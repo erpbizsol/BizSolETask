@@ -34,6 +34,9 @@ $(document).ready(async function () {
     $("#ddlEmployeeName").on("change", function () {
         GetDate();
     });
+    $("#ManualTimeCheckDefault").on("change", function () {
+        GetEmpDateList();
+    });
     
 });
 function GetDate() {
@@ -246,45 +249,76 @@ function addNewRow() {
     const table = document.getElementById("table");
     const tableHead = table.querySelector("thead");
     const tableBody = table.querySelector("tbody");
+    let isManualChecked = $('#ManualTimeCheckDefault').is(':checked') ? 'Y' : 'N';
+    tableHead.innerHTML = '';
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = `
+        <th style="width:150px;">Department<span class="text-danger">*</span></th>`;
 
-    if (!tableHead.querySelector("tr")) {
-        const headerRow = document.createElement("tr");
-        headerRow.innerHTML = `
-        <th style= "width:150px;">Department<span class="text-danger">*</span></th>
-        <th>From Hr</th>
-        <th>To Hr</th>
-        <th>Time in Minutes</th>
-        <th style= "width:200px;">Work Type<span class="text-danger">*</span></th>
-        <th>Remarks</th>
-        <th>Action</th>`;
-        tableHead.appendChild(headerRow);
+    if (isManualChecked === 'Y') {
+        headerRow.innerHTML += `
+            <th style="display:none;width:50px;">From Hr</th>
+            <th style="display:none;width:50px;">To Hr</th>
+            <th style="width:150px;">Time in Minutes</th>`;
+    } else {
+        headerRow.innerHTML += `
+            <th style="width:50px;">From Hr</th>
+            <th style="width:50px;">To Hr</th>
+            <th style="width:150px;">Time in Minutes</th>`;
     }
+
+    headerRow.innerHTML += `
+        <th style="width:150px;">Work Type<span class="text-danger">*</span></th>
+        <th style="width:150px;">Remarks</th>
+        <th style="width:60px;">Action</th>`;
+    tableHead.appendChild(headerRow);
+
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
-       <td>
-       <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
-        id="txtddlDipartment_0" autocomplete="off" maxlength="50">
-        </select>
+        <td>
+            <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
+                    id="txtddlDipartment_0" autocomplete="off" maxlength="50">
+            </select>
+        </td>`;
+
+    if (isManualChecked === 'Y') {
+        newRow.innerHTML += `
+            <td style="display:none"><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
+            <td style="display:none"><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" placeholder="Time in Minutes" autocomplete="off" maxlength="15"></td>`;
+    } else {
+        newRow.innerHTML += `
+            <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
+            <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="15"></td>`;
+    }
+
+    newRow.innerHTML += `
+        <td>
+            <select class="txtddlWorkType mandatory form-control form-control-sm box_border"
+                    id="txtddlWorkType_0" autocomplete="off" maxlength="50"> 
+            </select>
         </td>
-        <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
-        <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-        <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="15"></td>
-        <td><select class="txtddlWorkType mandatory form-control form-control-sm box_border"
-        id="txtddlWorkType_0" autocomplete="off" maxlength="50"> </select></td>
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
         <td style="text-align:center;">
-            <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData(0)"><i class="fas fa-save"></i></button>
-            <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData(0)">
+                <i class="fas fa-save"></i>
+            </button>
+            <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+            </button>
         </td>`;
     tableBody.appendChild(newRow);
+
     BindSelect2('txtddlDipartment_0', G_DepartmentList);
     BindSelect2('txtddlWorkType_0', G_WorkTypeList);
-
 }
+
 async function GetEmpDateList() {
     const emp = $('#ddlEmployeeName').val();
     const rawDate = $('#txtFromDate').val();
     const formattedDate = convertToDayMonthYear(rawDate);
+    let isManualChecked = $('#ManualTimeCheckDefault').is(':checked') ? 'Y' : 'N';
 
     try {
         const response = await fetch(`${appBaseURL}/api/Master/GetEmpDateList?EmployeeName=${encodeURIComponent(emp)}&WorkDate=${formattedDate}`, {
@@ -310,7 +344,13 @@ async function GetEmpDateList() {
             const Button = false;
             const showButtons = [];
             const StringdoubleFilterColumn = [];
-            const hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time (in Mins)", "Remarks1"];
+            let hiddenColumns = [];
+            let Disabled = isManualChecked == 'Y' ? '' : 'disabled';
+            if (isManualChecked === 'Y') {
+                hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time (in Mins)", "Remarks1", "From Hr", "To Hr"];
+            } else {
+                hiddenColumns = ["Code", "TimeSheetMaster_Code", "ClientMaster_Code", "WorkTypeMaster_Code", "Time (in Mins)", "Remarks1"];
+            }
             const ColumnAlignment = {
                 "Department": 'left;width:15%',
                 "From Hr": 'center;width: 25px',
@@ -320,21 +360,21 @@ async function GetEmpDateList() {
                 "Remarks": 'left;width: 300px',
                 "Action": 'center;width: 100px',
             };
-  
             const updatedResponse = result.map(item => ({
                 ...item,
                 "Department": `
-                    <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
-                        id="txtddlDipartment_${item.Code}" autocomplete="off" maxlength="50"></select>`,
+                <select class="txtddlDipartment mandatory form-control form-control-sm box_border"id="txtddlDipartment_${item.Code}" autocomplete="off" maxlength="50"></select>`,
                 "From Hr": `<input type="time" autocomplete="off" id="txtfromHr_${item.Code}" class="txtfromHr form-control form-control-sm box_border" value="${item['From Hr']}" maxlength="15"/>`,
                 "To Hr": `<input type="time" autocomplete="off" id="txttoHr_${item.Code}" class="txttoHr form-control form-control-sm box_border" value="${item['To Hr']}" maxlength="15"/>`,
-                "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" disabled value="${item['Time in Minutes']}" maxlength="15"/>`,
+                "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" ${Disabled} value="${item['Time in Minutes']}" maxlength="15"/>`,
                 "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off" maxlength="50"></select>`,
                 "Remarks": `<input type="text" autocomplete="off" id="txtRemarks1_${item.Code}" class="txtRemarks1 form-control form-control-sm box_border" value="${item.Remarks || ''}"/>`,
                 "Action": `
-                    <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
-                    <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}','${item.TimeSheetMaster_Code}')"><i class="fa-solid fa-trash"></i></button>`
+                <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
+                <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}','${item.TimeSheetMaster_Code}')"><i class="fa-solid fa-trash"></i></button>`
             }));
+           
+
             $("#txtRemarks").val(result[0].Remarks1)
             G_TimeSheetMaster_Code = result[0].TimeSheetMaster_Code;
            
@@ -498,6 +538,7 @@ function convertToISO(dateStr) {
     return `${year}-${month}-${day}`;
 }
 function SaveData(Code) {
+    let isManualChecked = $('#ManualTimeCheckDefault').is(':checked') ? 'Y' : 'N';
     const EmployeeName = $("#ddlEmployeeName").val();
     const Remarks = $("#Remarks").val();
     const FromDate = convertToISO($("#txtFromDate").val());
@@ -523,15 +564,17 @@ function SaveData(Code) {
         $("#txtddlDipartment_" + Code).focus();
         return;
     }
-    else if (fromHr == '00:00') {
-        toastr.error("Please select from Hr!");
-        $("#txtfromHr_" + Code).focus();
-        return;
-    }
-    else if (toHr == '00:00') {
-        toastr.error("Please select to Hr!");
-        $("#txttoHr_" + Code).focus();
-        return;
+    else if (isManualChecked == false) {
+        if (fromHr == '00:00') {
+            toastr.error("Please select from Hr!");
+            $("#txtfromHr_" + Code).focus();
+            return;
+        }
+        else if (toHr == '00:00') {
+            toastr.error("Please select to Hr!");
+            $("#txttoHr_" + Code).focus();
+            return;
+        }
     }
     else if (workType == '0') {
         toastr.error("Please select work Type!");
