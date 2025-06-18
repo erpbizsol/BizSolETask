@@ -6,6 +6,8 @@ var authKeyData = sessionStorage.getItem('authKey');
 const UserType = authKeyData1.UserType;
 var baseUrl1 = sessionStorage.getItem('AppBaseURL');
 var baseUrl = sessionStorage.getItem('AppBaseURLMenu');
+var authKeyData2 = JSON.parse(sessionStorage.getItem('authKey'));
+let UserMaster_Code1 = authKeyData2.UserMaster_Code;
 function UserMenuRightsList() {
         $.ajax({
             url: `${baseUrl1}/api/Master/GetUserModuleMasterList?UserType=${UserType}`,
@@ -33,7 +35,7 @@ function UserMenuRightsList() {
                 }
             }
         });
-    }
+}
 
 function setActiveMenu() {
     var currentUrl = window.location.pathname;
@@ -49,6 +51,28 @@ function setActiveMenu() {
             $(this).addClass('active');
             $(this).parents('li').last().addClass('last-active');
             $(this).parents('ul.sub-menu').show();
+        }
+    });
+}
+
+function GetWorksTime() {
+    $.ajax({
+        url: `${baseUrl1}/api/Master/GetWorksTimes?Code=${UserMaster_Code1}`,
+        type: 'POST',
+        contentType: 'application/json',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData); 
+        },
+        success: function (response) {
+            if (response?.length > 0) {
+                $('#gettime').text(response[0].Time);
+            } else {
+                $('#gettime').text('0');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            alert("Server connection error. Please check if the API is running.");
         }
     });
 }
