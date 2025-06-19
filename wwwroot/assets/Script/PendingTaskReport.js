@@ -37,8 +37,8 @@ function GetPendingTaskReport(Type) {
             },
             success: function (response) {
                 if (response.length > 0) {
-                    $("#Table").show();
-                    const StringFilterColumn = [""];
+                    $("#txtTable").show();
+                    const StringFilterColumn = ["Ticket No", "Work Type", "	Client Name", "Ticket Created By", "Assigned","ssignedBy",""];
                     const NumericFilterColumn = [""];
                     const DateFilterColumn = [""];
                     const Button = false;
@@ -50,7 +50,7 @@ function GetPendingTaskReport(Type) {
                     };
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body",response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
                 } else {
-                    $("#Table").hide();
+                    $("#txtTable").hide();
                     if (Type != 'Load') {
                         toastr.error("Record not found...!");
                     }

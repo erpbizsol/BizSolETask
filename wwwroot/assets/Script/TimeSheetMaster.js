@@ -16,8 +16,10 @@ $(document).ready(async function () {
     setupDateInputFormatting();
     if (UserTypes === "A") {
         $("#ddlEmployeeName").prop('disabled', false);
+        
     } else {
         $("#ddlEmployeeName").prop('disabled', true);
+        GetDepartmentList(UserName);
     }
     $('#ddlEmployeeName').on('keydown', function (e) {
         if (e.key === "Enter") {
@@ -39,6 +41,9 @@ $(document).ready(async function () {
     });
     
 });
+function NumericValue(e) {
+    if (/\D/g.test(e.value)) e.value = e.value.replace(/[^0-9]/g, '')
+}
 function GetDate() {
     const emp = $('#ddlEmployeeName').val();
     $.ajax({
@@ -285,12 +290,12 @@ function addNewRow() {
         newRow.innerHTML += `
             <td style="display:none"><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
             <td style="display:none"><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" placeholder="Time in Minutes" autocomplete="off" maxlength="15"></td>`;
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" onkeyup="NumericValue(this)" placeholder="Time in Minutes" autocomplete="off" maxlength="15"></td>`;
     } else {
         newRow.innerHTML += `
             <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
             <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="15"></td>`;
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" onkeyup="NumericValue(this)" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="15"></td>`;
     }
 
     newRow.innerHTML += `
@@ -685,3 +690,19 @@ async function updateTimeSheetRemark() {
 function ClearData() {
     $("#txtRemarks").val("");
 }
+
+
+$('#ManualTimeCheckDefault').on('change', function () {
+    ShowHideFooter();
+});
+
+
+function ShowHideFooter() {
+    let isManual = $('#ManualTimeCheckDefault').is(':checked');
+    if (isManual === true) {
+        $(".footerth").hide();
+    } else {
+        $(".footerth").show(); 
+    }
+}
+

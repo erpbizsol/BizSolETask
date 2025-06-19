@@ -78,7 +78,11 @@ $(document).ready(async function () {
     });
 
     GetGenerateTaskTicketDateList('Get');
-  
+    if (UserTypes == "A") {
+        $("#txtAllUser").show();
+    } else {
+        $("#txtAllUser").hide();
+    }
 });
 
 $('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
@@ -98,14 +102,14 @@ function GetTicketType() {
             $.each(response, function (index, item) {
                 $select.append(`<option value="${item.Code}">${item.TicketType}</option>`);
             });
-            if (Array.isArray(response) && response.length > 0) {
-                G_TicketTypetList = response.map(item => ({
-                    Code: item.Code,
-                    Name: item.TicketType
-                }));
-            } else {
-                G_TicketTypetList = [];
-            }
+            //if (Array.isArray(response) && response.length > 0) {
+            //    G_TicketTypetList = response.map(item => ({
+            //        Code: item.Code,
+            //        Name: item.TicketType
+            //    }));
+            //} else {
+            //    G_TicketTypetList = [];
+            //}
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -124,7 +128,7 @@ function GetTicketNo() {
             const $select = $('#txtTaskNo');
             $select.empty();
             if (response && response.length > 0) {
-                $select.append(new Option("Select Ticket No...", "", true, true));
+              //  $select.append(new Option("Select Ticket No...", "", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.UID));
                 });
@@ -133,7 +137,7 @@ function GetTicketNo() {
             $select.select2({
                 width: '100%',
                 closeOnSelect: false,
-                placeholder: "Select Ticket No...",
+                //placeholder: "Select Ticket No...",
                 allowClear: true
             });
         },
@@ -172,6 +176,12 @@ function GetPriorityDetails() {
         }
     });
 }
+function convertDateFormat(dateString) {
+    const [day, month, year] = dateString.split('/');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthAbbreviation = monthNames[parseInt(month) - 1];
+    return `${day}-${monthAbbreviation}-${year}`;
+}
 function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
@@ -180,7 +190,21 @@ function DatePicker() {
     $('#txtLogDate,#txtCommittedDate').datepicker({
         format: 'dd/mm/yyyy',
         autoclose: true,
+        orientation: 'bottom auto',
         todayHighlight: true
+    }).on('show', function () {
+        let $input = $(this);
+        let inputOffset = $input.offset();
+        let inputHeight = $input.outerHeight();
+        let inputWidth = $input.outerWidth();
+        setTimeout(function () {
+            let $datepicker = $('.datepicker-dropdown');
+            $datepicker.css({
+                width: inputWidth + 'px',
+                top: (inputOffset.top + inputHeight) + 'px',
+                left: inputOffset.left + 'px'
+            });
+        }, 10);
     });
 }
 function formatDateToString(dateObj) {
@@ -217,7 +241,7 @@ function GetClientMasterDetails() {
             $select.select2({
                 width: '100%',
                 closeOnSelect: false,
-                placeholder: "Select Project Client...",
+               // placeholder: "Select Project Client...",
                 allowClear: true
             });
         },
@@ -246,7 +270,7 @@ function GetWorkTypes() {
             const $select = $('#txtWorkType');
             $select.empty();
             if (response && response.length > 0) {
-                //$select.append(new Option("Select Work Type..", true, true));
+               // $select.append(new Option("Select Work Type..", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.WorkType, item.Code));
                 });
@@ -255,7 +279,7 @@ function GetWorkTypes() {
             $select.select2({
                 width: '100%',
                 closeOnSelect: false,
-                placeholder: "Select Work Type...",
+                //placeholder: "Select Work Type...",
                 allowClear: true
             });
         },
@@ -284,7 +308,7 @@ function GetAssigneds() {
             const $select = $('#txtAssigned');
             $select.empty();
             if (response && response.length > 0) {
-                // $select.append(new Option("Select Assigned..", true, true));
+                 //$select.append(new Option("Select Assigned..", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
@@ -293,7 +317,7 @@ function GetAssigneds() {
             $select.select2({
                 width: '100%',
                 closeOnSelect: false,
-                placeholder: "Select Assigned...",
+                //placeholder: "Select Assigned...",
                 allowClear: true
             });
         },
@@ -447,12 +471,12 @@ function SaveData() {
     let TaskType = $("#txtTaskType").val();
     let TicketNo = $("#txtTaskNo").val();
     let Priority = $("#txtPriority").val();
-    let LogDate = $("#txtLogDate").val();
+    let LogDate = convertDateFormat($("#txtLogDate").val());
     let ProjectClient = $("#txtProjectClient").val();
     let WorkType = $("#txtWorkType").val();
     let Description = $("#txtDescription").val();
     let Assigned = $("#txtAssigned").val();
-    let CommittedDate = $("#txtCommittedDate").val();
+    let CommittedDate = convertDateFormat($("#txtCommittedDate").val());
     let EstimatedTime = $("#txtEstimatedTime").val();
     if (TaskType == "") {
         toastr.error('Please Select Task Type.');
@@ -544,7 +568,7 @@ function GetGenerateTaskTicketDateList(Type) {
             success: function (response) {
                 if (response.length > 0) {
                     $("#txtSummary").show();
-                    const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project / Client","Ticket No"];
+                    const StringFilterColumn = [];
                     const NumericFilterColumn = [];
                     const DateFilterColumn = ["Log Date"];
                     const Button = false;
@@ -553,12 +577,35 @@ function GetGenerateTaskTicketDateList(Type) {
                     const hiddenColumns = ["ACode","Attachment","CallTicketMaster_Code","AttachmentFileName","ResolutionTime","Remarks","ResolvedDate","RaisedBy","Module","Source","FirstCheckBy","CommitedDate","ContactNo","Status","EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType","ContactEMail","ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code","EmployeeMaster_Code","Code"];
                     const ColumnAlignment = {
                     };
-                    const updatedResponse = response.map(item => ({
-                        ...item, 'Action':
-                           `
-                    <a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
-                    <button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`
-                    }));
+                    const updatedResponse = response.map(item => {
+                        let actionButtons = `
+                            <a class="btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')">
+                            <i class="fa fa-paperclip"></i>
+                            </a>
+                            <button class="btn btn-primary icon-height mb-1" style="background:#20425d" title="Edit" onclick="Edit('${item.Code}')">
+                            <i class="fa-solid fa-pencil"></i>
+                            </button>`;
+
+                        if (UserTypes === 'A') {
+
+                        actionButtons += `
+                            <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}')">
+                            <i class="fa-solid fa-trash"></i>
+                            </button>`;
+                        }
+
+                        return {
+                            ...item,
+                            'Action': actionButtons
+                        };
+                    });
+                    //const updatedResponse = response.map(item => ({
+                    //    ...item, 'Action':
+                    //       `
+                    //<a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
+                    //<button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
+                    //<button class="btn btn-danger icon-height mb-1"  title="Delete" onclick="Delete('${item.Code}')"><i class="fa-solid fa-trash"></i></button>`
+                    //}));
                    
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
 
@@ -609,6 +656,11 @@ function Edit(code) {
                 $("#txtWorkType").val(response[0].WorkType);
                 $("#txtAssigned").val(response[0].Assigned);
                 $("#txtPriority").val(response[0].Priority);
+                $("#txtTaskType").val(response[0].TicketTypeMaster_Code);
+                $("#txtPriority").val(response[0].PriorityMaster_Code);
+                //SelectOptionByText("txtProjectClient", item.ClientMaster_Code);
+                //SelectOptionByText("txtWorkType", item.WorkTypeMaster_Code);
+                //SelectOptionByText("txtAssigned", item.EmployeeMaster_Code);
                 response.forEach(item => {
                     BindSelect2(`txtProjectClient`, G_ProjectList);
                     $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
@@ -621,14 +673,11 @@ function Edit(code) {
                     BindSelect2(`txtAssigned`, G_EmployeeNameList);
                     $(`#txtAssigned`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
                 });
-                response.forEach(item => {
-                    BindSelect2(`txtTaskType`, G_TicketTypetList);
-                    $(`#txtTaskType`).val(item.TicketTypeMaster_Code).select2({ width: '100%' });
-                });
-                response.forEach(item => {
-                    BindSelect2(`txtPriority`, G_PriorityList);
-                    $(`#txtPriority`).val(item.PriorityMaster_Code).select2({ width: '100%' });
-                });
+                //$("#txtProjectClient").val(response[0].ClientMaster_Code);
+               // $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
+                //$("#txtAssigned").val(response[0].EmployeeMaster_Code);
+         
+             
                 //$('#txtAttachment').off('change').on('change', function () {
                 //    $.each(this.files, function (key, file) {
                 //        const fileName = file.name;
@@ -653,30 +702,7 @@ function Edit(code) {
         }
     });
 }
-// Attach delete logic (only bind once)
-//$(document).off('click', '.delete-btn').on('click', '.delete-btn', function () {
-//    const fileToDelete = $(this).data('filename');
-//    const codeToDelete = $(this).data('code');
 
-//    if (confirm(`Are you sure you want to delete ${fileToDelete}?`)) {
-//        $.ajax({
-//            url: `${appBaseURL}/api/Master/DeleteAttachment`,
-//            type: 'POST',
-//            data: JSON.stringify({ Code: codeToDelete, FileName: fileToDelete }),
-//            contentType: 'application/json',
-//            beforeSend: function (xhr) {
-//                xhr.setRequestHeader('Auth-Key', authKeyData);
-//            },
-//            success: function () {
-//                toastr.success("Attachment deleted successfully.");
-//                ViewAttachment(codeToDelete); // Refresh the attachment list
-//            },
-//            error: function () {
-//                toastr.error("Failed to delete attachment.");
-//            }
-//        });
-//    }
-//});
 function ViewAttachment(code) {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAttachment?Code=${code}`,
@@ -766,17 +792,16 @@ function onAttachmentClick(fileName, base64Data, code, download) {
 }
 function ClearData() {
     $("#hftxtCode").val("0");
-    $("#txtTaskType").val("");
+    $("#txtTaskType").val("1");
     $("#txtTaskNo").val("");
-    $("#txtPriority").val("");
-    $("#txtLogDate").val("");
-    $("#txtProjectClient").val(null).trigger('change');
-    $("#txtWorkType").val(null).trigger('change');
+    $("#txtPriority").val("1");
+    $("#txtProjectClient").val("").trigger('change');
+    $("#txtWorkType").val("").trigger('change');
     $("#txtDescription").val("");
-    $("#txtAssigned").val(null).trigger('change');
-    $("#txtCommittedDate").val("");
+    $("#txtAssigned").val("").trigger('change');
     $("#txtEstimatedTime").val("");
     $("#txtAttachment").val("");
+    DatePicker();
 }
 function GetAllDetailsTicketNo() {
    var TicketNo=$("#txtTaskNo").val();
@@ -789,10 +814,11 @@ function GetAllDetailsTicketNo() {
         success: function (response) {
             $("#txtLogDate").val(response[0].LogDate);
             $("#txtDescription").val(response[0].Description);
-            $("#txtWorkType").val(response[0].ProjectClient); 
+           // SelectOptionByText("txtWorkType", response[0].WorkTypeMaster_Code);
+            $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
             response.forEach(item => {
-                BindSelect2(`txtProjectClient`, G_ProjectList);
-                $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
+                BindSelect2(`txtWorkType`, G_WorkTypeList);
+                $(`#txtWorkType`).val(item.WorkTypeMaster_Code).select2({ width: '100%' });
             });
         },
         error: function (xhr, status, error) {
@@ -804,3 +830,26 @@ function GetAllDetailsTicketNo() {
 $("#txtTaskNo").on('change', function () {
     GetAllDetailsTicketNo();
 })
+
+function Delete(code) {
+    if (confirm(`Are you sure you want delete this.?`)) {
+        $.ajax({
+            url: `${appBaseURL}/api/Master/DeleteGenerateTask?Code=${code}`,
+            type: 'Get',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Auth-Key', authKeyData);
+            },
+            success: function (response) {
+                if (response[0].Status === 'Y') {
+                    toastr.success(response[0].Msg);
+                    GetGenerateTaskTicketDateList('Get');
+                } else {
+                    toastr.error("Unexpected response format.");
+                }
+            },
+            error: function (xhr, status, error) {
+                toastr.error("Error deleting item:", Msg);
+            }
+        });
+    }
+}

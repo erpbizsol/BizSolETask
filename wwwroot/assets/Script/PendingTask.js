@@ -17,16 +17,19 @@ $(document).ready(async function () {
     });
    
     GetStatuss();
-    $('input[type=radio][name=ticktOrder]').change(function () {
-        GetGenerateTaskTicketDateList('Load');
-    });
-    $('input[type=radio][name=ticktOrderStatus]').change(function () {
-        GetGenerateTaskTicketDateList(this.value);
-    });
+
     DatePicker();
-    
+    if (UserTypes == "A") {
+        $("#txtAllUser").show();
+    } else {
+        $("#txtAllUser").hide();
+    }
+    GetGenerateTaskTicketDateList('Get');
 });
 
+$('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
+    GetGenerateTaskTicketDateList('Get');
+});
 $("#txtStatus").on('change', function () {
     var Status = $("#txtStatus").val();
     if (Status == "2") {
@@ -63,34 +66,8 @@ function GetGenerateTaskTicketDateList(Type) {
     let EmployeeName = UserName;
     let showBy = $('input[type=radio][name="ticktOrder"]:checked').val();
     let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
-    Status = Status ? Status.value : 0;
-    let TaskNo1 = "";
-    if (IsLoad) {
-        IsLoad = false;
-        $('input:radio[name=ticktOrderStatus]').filter(function () {
-            this.checked = false;
-
-        });
-        $('input:radio[name=ticktOrder]').filter(function () {
-            this.checked = false;
-
-        });
-
-        $('input:radio[name=ticktOrderStatus]').filter(function () {
-
-            if (this.value == $('#ticktOrderStatus').val())
-                this.checked = true;
-
-        });
-        $('input:radio[name=ticktOrder]').filter(function () {
-            if (this.value == $('#ticktOrder').val())
-                this.checked = true;
-
-        });
-    } else {
-        let showBy = $('input[type=radio][name="ticktOrder"]:checked').val();
-        let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
-
+    let TaskNo = $("#txtTaskNo").val();
+    TaskNo = TaskNo ? TaskNo.value : 0; 
         $.ajax({
             url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDate?EmployeeName=${EmployeeName}&showBy=${showBy}&Status=${Status}&ticketNo=0`,
             type: 'POST',
@@ -100,7 +77,7 @@ function GetGenerateTaskTicketDateList(Type) {
             },
             success: function (response) {
                 if (response.length > 0) {
-                    $("#Table").show();
+                    $("#txtSummary").show();
                     const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project / Client", "Ticket No"];
                     const NumericFilterColumn = [];
                     const DateFilterColumn = ["Log Date"];
@@ -121,8 +98,8 @@ function GetGenerateTaskTicketDateList(Type) {
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
 
                 } else {
-                    $("#Table").hide();
-                    if (Type != 'Load') {
+                    $("#txtSummary").hide();
+                    if (Type == 'Get') {
                         toastr.error("Record not found...!");
                     }
 
@@ -133,7 +110,7 @@ function GetGenerateTaskTicketDateList(Type) {
                 console.error("Error:", error);
             }
         });
-    }
+    
 }
 function ViewAttachment(code) {
     $.ajax({
@@ -379,7 +356,7 @@ function StatusType(code) {
             if (response) {
                 const item = response[0];  // Define item properly
                 $("#txtTotalResolutionM").val(item.Times);
-                $("#txtResolutionDates").val(item.Dates.split('T')[0]);
+                $("#txtResolutionDates").val(item.Dates);
                 $("#txtRemarks").val(item.Remarks);
                 $("#txtResolvedBy").val(item.Name);
                 $("#txtReAssign").val(item.Name);
@@ -543,10 +520,16 @@ function Edit(code) {
     $("#txtpage").show();
     G_Code = code;
 }
+function convertDateFormat(dateString) {
+    const [day, month, year] = dateString.split('/');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthAbbreviation = monthNames[parseInt(month) - 1];
+    return `${day}-${monthAbbreviation}-${year}`;
+}
 function Save(){
     let Status = $("#txtStatus").val();
     let TotalResolutionM = $("#txtTotalResolutionM").val();
-    let ResolutionDates = $("#txtResolutionDates").val();
+    let ResolutionDates = convertDateFormat($("#txtResolutionDates").val());
     let ReAssign = $("#txtReAssign").val();
     let ResolvedBy = $("#txtResolvedBy").val();
     let UpdateBy = $("#txtUpdateBy").val();

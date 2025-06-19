@@ -215,21 +215,16 @@
                             <input type="radio" name="ticktOrder" class="with-gap" checked="checked" value="UsWise" />
                             <span class="font-size1-3rem">User wise </span>
                         </label>
-                        @{
-                            var employeeType = Context.Session.GetString("EmployeeType");
+                       @*  @{
+                            var UserType = Context.Session.GetString("UserType");
                         }
-
-                        @if (employeeType == "A")
-                        {
-                            <label>
+                        @if (UserType == "A")
+                        { *@
+                        <label id="txtAllUser">
                                 <input type="radio" name="ticktOrder" class="with-gap" value="allUser" />
                                 <span>All User</span>
                             </label>
-                        }
-                     @*    <label>
-                            <input type="radio" name="ticktOrder" class="with-gap" value="allUser" />
-                            <span class="font-size1-3rem">All User </span>
-                        </label> *@
+                        @* } *@
                     </div>
                 </div>
 
