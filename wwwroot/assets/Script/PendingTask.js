@@ -242,6 +242,8 @@ function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
 
+    $('txtResolutionDates').val(defaultDate);
+
     $('#txtResolutionDates').val(defaultDate);
     $('#txtResolutionDates').datepicker({
         format: 'dd/mm/yyyy',
@@ -592,6 +594,5 @@ function ClearData() {
     $("#txtResolvedBy").val(null).trigger('change');
     $("#txtUpdateBy").val('0').trigger('change');
     $("#txtRemarks").val("");
-   
 }
 

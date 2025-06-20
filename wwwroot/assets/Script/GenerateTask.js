@@ -801,6 +801,7 @@ function ClearData() {
     $("#txtAssigned").val("Select").trigger('change');
     $("#txtEstimatedTime").val("");
     $("#txtAttachment").val("");
+    AttachmentDetail = [];
     DatePicker();
 }
 function GetAllDetailsTicketNo() {
@@ -814,11 +815,21 @@ function GetAllDetailsTicketNo() {
         success: function (response) {
             $("#txtLogDate").val(response[0].LogDate);
             $("#txtDescription").val(response[0].Description);
-           // SelectOptionByText("txtWorkType", response[0].WorkTypeMaster_Code);
+            $("#txtProjectClient").val(response[0].ClientMaster_Code);
             $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
+            $("#txtAssigned").val(response[0].EmployeeMaster_Code);
+           
+            response.forEach(item => {
+                BindSelect2(`txtProjectClient`, G_ProjectList);
+                $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
+            });
             response.forEach(item => {
                 BindSelect2(`txtWorkType`, G_WorkTypeList);
                 $(`#txtWorkType`).val(item.WorkTypeMaster_Code).select2({ width: '100%' });
+            });
+            response.forEach(item => {
+                BindSelect2(`txtAssigned`, G_EmployeeNameList);
+                $(`#txtAssigned`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
             });
         },
         error: function (xhr, status, error) {
