@@ -200,11 +200,11 @@ function Delete(code) {
                     toastr.success(response[0].Msg);
                     ShowClientMaster('Get');
                 } else {
-                    toastr.error("Unexpected response format.");
+                    toastr.success(response[0].Msg);
                 }
             },
             error: function (xhr, status, error) {
-                toastr.error("Error deleting item:", Msg);
+                toastr.error("Cannot be deleted as it is reference !");
             }
         });
     }
@@ -219,9 +219,9 @@ function GetExcelTemplate(WithData) {
         success: function (response) {
             if (response.length > 0) {
                 if (WithData == 'N') {
-                    ExportToExcel(response, 'WorkType_Tamplate.xlsx');
+                    ExportToExcel(response, 'ClientMaster_Tamplate.xlsx');
                 } else {
-                    ExportToExcel(response, 'WorkType_Tamplate_Sample.xlsx');
+                    ExportToExcel(response, 'ClientMaster_Tamplate_Sample.xlsx');
                 }
 
             } else {

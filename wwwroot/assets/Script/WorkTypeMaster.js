@@ -152,12 +152,12 @@ function Delete(code) {
                 if (response[0].Status === 'Y') {
                     toastr.success(response[0].Msg);
                     ShowWorkTypeMaster('Get');
-                } else {
-                    toastr.error("Unexpected response format.");
+                }else {
+                    toastr.error(response[0].Msg);
                 }
             },
             error: function (xhr, status, error) {
-                toastr.error("Error deleting item:", Msg);
+                toastr.error("Cannot be deleted as it is referenced !");
             }
         });
     }

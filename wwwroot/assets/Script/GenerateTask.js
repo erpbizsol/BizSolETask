@@ -232,7 +232,7 @@ function GetClientMasterDetails() {
             const $select = $('#txtProjectClient');
             $select.empty();
             if (response && response.length > 0) {
-                $select.append(new Option("Select Project Client..", "0", true));
+                $select.append(new Option("Select Project Client..", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.ClientName, item.Code));
                 });
@@ -795,10 +795,10 @@ function ClearData() {
     $("#txtTaskType").val("1");
     $("#txtTaskNo").val("");
     $("#txtPriority").val("1");
-    $("#txtProjectClient").val("").trigger('change');
-    $("#txtWorkType").val("").trigger('change');
+    $("#txtProjectClient").val("Select").trigger('change');
+    $("#txtWorkType").val("Select").trigger('change');
     $("#txtDescription").val("");
-    $("#txtAssigned").val("").trigger('change');
+    $("#txtAssigned").val("Select").trigger('change');
     $("#txtEstimatedTime").val("");
     $("#txtAttachment").val("");
     DatePicker();
