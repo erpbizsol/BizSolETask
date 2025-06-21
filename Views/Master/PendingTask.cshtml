@@ -153,7 +153,7 @@
                             <input type="hidden" id="hftxtCode" value="0" />
                             <label for="txtStatus" class="col-form-label-sm fw-bold">Status</label>
                             <select id="txtStatus" name="txtStatus" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Status..." maxlength="10">
-                               
+                               <option value="0">Please Select</option>
                             </select>
                         </div>
                         <div class="col-md-3 col-sm-6" style="display:none" id="txtTotalResolutionM1">
@@ -215,16 +215,10 @@
                             <input type="radio" name="ticktOrder" class="with-gap" checked="checked" value="UsWise" />
                             <span class="font-size1-3rem">User wise </span>
                         </label>
-                       @*  @{
-                            var UserType = Context.Session.GetString("UserType");
-                        }
-                        @if (UserType == "A")
-                        { *@
                         <label id="txtAllUser">
                                 <input type="radio" name="ticktOrder" class="with-gap" value="allUser" />
                                 <span>All User</span>
-                            </label>
-                        @* } *@
+                        </label>
                     </div>
                 </div>
 
@@ -279,8 +273,9 @@
                             <tbody id="table-body"></tbody>
                         </table>
                     </div>
-                    <div class="paginator" id="paginator-table">
-                    </div>
+                  
+                </div>
+                <div class="paginator" id="paginator-table">
                 </div>
             </div>
         </div>

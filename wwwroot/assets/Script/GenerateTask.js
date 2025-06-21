@@ -221,18 +221,10 @@ function GetClientMasterDetails() {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (response) {
-            if (Array.isArray(response) && response.length > 0) {
-                G_ProjectList = response.map(item => ({
-                    Code: item.Code,
-                    Name: item.ClientName
-                }));
-            } else {
-                G_ProjectList = [];
-            }
             const $select = $('#txtProjectClient');
             $select.empty();
             if (response && response.length > 0) {
-                $select.append(new Option("Select Project Client..", true, true));
+                $select.append(new Option("Select Project Client..", "0", true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.ClientName, item.Code));
                 });
@@ -241,9 +233,18 @@ function GetClientMasterDetails() {
             $select.select2({
                 width: '100%',
                 closeOnSelect: false,
-               // placeholder: "Select Project Client...",
+                // placeholder: "Select Project Client...",
                 allowClear: true
             });
+            if (Array.isArray(response) && response.length > 0) {
+                G_ProjectList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.ClientName
+                }));
+            } else {
+                G_ProjectList = [];
+            }
+          
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -270,7 +271,7 @@ function GetWorkTypes() {
             const $select = $('#txtWorkType');
             $select.empty();
             if (response && response.length > 0) {
-               // $select.append(new Option("Select Work Type..", true, true));
+               $select.append(new Option("Select Work Type..", "0", true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.WorkType, item.Code));
                 });
@@ -308,7 +309,7 @@ function GetAssigneds() {
             const $select = $('#txtAssigned');
             $select.empty();
             if (response && response.length > 0) {
-                 //$select.append(new Option("Select Assigned..", true, true));
+                 $select.append(new Option("Select Assigned..", "0", true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
@@ -794,11 +795,11 @@ function ClearData() {
     $("#hftxtCode").val("0");
     $("#txtTaskType").val("1");
     $("#txtTaskNo").val("");
-    $("#txtPriority").val("1");
-    $("#txtProjectClient").val("Select").trigger('change');
-    $("#txtWorkType").val("Select").trigger('change');
+    $("#txtPriority").val("2");
+    $("#txtProjectClient").val("").trigger('change');
+    $("#txtWorkType").val("").trigger('change');
     $("#txtDescription").val("");
-    $("#txtAssigned").val("Select").trigger('change');
+    $("#txtAssigned").val("").trigger('change');
     $("#txtEstimatedTime").val("");
     $("#txtAttachment").val("");
     AttachmentDetail = [];
@@ -841,7 +842,6 @@ function GetAllDetailsTicketNo() {
 $("#txtTaskNo").on('change', function () {
     GetAllDetailsTicketNo();
 })
-
 function Delete(code) {
     if (confirm(`Are you sure you want delete this.?`)) {
         $.ajax({

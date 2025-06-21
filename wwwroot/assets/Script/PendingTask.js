@@ -280,7 +280,7 @@ function GetResolvedBy() {
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
-              
+                EmployeeName = response.Code;
             }
             $select.select2({
                 width: '100%',
@@ -318,7 +318,7 @@ function GetReAssign() {
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
-             
+                EmployeeName = response.Code;
             }
             $select.select2({
                 width: '100%',
@@ -346,26 +346,26 @@ function BindSelect2(elementId, list) {
         width: '100%'
     });
 }
-function StatusType(code) {
+function StatusType() {
     var Status = $("#txtStatus").val();
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetStatusType?Code=36`,
+        url: `${appBaseURL}/api/Master/GetStatusType?Code=${G_Code}`,
         type: 'POST',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (response) {
             if (response) {
-                const item = response[0];  // Define item properly
-                $("#txtTotalResolutionM").val(item.Times);
-                $("#txtResolutionDates").val(item.Dates);
-                $("#txtRemarks").val(item.Remarks);
-                $("#txtResolvedBy").val(item.Name);
-                $("#txtReAssign").val(item.Name);
+             
+                $("#txtTotalResolutionM").val(response[0].Times);
+                $("#txtResolutionDates").val(response[0].Dates);
+                $("#txtRemarks").val(response[0].Remarks);
+                //$("#txtResolvedBy").val(response[0].EmployeeName);
+                //$("#txtReAssign").val(response[0].EmployeeName);
                 if (Status == "2") {
                     response.forEach(item => {
                         BindSelect2(`txtResolvedBy`, G_ResolvedByList);
-                        $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
+                        $(`#txtResolvedBy`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
                     });
                 }
                 
@@ -521,6 +521,7 @@ function imgToCanvasWithOrientation(img, rawWidth, rawHeight, orientation) {
 function Edit(code) {
     $("#txtpage").show();
     G_Code = code;
+    DatePicker();
 }
 function convertDateFormat(dateString) {
     const [day, month, year] = dateString.split('/');
@@ -587,12 +588,13 @@ function Save(){
 
 function ClearData() {
     $("#hftxtCode").val("0");
-    $("#txtStatus").val('0').trigger('change');
+    $("#txtStatus").val("0").trigger('change');
     $("#txtTotalResolutionM").val("");
-    $("#txtResolutionDates").val("");
-    $("#txtReAssign").val(null).trigger('change');
-    $("#txtResolvedBy").val(null).trigger('change');
-    $("#txtUpdateBy").val('0').trigger('change');
+   // $("#txtResolutionDates").val("");
     $("#txtRemarks").val("");
+    $("#txtReAssign").val("0").trigger('change');
+    $("#txtResolvedBy").val("0").trigger('change');
+    $("#txtUpdateBy").val('0').trigger('change');
+    DatePicker();
 }
 

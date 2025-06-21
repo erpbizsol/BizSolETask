@@ -157,7 +157,7 @@ function Delete(code) {
                 }
             },
             error: function (xhr, status, error) {
-                toastr.error("Cannot be deleted as it is referenced !");
+                toastr.error("Cannot be deleted as it is referenced.");
             }
         });
     }

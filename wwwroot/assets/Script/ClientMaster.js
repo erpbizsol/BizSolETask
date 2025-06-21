@@ -32,7 +32,6 @@ $(document).ready(function () {
         UploadExcel();
     });
     GetEmployeeMasterList();
-    
 
     $('#mySelect2').change(function () {
         G_SelectedValues = $(this).val();
@@ -200,11 +199,11 @@ function Delete(code) {
                     toastr.success(response[0].Msg);
                     ShowClientMaster('Get');
                 } else {
-                    toastr.success(response[0].Msg);
+                    toastr.error(response[0].Msg);
                 }
             },
             error: function (xhr, status, error) {
-                toastr.error("Cannot be deleted as it is reference !");
+                toastr.error("Cannot be deleted as it is reference.");
             }
         });
     }

@@ -21,6 +21,7 @@ $(document).ready(async function () {
         $("#ddlEmployeeName").prop('disabled', true);
         GetDepartmentList(UserName);
     }
+    GetDepartmentList(UserName);
     $('#ddlEmployeeName').on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtFromDate").focus();

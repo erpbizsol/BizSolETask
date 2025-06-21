@@ -64,8 +64,8 @@ function GetWorksTime() {
             xhr.setRequestHeader('Auth-Key', authKeyData); 
         },
         success: function (response) {
-            if (response?.length > 0) {
-                $('#gettime').text(response[0].Time);
+            if (Array.isArray(response) && response.length > 0 && response[0].Time != null) {
+                $('#gettime').text(response[0].Time); 
             } else {
                 $('#gettime').text('0');
             }
