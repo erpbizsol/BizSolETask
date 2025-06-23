@@ -67,7 +67,7 @@ $(document).ready(async function () {
     await GetPriorityDetails();
     await GetClientMasterDetails();
     await GetWorkTypes();
-    await GetAssigneds();
+   // await GetAssigneds();
     $("#txtTaskType").change(function () {
         var selectedValue = $(this).val();
         if (selectedValue === "1") {
@@ -252,6 +252,12 @@ function GetClientMasterDetails() {
         }
     });
 }
+$('#txtProjectClient').on('change', function () {
+    let selectedCode = $(this).val();
+    if (selectedCode && selectedCode !== "0") {
+        GetAssigneds(selectedCode);
+    }
+});
 function GetWorkTypes() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetWorkTypes`,
@@ -290,9 +296,9 @@ function GetWorkTypes() {
         }
     });
 }
-function GetAssigneds() {
+function GetAssigneds(selectedCode) {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetAssigneds`,
+        url: `${appBaseURL}/api/Master/GetAssigneds?Code=${selectedCode}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -305,6 +311,7 @@ function GetAssigneds() {
                 }));
             } else {
                 G_EmployeeNameList = [];
+                toastr.error("No employees found.");
             }
             const $select = $('#txtAssigned');
             $select.empty();

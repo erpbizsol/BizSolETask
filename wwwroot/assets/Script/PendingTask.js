@@ -41,7 +41,7 @@ $("#txtStatus").on('change', function () {
         $("#txtReAssign1").hide();
         GetResolvedBy();
         StatusType();
-        
+      
     } else if (Status == "4") {
         $("#txtTotalResolutionM1").show();
         $("#txtResolutionDate").show();
@@ -51,6 +51,7 @@ $("#txtStatus").on('change', function () {
         $("#txtUpdateBy1").hide();
         StatusType();
         GetReAssign();
+     
     } else {
         $("#txtTotalResolutionM1").hide();
         $("#txtResolutionDate").hide();
@@ -92,7 +93,7 @@ function GetGenerateTaskTicketDateList(Type) {
                             `
                     <a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
                     <button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
-                    <button class="btn btn-primary icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`
+                    <button class="btn btn-primary icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}','${UserMaster_Code}')"><i class="fa-solid fa-pencil"></i></button>`
                     }));
 
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
@@ -360,12 +361,12 @@ function StatusType() {
                 $("#txtTotalResolutionM").val(response[0].Times);
                 $("#txtResolutionDates").val(response[0].Dates);
                 $("#txtRemarks").val(response[0].Remarks);
-                //$("#txtResolvedBy").val(response[0].EmployeeName);
-                //$("#txtReAssign").val(response[0].EmployeeName);
+                $("#txtResolvedBy").val(response[0].Code);
+                $("#txtReAssign").val(response[0].Code);
                 if (Status == "2") {
                     response.forEach(item => {
                         BindSelect2(`txtResolvedBy`, G_ResolvedByList);
-                        $(`#txtResolvedBy`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
+                        $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
                     });
                 }
                 
@@ -379,6 +380,7 @@ function StatusType() {
         }
     });
 }
+
 
 $("#txtAttachment").on('change', (event) => {
     const files = event.target.files;
