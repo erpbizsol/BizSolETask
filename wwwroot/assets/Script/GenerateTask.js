@@ -645,6 +645,7 @@ function BindSelect2(elementId, list) {
     });
 }
 function Edit(code) {
+    $("#txtTaskType").focus();
     $.ajax({
         url: ` ${appBaseURL}/api/Master/GetGenerateTaskTicketByCode?Code=${code}`,
         type: 'GET',

@@ -31,12 +31,32 @@ $(document).ready(function () {
     $("#btnUpload").click(function (e) {
         UploadExcel();
     });
+    $('.select-checkbox-multi').click(function () {
+        let inputWidth = $(this).outerWidth();
+        $('#dropdownList').css({
+            'position': 'absolute',
+            'width': inputWidth + 'px',
+        }).toggle(); 
+    });
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown-container').length) {
+            $('#dropdownList').hide();
+        }
+    });
+    $('#selectAll').on('change', function () {
+        $('.option').prop('checked', this.checked);
+        updateSelectedText();
+    });
+    $(document).on('change', '.option', function () {
+        if ($('.option:checked').length === $('.option').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+        updateSelectedText();
+    });
     GetEmployeeMasterList();
 
-    $('#mySelect2').change(function () {
-        G_SelectedValues = $(this).val();
-        console.log(G_SelectedValues);
-    });
 });
 function ShowClientMaster(Type) {
     $.ajax({
@@ -81,6 +101,7 @@ function Save() {
     var ClientName = $("#txtClientName").val();
     var DefaultEmails = $("#txtDefaultEmail").val();
     var Code = $("#hfCode").val();
+    const G_SelectedValues = document.getElementById('dropdownButton').value;
     if (ClientName == "") {
         toastr.error('Please enter client name.');
         $("#txtClientName").focus();
@@ -95,12 +116,12 @@ function Save() {
         return;
     } else if (G_SelectedValues.length == 0) {
         toastr.error('Please select users.');
-        $("#mySelect2").focus();
+        $("#dropdownButton").focus();
         return;
     }
     else {
-        let Employee_Codes = Array.isArray(G_SelectedValues)? G_SelectedValues.join(','): JSON.parse(G_SelectedValues.replace(/'/g, '"')).join(',');
-        
+        let codes = GetSelectedWorkTypeCodes();
+        let Employee_Codes = Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',');
         const payload = {
             Code: Code,
             ClientName: ClientName,
@@ -160,15 +181,33 @@ function Edit(code) {
                 $("#hfCode").val(response[0].Code);
                 $("#txtClientName").val(response[0].ClientName);
                 $("#txtDefaultEmail").val(response[0].DefaultEmails);
+               // let codesRaw = response[0].Employee_Codes;
+                //if (typeof codesRaw === "string") {
+                //        let fixed = codesRaw.trim().replace(/^\[|\]$/g, '').replace(/'/g, '"');  
+                //        let finalJson = "[" + fixed + "]";
+                //        let codes = JSON.parse(finalJson);
+                //    $('#dropdownButton').val(codes).trigger('change');
+                //}
                 let codesRaw = response[0].Employee_Codes;
+                let codes = [];
 
-                if (typeof codesRaw === "string") {
-                        let fixed = codesRaw.trim().replace(/^\[|\]$/g, '').replace(/'/g, '"');  
-                        let finalJson = "[" + fixed + "]";
-                        let codes = JSON.parse(finalJson);
-                        $('#mySelect2').val(codes).trigger('change');
+                try {
+                    let fixed = codesRaw.trim().replace(/^\[|\]$/g, '').replace(/'/g, '"');
+                    let finalJson = "[" + fixed + "]";
+                    codes = JSON.parse(finalJson); 
+                } catch (e) {
+                    console.error("Employee_Codes parse error:", e);
                 }
-
+                setTimeout(function () {
+                    $('.option').each(function () {
+                        if (codes.includes(parseInt($(this).val()))) {
+                            $(this).prop('checked', true);
+                            updateSelectedText();
+                        } else {
+                            $(this).prop('checked', false);
+                        }
+                    });
+                }, 300);
             } else {
                 toastr.error("Record not found...!");
             }
@@ -183,8 +222,9 @@ function ClearData() {
     $("#hfCode").val("0");
     $("#txtClientName").val("");
     $("#txtDefaultEmail").val("");
-    $('#mySelect2').val(null).trigger('change');
+    $('#dropdownButton').val(null).trigger('change');
     G_SelectedValues = [];
+    selectedCodes = [];
 }
 function Delete(code) {
     if (confirm(`Are you sure you want delete this.?`)) {
@@ -407,30 +447,36 @@ function GetEmployeeMasterList() {
         },
         success: function (response) {
             if (response.length > 0) {
-                const $select = $('#mySelect2');
-                $select.empty(); 
-
-                $.each(response, function (key, val) {
-                    $select.append(new Option(val.EmployeeName, val.Code));
+                let html = '';
+                response.forEach(item => {
+                    html += `<label>
+                    <input type="checkbox" class="option" value="${item.Code}" data-name="${item.EmployeeName.trim()}"> ${item.EmployeeName.trim()}
+                    </label><br>`;
                 });
-
-                $select.select2({
-                    width: '100%',
-                    closeOnSelect: false,
-                    placeholder: "Select users...",
-                    allowClear: true
-                });
-            } else {
-                $('#mySelect2').empty();
+                $('#checkboxOptions').html(html);
             }
         },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            $('#mySelect2').empty();
+        error: function () {
+            alert('Error loading work types');
         }
     });
+}
+
+function updateSelectedText() {
+    let selectedNames = $('.option:checked').map(function () {
+        return $(this).data('name');
+    }).get().join(', ');
+    $('#dropdownButton').val(selectedNames);
+}
+function GetSelectedWorkTypeCodes() {
+    let selectedCodes = [];
+    $('.option:checked').each(function () {
+        selectedCodes.push($(this).val());
+    });
+    return selectedCodes; 
 }
 function isEmail(email) {
     var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     return regex.test(email);
 }
+

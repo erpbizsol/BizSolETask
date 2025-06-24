@@ -179,7 +179,6 @@ function GetWorkTypeList() {
                 G_WorkTypeList = response;
                 G_WorkTypeList = G_WorkTypeList.map((item) => ({ Code: item.Code, Name: item['WorkType'] }));
                 addNewRow();
-
             }
         },
         error: function (xhr, status, error) {
@@ -692,11 +691,9 @@ function ClearData() {
     $("#txtRemarks").val("");
 }
 
-
 $('#ManualTimeCheckDefault').on('change', function () {
     ShowHideFooter();
 });
-
 
 function ShowHideFooter() {
     let isManual = $('#ManualTimeCheckDefault').is(':checked');

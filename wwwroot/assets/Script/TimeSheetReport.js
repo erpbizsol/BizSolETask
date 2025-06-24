@@ -7,8 +7,8 @@ const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
     DatePicker();
     GetEmployeeMasterList();
-    GetWorkTypeList();
-    GetClientList();
+    //GetWorkTypeList();
+   // GetClientList();
     $("#ERPHeading").text("Time Sheet Report");
     $("#txtFromDate").on('keydown', function (e) {
         if (e.key === "Enter") {
@@ -49,7 +49,79 @@ $(document).ready(function () {
         $("#ddlEmployeeName").prop('disabled', true);
         SelectOptionByText('ddlEmployeeName', UserName);
     }
+    $('.select-checkbox-multis').click(function () {
+        let inputWidth = $(this).outerWidth();
+        $('#ddlWorkType').css({
+            'position': 'absolute',
+            'width': inputWidth + 'px',
+        }).toggle();
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown-container').length) {
+            $('#ddlWorkType').hide();
+        }
+    });
+
+    $('#selectAll').on('change', function () {
+        $('.option').prop('checked', this.checked);
+        updateSelectedText();
+    });
+    $(document).on('change', '.option', function () {
+        if ($('.option:checked').length === $('.option').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+        updateSelectedText();
+    });
+    GetWorkTypeList();
+    $('.select-checkbox-multi').click(function () {
+        let inputWidth = $(this).outerWidth();
+        $('#ddlClientName').css({
+            'position': 'absolute',
+            'width': inputWidth + 'px',
+        }).toggle();
+    });
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown-container1').length) {
+            $('#ddlClientName').hide();
+        }
+    });
+    $('#selectAllClient').on('change', function () {
+        $('.option1').prop('checked', this.checked);
+        updateSelectedTextC();
+    });
+    $(document).on('change', '.option1', function () {
+        if ($('.option1:checked').length === $('.option1').length) {
+            $('#selectAllClient').prop('checked', true);
+        } else {
+            $('#selectAllClient').prop('checked', false);
+        }
+        updateSelectedTextC();
+    });
+    GetClientList();
 });
+function updateSelectedText() {
+    let selectedNames = $('.option:checked').map(function () {
+        return $(this).data('name');
+    }).get().join(', ');
+    $('#SddlWorkType').val(selectedNames);
+}
+function updateSelectedTextC() {
+    let selectedNamess = $('.option1:checked').map(function () {
+        return $(this).data('name');
+    }).get().join(', ');
+    $('#CddlClientName').val(selectedNamess);
+}
+
+function GetSelectedWorkTypeCodes() {
+    let selectedCodes = [];
+    $('.option:checked').each(function () {
+        selectedCodes.push($(this).val());
+    });
+    return selectedCodes;
+}
 $("#txtShow").click(async function () {
     var reportType = $("#ddlReportType").val();
 
@@ -158,19 +230,28 @@ function GetWorkTypeList() {
         },
         success: function (response) {
             if (response.length > 0) {
-                const $select = $('#ddlWorkType');
-                $select.empty();
+                if (response.length > 0) {
+                    let html = '';
+                    response.forEach(item => {
+                        html += `<label>
+                    <input type="checkbox" class="option" value="${item.Code}" data-name="${item.WorkType.trim()}"> ${item.WorkType.trim()}
+                    </label><br>`;
+                    });
+                    $('#checkboxOptions').html(html);
+                }
+                //const $select = $('#ddlWorkType');
+                //$select.empty();
 
-                $.each(response, function (key, val) {
-                    $select.append(new Option(val.WorkType, val.Code));
-                });
+                //$.each(response, function (key, val) {
+                //    $select.append(new Option(val.WorkType, val.Code));
+                //});
 
-                $select.select2({
-                    width: '100%',
-                    closeOnSelect: false,
-                    placeholder: "Select Work Type...",
-                    allowClear: true
-                });
+                //$select.select2({
+                //    width: '100%',
+                //    closeOnSelect: false,
+                //    placeholder: "Select Work Type...",
+                //    allowClear: true
+                //});
             } else {
                 $('#ddlWorkType').empty();
             }
@@ -190,19 +271,26 @@ function GetClientList() {
         },
         success: function (response) {
             if (response.length > 0) {
-                const $select = $('#ddlClientName');
-                $select.empty();
+                //const $select = $('#ddlClientName');
+                //$select.empty();
 
-                $.each(response, function (key, val) {
-                    $select.append(new Option(val.ClientName, val.Code));
-                });
+                //$.each(response, function (key, val) {
+                //    $select.append(new Option(val.ClientName, val.Code));
+                //});
 
-                $select.select2({
-                    width: '100%',
-                    closeOnSelect: false,
-                    placeholder: "Select Client...",
-                    allowClear: true
+                //$select.select2({
+                //    width: '100%',
+                //    closeOnSelect: false,
+                //    placeholder: "Select Client...",
+                //    allowClear: true
+                //});
+                let html1 = '';
+                response.forEach(item => {
+                    html1 += `<label>
+                    <input type="checkbox" class="option1" value="${item.Code}" data-name="${item.ClientName.trim()}"> ${item.ClientName.trim()}
+                    </label><br>`;
                 });
+                $('#ClientOptions').html(html1);
             } else {
                 $('#ddlClientName').empty();
             }
@@ -228,10 +316,16 @@ function GetTimeSheetReport() {
     const FromDate = convertToYearMonthDay(FDate);
     const TDate = $('#txtToDate').val();
     const ToDate = convertToYearMonthDay(TDate);
-    const WorkType = $('#ddlWorkType').val();
-    const ClientName = $('#ddlClientName').val();
+    //const WorkType = $('#ddlWorkType').val();
+    const WorkType = document.getElementById('SddlWorkType').value;
+    //const ClientName = $('#ddlClientName').val();
+    const ClientName = document.getElementById('CddlClientName').value;
     const ReportType = $('#ddlReportType').val();
     G_ReportType = ReportType;
+    //let W_Code = GetSelectedWorkTypeCodes();
+    //let C_Code = GetSelectedWorkTypeCodes();
+    //let WorkType_Codes = Array.isArray(W_Code) ? W_Code.join(',') : JSON.parse(W_Code.replace(/'/g, '"')).join(',');
+    //let ClientName_Codes = Array.isArray(C_Code) ? C_Code.join(',') : JSON.parse(C_Code.replace(/'/g, '"')).join(',');
     $.ajax({
         url: `${appBaseURL}/api/Report/GetTimeSheetReport?FromDate=${FromDate}&ToDate=${ToDate}&ClientMaster_Code=${ClientName}&WorkTypeMaster_Code=${WorkType}&EmployeeMaster_Code=${emp}&ReportType=${ReportType}`,
         type: 'GET',
@@ -398,9 +492,9 @@ function GetEmployeeType() {
     });
 }
 function Reset() {
-    $('#ddlWorkType').val("").trigger('change');
+    $('#SddlWorkType').val("").trigger('change');
     //$('#ddlEmployeeName').val("").trigger('change');
-    $('#ddlClientName').val("").trigger('change');
+    $('#CddlClientName').val("").trigger('change');
     $("#AllTable").hide();
     $("#txtSummary").hide();
     document.getElementById("footerTotalMinutes").textContent = '';

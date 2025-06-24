@@ -94,6 +94,57 @@
         margin-top: 2.1rem;
     }
 
+    .dropdown-container1 {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, sans-serif;
+    }
+
+    .dropdown-button1 {
+        padding: 8px;
+        border: 2px solid black;
+        cursor: pointer;
+        background-color: white;
+        width: 300px;
+        margin-top: 10px;
+    }
+
+    .dropdown-list1 {
+        display: none;
+        background-color: white;
+        border: 1px solid #ccc;
+        z-index: 1000 !important;
+        padding: 5px;
+        max-height: 132px;
+        margin-top: -8px;
+        overflow-y: auto;
+    }
+
+    .dropdown-container2 {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, sans-serif;
+    }
+
+    .dropdown-button2 {
+        padding: 8px;
+        border: 2px solid black;
+        cursor: pointer;
+        background-color: white;
+        width: 300px;
+        margin-top: 10px;
+    }
+
+    .dropdown-list2 {
+        display: none;
+        background-color: white;
+        border: 1px solid #ccc;
+        z-index: 1000 !important;
+        padding: 5px;
+        max-height: 132px;
+        margin-top: -8px;
+        overflow-y: auto;
+    }
 </style>
 
 <div id="txtCreatepage">
@@ -115,18 +166,45 @@
                             <select id="ddlEmployeeName" multiple autocomplete="off" class="form-control form-control-sm box_border" placeholder="Select Employee Name..">
                             </select>
                         </div>
-                        <div class="col-md-3 col-sm-6">
+                       
+                        <div class="col-md-3  col-sm-6 dropdown-container">
+
+                            <label for="SddlWorkType" class="col-form-label-sm fw-bold">
+                                Work Type <span class="text-danger"></span>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="text" id="SddlWorkType" readonly class="form-control form-control-sm box_border select-checkbox-multis" placeholder="Select Work Type">
+                            </div>
+                            <div class="dropdown-list" id="ddlWorkType">
+                                <label><input type="checkbox" id="selectAll"> Select All</label><br>
+                                <div id="checkboxOptions"></div>
+                            </div>
+                        </div>
+                      @*   <div class="col-md-3 col-sm-6">
                             <label for="ddlWorkType" class="col-form-label-sm fw-bold">Work Type</label>
                            
                             <select id="ddlWorkType" multiple name="ddlWorkType" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Select Work Type.." maxlength="10">
                             </select>
-                        </div>
+                        </div> *@
                     </div>
                     <div class="row">
-                        <div class="col-md-3 col-sm-6">
+                      @*   <div class="col-md-3 col-sm-6">
                             <label for="ddlClientName" class="col-form-label-sm fw-bold">Client Name</label>
                             <select id="ddlClientName" multiple name="ddlClientName" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Select Client Name.." maxlength="10">
                             </select>
+                        </div> *@
+                        <div class="col-md-3  col-sm-6 dropdown-container1">
+
+                            <label for="CddlClientName" class="col-form-label-sm fw-bold">
+                                Client Name <span class="text-danger"></span>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="text" id="CddlClientName" readonly class="form-control form-control-sm box_border select-checkbox-multi" placeholder="Select Client Name">
+                            </div>
+                            <div class="dropdown-list1" id="ddlClientName">
+                                <label><input type="checkbox" id="selectAllClient"> Select All</label><br>
+                                <div id="ClientOptions"></div>
+                            </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <label for="ddlReportType" class="col-form-label-sm fw-bold">Report Type</label>
@@ -144,10 +222,10 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mt-5">
                 <div class="col-md-12" id="AllTable">
                     <div class="table-wrapper" style="overflow: auto;">
-                        <table id="table" class="table">
+                        <table id="table" class="">
                             <thead id="table-header">
                             <th>Client</th>
                             <th>Employee Name</th>

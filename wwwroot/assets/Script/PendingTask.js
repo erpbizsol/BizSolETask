@@ -522,6 +522,7 @@ function imgToCanvasWithOrientation(img, rawWidth, rawHeight, orientation) {
 }
 function Edit(code) {
     $("#txtpage").show();
+    $("#txtStatus").focus();
     G_Code = code;
     DatePicker();
 }

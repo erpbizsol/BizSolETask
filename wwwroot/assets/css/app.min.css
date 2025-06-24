@@ -6111,7 +6111,8 @@ legend {
 }
 
 :is(.form-control:disabled, input.form-control[readonly]) {
-    background-color: #e2e2e3 !important;
+    /*background-color: #e2e2e3 !important;*/
+    background-color: #f8f9fa !important;
     color: #000;
 }
 
@@ -6447,3 +6448,31 @@ th, .filter-table-heading {
 }
 
 /* End Login page design  */
+
+/* Start Select All CSS  */
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+    font-family: Arial, sans-serif;
+}
+
+.dropdown-button {
+    padding: 8px;
+    border: 2px solid black;
+    cursor: pointer;
+    background-color: white;
+    width: 300px;
+    margin-top: 10px;
+}
+
+.dropdown-list {
+    display: none;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 1000 !important;
+    padding: 5px;
+    max-height: 191px;
+    margin-top: -8px;
+    overflow-y: auto;
+}
+/* END Select All CSS  */
