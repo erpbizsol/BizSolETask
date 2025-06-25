@@ -259,7 +259,6 @@ function addNewRow() {
     const headerRow = document.createElement("tr");
     headerRow.innerHTML = `
         <th style="width:150px;">Department<span class="text-danger">*</span></th>`;
-
     if (isManualChecked === 'Y') {
         headerRow.innerHTML += `
             <th style="display:none;width:50px;">From Hr</th>
@@ -271,37 +270,33 @@ function addNewRow() {
             <th style="width:50px;">To Hr</th>
             <th style="width:150px;">Time in Minutes</th>`;
     }
-
     headerRow.innerHTML += `
         <th style="width:150px;">Work Type<span class="text-danger">*</span></th>
         <th style="width:150px;">Remarks</th>
         <th style="width:60px;">Action</th>`;
     tableHead.appendChild(headerRow);
-
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
         <td>
-            <select class="txtddlDipartment mandatory form-control form-control-sm box_border"
+            <select class="txtddlDipartment mandatory box_border form-control form-control-sm"
                     id="txtddlDipartment_0" autocomplete="off" maxlength="50">
             </select>
         </td>`;
-
     if (isManualChecked === 'Y') {
         newRow.innerHTML += `
             <td style="display:none"><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
             <td style="display:none"><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" onkeyup="NumericValue(this)" placeholder="Time in Minutes" autocomplete="off" maxlength="15"></td>`;
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes" autocomplete="off" maxlength="6"></td>`;
     } else {
         newRow.innerHTML += `
             <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
             <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes form-control form-control-sm box_border" onkeyup="NumericValue(this)" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="15"></td>`;
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="6"></td>`;
     }
-
     newRow.innerHTML += `
         <td>
-            <select class="txtddlWorkType mandatory form-control form-control-sm box_border"
-                    id="txtddlWorkType_0" autocomplete="off" maxlength="50"> 
+            <select class="txtddlWorkType mandatory box_border form-control form-control-sm"
+                    id="txtddlWorkType_0" autocomplete="off" maxlength="50">
             </select>
         </td>
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
@@ -314,11 +309,9 @@ function addNewRow() {
             </button>
         </td>`;
     tableBody.appendChild(newRow);
-
     BindSelect2('txtddlDipartment_0', G_DepartmentList);
     BindSelect2('txtddlWorkType_0', G_WorkTypeList);
 }
-
 async function GetEmpDateList() {
     const emp = $('#ddlEmployeeName').val();
     const rawDate = $('#txtFromDate').val();
@@ -694,7 +687,6 @@ function ClearData() {
 $('#ManualTimeCheckDefault').on('change', function () {
     ShowHideFooter();
 });
-
 function ShowHideFooter() {
     let isManual = $('#ManualTimeCheckDefault').is(':checked');
     if (isManual === true) {

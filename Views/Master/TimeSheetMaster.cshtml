@@ -93,6 +93,12 @@
         background-color: #195c61 !important;
         color: white;
     }
+
+    .dynamic-table td select,
+    .dynamic-table td input {
+        width: 100%;
+    }
+
 </style>
 <div id="txtCreatepage">
     <div class="card shadow-sm">
@@ -125,7 +131,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-wrapper" style="overflow: auto;">
-                        <table id="table" class="table">
+                        <table id="table" class="table dynamic-table">
                             <thead id="table-header">
                             </thead>
                             <tbody id="table-body"></tbody>
@@ -144,7 +150,7 @@
                 </div>
             </div>
         </div>
-        <div class="p-2">
+        <div class="col-sm-4 p-2">
             <label>Department Pending work remark</label>
             <input class="remarks-box form-control-sm box_border" type="text" id="txtRemarks" autocomplete="off" maxlength="500">
         </div>

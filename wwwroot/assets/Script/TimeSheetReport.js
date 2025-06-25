@@ -122,6 +122,13 @@ function GetSelectedWorkTypeCodes() {
     });
     return selectedCodes;
 }
+function GetSelectedClientCodes() {
+    let selectedCodes = [];
+    $('.option1:checked').each(function () {
+        selectedCodes.push($(this).val());
+    });
+    return selectedCodes;
+}
 $("#txtShow").click(async function () {
     var reportType = $("#ddlReportType").val();
 
@@ -322,12 +329,12 @@ function GetTimeSheetReport() {
     const ClientName = document.getElementById('CddlClientName').value;
     const ReportType = $('#ddlReportType').val();
     G_ReportType = ReportType;
-    //let W_Code = GetSelectedWorkTypeCodes();
-    //let C_Code = GetSelectedWorkTypeCodes();
-    //let WorkType_Codes = Array.isArray(W_Code) ? W_Code.join(',') : JSON.parse(W_Code.replace(/'/g, '"')).join(',');
-    //let ClientName_Codes = Array.isArray(C_Code) ? C_Code.join(',') : JSON.parse(C_Code.replace(/'/g, '"')).join(',');
+    let W_Code = GetSelectedWorkTypeCodes();
+    let C_Code = GetSelectedClientCodes();
+    let WorkType_Codes = Array.isArray(W_Code) ? W_Code.join(',') : JSON.parse(W_Code.replace(/'/g, '"')).join(',');
+    let ClientName_Codes = Array.isArray(C_Code) ? C_Code.join(',') : JSON.parse(C_Code.replace(/'/g, '"')).join(',');
     $.ajax({
-        url: `${appBaseURL}/api/Report/GetTimeSheetReport?FromDate=${FromDate}&ToDate=${ToDate}&ClientMaster_Code=${ClientName}&WorkTypeMaster_Code=${WorkType}&EmployeeMaster_Code=${emp}&ReportType=${ReportType}`,
+        url: `${appBaseURL}/api/Report/GetTimeSheetReport?FromDate=${FromDate}&ToDate=${ToDate}&ClientMaster_Code=${ClientName_Codes}&WorkTypeMaster_Code=${WorkType_Codes}&EmployeeMaster_Code=${emp}&ReportType=${ReportType}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -493,7 +500,7 @@ function GetEmployeeType() {
 }
 function Reset() {
     $('#SddlWorkType').val("").trigger('change');
-    //$('#ddlEmployeeName').val("").trigger('change');
+    $('#ddlEmployeeName').val("").trigger('change');
     $('#CddlClientName').val("").trigger('change');
     $("#AllTable").hide();
     $("#txtSummary").hide();
