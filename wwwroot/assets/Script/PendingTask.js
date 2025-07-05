@@ -25,8 +25,32 @@ $(document).ready(async function () {
         $("#txtAllUser").hide();
     }
     GetGenerateTaskTicketDateList('Get');
+    $('.select-checkbox-multi').click(function () {
+        let inputWidth = $(this).outerWidth();
+        $('#dropdownList').css({
+            'position': 'absolute',
+            'width': inputWidth + 'px',
+        }).toggle();
+    });
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown-container').length) {
+            $('#dropdownList').hide();
+        }
+    });
+    $('#selectAll').on('change', function () {
+        $('.option').prop('checked', this.checked);
+        updateSelected();
+    });
+    $(document).on('change', '.option', function () {
+        if ($('.option:checked').length === $('.option').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+        updateSelected();
+    });
+    GetEmployeeMasterList();
 });
-
 $('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
     GetGenerateTaskTicketDateList('Get');
 });
@@ -62,15 +86,21 @@ $("#txtStatus").on('change', function () {
     }
 
 });
+$(document).on('change', '.option', function () {
+    GetGenerateTaskTicketDateList('Get');
+});
 function GetGenerateTaskTicketDateList(Type) {
-
-    let EmployeeName = UserName;
-    let showBy = $('input[type=radio][name="ticktOrder"]:checked').val();
+    let EmployeeName = document.getElementById('dropdownButton').value;
+    //EmployeeName = UserName;
+    let showBy = "";
+    //$('input[type=radio][name="ticktOrder"]:checked').val();
     let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
     let TaskNo = $("#txtTaskNo").val();
     TaskNo = TaskNo ? TaskNo.value : 0; 
+    let codes = GetEmpCodes();
+    let Employee_Codes = codes.length > 0 ? codes.join(',') : null;
         $.ajax({
-            url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDate?EmployeeName=${EmployeeName}&showBy=${showBy}&Status=${Status}&ticketNo=0`,
+            url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDatePending?EmployeeName=${Employee_Codes}&showBy=${showBy}&Status=${Status}&ticketNo=0`,
             type: 'POST',
             dataType: "json",
             beforeSend: function (xhr) {
@@ -228,7 +258,6 @@ function GetStatuss() {
         }
     });
 }
-
 $("#txtBack").click(function () {
     $("#txtpage").hide();
     $("#txtTotalResolutionM1").hide();
@@ -260,7 +289,7 @@ function formatDateToString(dateObj) {
 }
 function GetResolvedBy() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetAssigneds`,
+        url: `${appBaseURL}/api/Master/GetAssignedss`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -298,7 +327,7 @@ function GetResolvedBy() {
 }
 function GetReAssign() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetAssigneds`,
+        url: `${appBaseURL}/api/Master/GetAssignedss`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -358,16 +387,24 @@ function StatusType() {
         success: function (response) {
             if (response) {
              
-                $("#txtTotalResolutionM").val(response[0].Times);
-                $("#txtResolutionDates").val(response[0].Dates);
-                $("#txtRemarks").val(response[0].Remarks);
-                $("#txtResolvedBy").val(response[0].Code);
-                $("#txtReAssign").val(response[0].Code);
+               
                 if (Status == "2") {
+                    $("#txtTotalResolutionM").val(response[0].Times);
+                    $("#txtResolutionDates").val(response[0].Dates);
+                    $("#txtRemarks").val(response[0].Remarks);
+                    $("#txtResolvedBy").val(response[0].Code);
+                    $("#txtReAssign").val(response[0].Code);
                     response.forEach(item => {
                         BindSelect2(`txtResolvedBy`, G_ResolvedByList);
                         $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
                     });
+                }
+                else if (Status == "4") {
+                    $("#txtTotalResolutionM").val(response[0].Times);
+                    $("#txtResolutionDates").val(response[0].Dates);
+                    $("#txtRemarks").val(response[0].Remarks);
+                    $("#txtResolvedBy").val(response[0].Code);
+                    $("#txtReAssign").val(response[0].Code);
                 }
                 
             } else {
@@ -380,7 +417,6 @@ function StatusType() {
         }
     });
 }
-
 
 $("#txtAttachment").on('change', (event) => {
     const files = event.target.files;
@@ -588,7 +624,6 @@ function Save(){
         });
     }
 }
-
 function ClearData() {
     $("#hftxtCode").val("0");
     $("#txtStatus").val("0").trigger('change');
@@ -600,4 +635,40 @@ function ClearData() {
     $("#txtUpdateBy").val('0').trigger('change');
     DatePicker();
 }
+function GetEmployeeMasterList() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=U`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                let html = '';
+                response.forEach(item => {
+                    html += `<label>
+                    <input type="checkbox" class="option" value="${item.Code}" data-name="${item.EmployeeName.trim()}"> ${item.EmployeeName.trim()}
+                    </label><br>`;
+                });
+                $('#checkboxOptions').html(html);
+            }
+        },
+        error: function () {
+            alert('Error loading work types');
+        }
+    });
+}
+function updateSelected() {
+    let selectedNames = $('.option:checked').map(function () {
+        return $(this).data('name');
+    }).get().join(', ');
+    $('#dropdownButton').val(selectedNames);
+}
+function GetEmpCodes() {
+    let selectedCodes = [];
+    $('.option:checked').each(function () {
+        selectedCodes.push($(this).val());
+    });
 
+    return selectedCodes;
+}

@@ -121,6 +121,32 @@
     a {
         text-decoration: none;
     }
+
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, sans-serif;
+    }
+
+    .dropdown-button {
+        padding: 8px;
+        border: 2px solid black;
+        cursor: pointer;
+        background-color: white;
+        width: 300px;
+        margin-top: 10px;
+    }
+
+    .dropdown-list {
+        display: none;
+        background-color: white;
+        border: 1px solid #ccc;
+        z-index: 1000 !important;
+        padding: 5px;
+        max-height: 132px;
+        margin-top: -8px;
+        overflow-y: auto;
+    }
 </style>
 @* ----------------Modal-------------------- *@
 <div id="attachmentModal" class="modal" style="display:none;">
@@ -208,21 +234,34 @@
         <div class="summary-section p-2">
             <div class="summary-title" style="text-align:center">Task Records</div>
             <div class="row">
-                <div class="col s4 m4">
+                <div class="col s4 m4" style="display:none;">
                     <strong>User</strong>
                     <div class="col s6 m4">
                         <label>
                             <input type="radio" name="ticktOrder" class="with-gap" checked="checked" value="UsWise" />
                             <span class="font-size1-3rem">User wise </span>
                         </label>
-                        <label id="txtAllUser">
+                        <label id="txtAllUser" >
                                 <input type="radio" name="ticktOrder" class="with-gap" value="allUser" />
                                 <span>All User</span>
                         </label>
+
                     </div>
                 </div>
+                <div class="col-md-3  col-sm-6 dropdown-container" style="margin-top:-10px;">
 
-                <div class="col s4 m4">
+                    <label for="dropdownButton" class="col-form-label-sm fw-bold">
+                        <strong>User</strong> <span class="text-danger">*</span>
+                    </label>
+                    <div style="position: relative;">
+                        <input type="text" id="dropdownButton" readonly class="form-control form-control-sm box_border select-checkbox-multi" placeholder="Select Users">
+                    </div>
+                    <div class="dropdown-list" id="dropdownList">
+                        <label><input type="checkbox" id="selectAll"> Select All</label><br>
+                        <div id="checkboxOptions"></div>
+                    </div>
+                </div>
+                <div class="col-md-3  col-sm-6">
                     <strong>Status</strong>
                     <div class="col s6 m4">
                         <label>
@@ -230,6 +269,10 @@
                             <span class="font-size1-3rem">Pending</span>
                         </label>
                         <label>
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" />
+                            <span class="font-size1-3rem">Completed </span>
+                        </label>
+                        <label style="display:none;">
                             <input type="radio" name="ticktOrderStatus" class="with-gap" value="PR" />
                             <span class="font-size1-3rem">Re-Assigned </span>
                         </label>
@@ -239,16 +282,16 @@
                 <div class="col s4">
                     <label></label>
                     <div class="col s6 m4">
-                        <label>
+                        <label style="display:none;">
                             <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" />
                             <span class="font-size1-3rem">Completed </span>
                         </label>
-                        <label>
+                        <label style="display:none;">
                             <input type="radio" name="ticktOrderStatus" class="with-gap" value="LC" />
                             <span class="font-size1-3rem">Last 30 day Completed </span>
                         </label>
 
-                        <label>
+                        <label style="display:none;">
                             <input type="radio" name="ticktOrderStatus" class="with-gap" value="A" />
                             <span class="font-size1-3rem">All  </span>
                         </label>
