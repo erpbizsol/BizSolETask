@@ -301,9 +301,10 @@ function addNewRow() {
         </td>
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
         <td style="text-align:center;">
-            <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData(0)">
-                <i class="fas fa-save"></i>
-            </button>
+
+             <button class="btn btn-success icon-height mb-1" style="background:#216c4a" title="Add New Row" onclick="SaveData(0)">
+             <i class="fa-solid fa-plus"></i>
+             </button>
             <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete">
                 <i class="fa-solid fa-trash"></i>
             </button>
@@ -312,6 +313,14 @@ function addNewRow() {
     BindSelect2('txtddlDipartment_0', G_DepartmentList);
     BindSelect2('txtddlWorkType_0', G_WorkTypeList);
 }
+$(document).on("focusout", ".txtRemarks1", function () {
+    const inputId = $(this).attr("id");
+    const code = inputId.split("_")[1];
+    const val = $(this).val().trim();
+    const $row = $(this).closest("tr");
+    
+    SaveData(code);
+});
 async function GetEmpDateList() {
     const emp = $('#ddlEmployeeName').val();
     const rawDate = $('#txtFromDate').val();
@@ -368,7 +377,8 @@ async function GetEmpDateList() {
                 "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off" maxlength="50"></select>`,
                 "Remarks": `<input type="text" autocomplete="off" id="txtRemarks1_${item.Code}" class="txtRemarks1 form-control form-control-sm box_border" value="${item.Remarks || ''}"/>`,
                 "Action": `
-                <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData('${item.Code}')"><i class="fas fa-save"></i></button>
+                 
+                <button class="btn btn-success icon-height mb-1" title="Save" onclick="SaveData('${item.Code}')"><i class="fa-solid fa-plus"></i></button>
                 <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}','${item.TimeSheetMaster_Code}')"><i class="fa-solid fa-trash"></i></button>`
             }));
            
@@ -559,24 +569,36 @@ function SaveData(Code) {
     }
     else if (clientName == '0') {
         toastr.error("Please select Department!");
-        $("#txtddlDipartment_" + Code).focus();
+        $("#txtddlDipartment_" + Code).focus().css("background-color", "#ffcccc");
+        $("#txtddlDipartment_" + Code).next(".select2-container").find(".select2-selection").css("background-color", "#ffcccc");
         return;
     }
     else if (isManualChecked == false) {
         if (fromHr == '00:00') {
             toastr.error("Please select from Hr!");
-            $("#txtfromHr_" + Code).focus();
+            $("#txtfromHr_" + Code).focus().css("background-color", "#ffcccc");
             return;
         }
         else if (toHr == '00:00') {
             toastr.error("Please select to Hr!");
-            $("#txttoHr_" + Code).focus();
+            $("#txttoHr_" + Code).focus().css("background-color", "#ffcccc");
             return;
         }
     }
+    else if (timeinMinutes == '0') {
+        toastr.error("Please enter time in Minutes!");
+        $("#txttimeInMinutes_" + Code).focus().css("background-color", "#ffcccc");
+        return;
+    }
     else if (workType == '0') {
         toastr.error("Please select work Type!");
-        $("#txtddlWorkType_" + Code).focus();
+        $("#txtddlWorkType_" + Code).focus().css("background-color", "#ffcccc");
+        $("#txtddlWorkType_" + Code).next(".select2-container").find(".select2-selection").css("background-color", "#ffcccc");
+        return;
+    }
+    else if (remarks == "") {
+        toastr.error("Please enter remarks!");
+        $("#txtRemarks1_" + Code).focus().css("background-color", "#ffcccc");
         return;
     }
     else {
@@ -695,4 +717,5 @@ function ShowHideFooter() {
         $(".footerth").show(); 
     }
 }
+
 

@@ -3,8 +3,9 @@
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link href="~/assets/css/filter.css" rel="stylesheet" />
-<script src="~/assets/script/ClientMaster.js"></script>
+
 <script src="~/assets/js/xlsx.full.min.js"></script>
+
 <style>
     .tabs {
         width: 100%;
@@ -14,13 +15,48 @@
         overflow: hidden;
         padding: 0.7rem;
     }
- 
+
+    .dropdown-container1 {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, sans-serif;
+    }
+
+    .dropdown-button1 {
+        padding: 8px;
+        border: 2px solid black;
+        cursor: pointer;
+        background-color: white;
+        width: 300px;
+        margin-top: 10px;
+    }
+
+    .dropdown-list1 {
+        display: none;
+        background-color: white;
+        border: 1px solid #ccc;
+        z-index: 1000 !important;
+        padding: 5px;
+        max-height: 132px;
+        margin-top: -8px;
+        overflow-y: auto;
+    }
+
+    .modal-body {
+        position: relative;
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: var(--bs-modal-padding);
+        height: 400px !important;
+    }
 </style>
 <div class="container">
     <div class="mt-1" id="txtListpage">
         <div class="row">
             <div class="col-sm-12 text-end">
                 <label></label>
+                <button type="button" class="btn btn-primary btn-height" title="Assign Client" onclick="GetAssignClient()">Assign Client</button>
                 <button type="button" class="btn btn-primary btn-height" title="CREATE NEW" onclick="Create()">CREATE NEW</button>
             </div>
         </div>
@@ -63,7 +99,7 @@
                                 Users <span class="text-danger">*</span>
                                 </label>
                                 <div style="position: relative;">
-                                <input type="text" id="dropdownButton" readonly  class="form-control form-control-sm box_border select-checkbox-multi" placeholder="Select Work Type">
+                                    <input type="text" id="dropdownButton" readonly class="form-control form-control-sm box_border select-checkbox-multi" placeholder="Select Users">
                                 </div>
                                 <div class="dropdown-list" id="dropdownList">
                                 <label><input type="checkbox" id="selectAll"> Select All</label><br>
@@ -101,10 +137,55 @@
                 </div>
             </div>
         </div>
-
+        
     </div>
+    <!-- Button trigger modal -->
+    <div class="modal position-absolute" id="staticBackdrop" style="padding-top:30px;" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header tab-header" style="background-color:#033764">
+                        <level style="color:white">Assign Client</level>
+                        <button type="button" class="close modal-close btn-sm" aria-label="Close" onclick="CloseModal()"><span aria-hidden="true">x</span></button>
+                    </div>
+                    <div class="row" style="margin-top:10px;">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <label for="ddlEmployeeName" class="col-form-label-sm fw-bold">Users</label> <span class="text-danger">*</span>
+                                    <select id="ddlEmployeeName" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Select Users..">
+                                    </select>
+                                </div>
+                                <div class="col-md-6  col-sm-6 dropdown-container1">
+
+                                    <label for="dropdownButton1" class="col-form-label-sm fw-bold">
+                                        Client Name <span class="text-danger">*</span>
+                                    </label>
+                                    <div style="position: relative;">
+                                        <input type="text" id="dropdownButton1" readonly class="form-control form-control-sm box_border select-checkbox-multi1" placeholder="Select Work Type">
+                                    </div>
+                                    <div class="dropdown-list1" id="dropdownList1">
+                                        <label><input type="checkbox" id="selectAll1"> Select All</label><br>
+                                        <div id="checkboxOption"></div>
+                                    </div>
+                                </div>
+                              
+                                <div class="col-md-2 col-sm-6">
+                                    <button type="button" id="btnModelShow" class="btn btn-success btn-height" title="Show" style="margin-top:200px;" onclick="AssignClients()">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 <script src="~/assets/js/filter.js"></script>
+<script src="~/assets/script/ClientMaster.js"></script>
 
 
 

@@ -592,7 +592,11 @@ function GetGenerateTaskTicketDateList(Type) {
                             </a>
                             <button class="btn btn-primary icon-height mb-1" style="background:#20425d" title="Edit" onclick="Edit('${item.Code}')">
                             <i class="fa-solid fa-pencil"></i>
-                            </button>`;
+                            </button>
+                             <button class="btn btn-success icon-height mb-1" style="background:#216c4a" title="A.D+" onclick="GetAssingData('${item[`Ticket No`]}')">
+                            <i class="fa-solid fa-plus"></i>
+                            </button> 
+                            `;
 
                         if (UserTypes === 'A') {
 
@@ -871,4 +875,35 @@ function Delete(code) {
             }
         });
     }
+}
+function GetAssingData(TickatNo) {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/DateWiseUserWiseTime?TickatNo=${TickatNo}`,
+        type: 'GET',
+        dataType: "json",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                const StringFilterColumn = [];
+                const NumericFilterColumn = [];
+                const DateFilterColumn = [];
+                const Button = false;
+                const showButtons = [];
+                const StringdoubleFilterColumn = [];
+                const hiddenColumns = [];
+                const ColumnAlignment = {
+                };
+                BizsolCustomFilterGrid.CreateDataTable("table-header1", "table-body1", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+                $('#attachmentModal1').show();
+            } else {
+                    toastr.error("Record not found...!");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+
 }

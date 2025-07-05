@@ -7,6 +7,9 @@ let G_JsonData = [];
 let G_Edit =false;
 $(document).ready(function () {
     $("#ERPHeading").text("Employee Master");
+    $(".Number").keyup(function (e) {
+        if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9]/g, '')
+    });
     $('#txtEmployeeId').on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtEmployeeName").focus();
@@ -110,6 +113,7 @@ function Save() {
     var MobileNo = $("#txtMobileNo").val();
     var Password = $("#txtPassword").val();
     var ConfirmPassword = $("#txtConfirmPassword").val();
+    var Numberofdays = $("#txtnumberofdays").val();
     var Code = $("#hftxtCode").val();
     if (EmployeeCard == "") {
         toastr.error('Please enter Employee Card.');
@@ -147,6 +151,10 @@ function Save() {
         toastr.error('Your password and confirmation password do not match.');
         $("#txtPassword").focus();
         return;
+    } else if (Numberofdays == 0) {
+        toastr.error('Please enter valid Number of days.');
+        $("#txtnumberofdays").focus();
+        return;
     }
     else {
         const payload = {
@@ -157,7 +165,8 @@ function Save() {
             MobileNo: MobileNo,
             Password: Password,
             EmployeeType: EmployeeType,
-            EmployeeId: UserMaster_Code
+            EmployeeId: UserMaster_Code,
+            Numberofdays: Numberofdays
         };
         $.ajax({
             url: `${appBaseURL}/api/Master/SaveEmployeeMaster`,
@@ -254,6 +263,7 @@ function Create() {
     $("#dvMobileNo").show();
     $("#dvPassword").show();
     $("#dvConfirmPassword").show();
+    $("#txtnumberofdays").show();
     $("#dvExcel").show();
 }
 function Back() {
@@ -278,7 +288,7 @@ function Edit(code) {
     $("#dvPassword").hide();
     $("#dvConfirmPassword").hide();
     $("#dvExcel").hide();
-
+ /*   $("#txtnumberofdays").hide();*/
     $.ajax({
         url: ` ${appBaseURL}/api/Master/GetEmployeeMasterByCode?Code=${code}`,
         type: 'GET',
@@ -293,6 +303,7 @@ function Edit(code) {
                 $("#txtEmailId").val(response[0].Email);
                 $("#txtMobileNo").val(response[0].MobileNo);
                 $("#txtEmployeeType").val(response[0].EmployeeType);
+                $("#txtnumberofdays").val(response[0].NumberOfdays);
             } else {
                 toastr.error("Record not found...!");
             }
@@ -329,6 +340,7 @@ function ClearData() {
     $("#txtConfirmPassword").val("");
     $("#txtEmployeeType").val("A");
     $("#txtExcelFile").val("");
+    $("#txtnumberofdays").val("");
     G_Edit = false;
 }
 function ActionStatus(code) {

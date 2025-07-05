@@ -6,7 +6,7 @@ let G_ReportType = "";
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
     DatePicker();
-    GetEmployeeMasterList();
+   
     //GetWorkTypeList();
    // GetClientList();
     $("#ERPHeading").text("Time Sheet Report");
@@ -101,6 +101,31 @@ $(document).ready(function () {
         updateSelectedTextC();
     });
     GetClientList();
+    $('.select-checkbox-multi2').click(function () {
+        let inputWidth = $(this).outerWidth();
+        $('#ddlEmployeeName').css({
+            'position': 'absolute',
+            'width': inputWidth + 'px',
+        }).toggle();
+    });
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown-container2').length) {
+            $('#ddlEmployeeName').hide();
+        }
+    });
+    $('#selectAllEmployee').on('change', function () {
+        $('.option2').prop('checked', this.checked);
+        updateSelectedTextEmployee();
+    });
+    $(document).on('change', '.option2', function () {
+        if ($('.option2:checked').length === $('.option2').length) {
+            $('#selectAllEmployee').prop('checked', true);
+        } else {
+            $('#selectAllEmployee').prop('checked', false);
+        }
+        updateSelectedTextEmployee();
+    });
+    GetEmployeeMasterList();
 });
 function updateSelectedText() {
     let selectedNames = $('.option:checked').map(function () {
@@ -147,18 +172,34 @@ $("#txtShow").click(async function () {
 function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
-    $('#txtFromDate,#txtToDate').val(defaultDate);
-    $('#txtFromDate,#txtToDate').datepicker({
+    $('#txtToDate').val(defaultDate);
+    $('#txtToDate').datepicker({
         format: 'dd/mm/yyyy',
         autoclose: true,
         todayHighlight: true
     }).datepicker('update', defaultDate);
+    setStartOfMonth();
 }
 function formatDateToString(dateObj) {
     const day = String(dateObj.getDate()).padStart(2, '0');
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const year = dateObj.getFullYear();
     return `${day}/${month}/${year}`;
+}
+function setStartOfMonth() {
+
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const formatted = formatDateToString(firstDay);
+
+    $('#txtFromDate').val(formatted);
+    $('#txtFromDate').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true
+    }).datepicker('update', formatted);
+
 }
 function setupDateInputFormatting() {
     $('#txtFromDate,#txtToDate').on('input', function () {
@@ -195,6 +236,19 @@ function validateDate(value) {
         $('#txtFromDate,#txtToDate').val('');
     }
 }
+function updateSelectedTextEmployee() {
+    let selectedNamess = $('.option2:checked').map(function () {
+        return $(this).data('name');
+    }).get().join(', ');
+    $('#SddlEmployeeName').val(selectedNamess);
+}
+function GetSelectedEmployeeCodes() {
+    let selectedCodes = [];
+    $('.option3:checked').each(function () {
+        selectedCodes.push($(this).val());
+    });
+    return selectedCodes;
+}
 function GetEmployeeMasterList() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
@@ -204,22 +258,29 @@ function GetEmployeeMasterList() {
         },
         success: function (response) {
             if (response.length > 0) {
-                const $select = $('#ddlEmployeeName');
-                $select.empty(); 
+                //const $select = $('#ddlEmployeeName');
+                //$select.empty();
 
-                $.each(response, function (key, val) {
-                    $select.append(new Option(val.EmployeeName, val.Code));
-                });
-                SelectOptionByText('ddlEmployeeName', UserName);
-                $select.select2({
-                    width: '100%',
-                    closeOnSelect: false,
-                    placeholder: "Select Employee...",
-                    allowClear: true
+                //$.each(response, function (key, val) {
+                //    $select.append(new Option(val.EmployeeName, val.Code));
+                //});
+                //SelectOptionByText('ddlEmployeeName', UserName);
+                //$select.select2({
+                //    width: '100%',
+                //    closeOnSelect: false,
+                //    placeholder: "Select Employee...",
+                //    allowClear: true
 
+                //});
+                let html1 = '';
+                response.forEach(item => {
+                    html1 += `<label>
+                    <input type="checkbox" class="option2" value="${item.Code}" data-name="${item.EmployeeName.trim()}"> ${item.EmployeeName.trim()}
+                    </label><br>`;
                 });
+                $('#checkboxOptions2').html(html1);
             } else {
-                $select.empty();
+                $('#ddlEmployeeName').empty();
             }
         },
         error: function (xhr, status, error) {
@@ -318,7 +379,7 @@ function convertToYearMonthDay(dateStr) {
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 function GetTimeSheetReport() {
-    const emp = $('#ddlEmployeeName').val();
+    const emp = document.getElementById('SddlEmployeeName').value;
     const FDate = $('#txtFromDate').val();
     const FromDate = convertToYearMonthDay(FDate);
     const TDate = $('#txtToDate').val();
@@ -331,10 +392,12 @@ function GetTimeSheetReport() {
     G_ReportType = ReportType;
     let W_Code = GetSelectedWorkTypeCodes();
     let C_Code = GetSelectedClientCodes();
+    let E_Code = GetSelectedEmployeeCodes();
     let WorkType_Codes = Array.isArray(W_Code) ? W_Code.join(',') : JSON.parse(W_Code.replace(/'/g, '"')).join(',');
     let ClientName_Codes = Array.isArray(C_Code) ? C_Code.join(',') : JSON.parse(C_Code.replace(/'/g, '"')).join(',');
+    let EmployeeName_Codes = Array.isArray(E_Code) ? E_Code.join(',') : JSON.parse(E_Code.replace(/'/g, '"')).join(',');
     $.ajax({
-        url: `${appBaseURL}/api/Report/GetTimeSheetReport?FromDate=${FromDate}&ToDate=${ToDate}&ClientMaster_Code=${ClientName_Codes}&WorkTypeMaster_Code=${WorkType_Codes}&EmployeeMaster_Code=${emp}&ReportType=${ReportType}`,
+        url: `${appBaseURL}/api/Report/GetTimeSheetReport?FromDate=${FromDate}&ToDate=${ToDate}&ClientMaster_Code=${ClientName_Codes}&WorkTypeMaster_Code=${WorkType_Codes}&EmployeeMaster_Code=${EmployeeName_Codes}&ReportType=${ReportType}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -356,7 +419,7 @@ function GetTimeSheetReport() {
                 BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, true);
                 var dynamicColspan;
                 if (ReportType == 'Default') {
-                    var dynamicColspan = 5;
+                    var dynamicColspan = 2;
                     document.getElementById('myCell1').setAttribute('style', 'display:none');
                     const totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time In Minutes"]) || 0), 0);
                     document.getElementById("footerTotalMinutes").textContent = totalMinutes;
@@ -397,7 +460,7 @@ function GetClientType() {
                 const Button = false;
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["TimeInMinutes", "RatePerHr", "Amount", "TimeInHours"];
+                const hiddenColumns = ["TimeInMinutes", "RatePerHr", "TimeInHours"];
                 const ColumnAlignment = {};
                 BizsolCustomFilterGrid.CreateDataTable(
                     "table-headerClient",
@@ -437,7 +500,7 @@ function GetWorkType() {
                 const Button = false;
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["TimeInMinutes", "RatePerHr", "Amount"];
+                const hiddenColumns = ["TimeInMinutes", "RatePerHr"];
                 const ColumnAlignment = {};
                 BizsolCustomFilterGrid.CreateDataTable(
                     "table-headerWorkType",
@@ -478,7 +541,7 @@ function GetEmployeeType() {
                 const Button = false;
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["TimeInMinutes", "RatePerHr", "Amount"];
+                const hiddenColumns = ["TimeInMinutes", "RatePerHr"];
                 const ColumnAlignment = {};
                 BizsolCustomFilterGrid.CreateDataTable(
                     "table-headerEmployeeType",
@@ -500,7 +563,7 @@ function GetEmployeeType() {
 }
 function Reset() {
     $('#SddlWorkType').val("").trigger('change');
-    $('#ddlEmployeeName').val("").trigger('change');
+    $('#SddlEmployeeName').val("").trigger('change');
     $('#CddlClientName').val("").trigger('change');
     $("#AllTable").hide();
     $("#txtSummary").hide();
