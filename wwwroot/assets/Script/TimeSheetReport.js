@@ -43,11 +43,11 @@ $(document).ready(function () {
     });
    
     if (UserTypes === "A") {
-        $("#ddlEmployeeName").prop('disabled', false);
+        $("#SddlEmployeeName").prop('disabled', false);
 
     } else {
-        $("#ddlEmployeeName").prop('disabled', true);
-        SelectOptionByText('ddlEmployeeName', UserName);
+        $("#SddlEmployeeName").prop('disabled', true);
+        //SelectOptionByText('checkboxOptions2', UserName);
     }
     $('.select-checkbox-multis').click(function () {
         let inputWidth = $(this).outerWidth();
@@ -279,6 +279,7 @@ function GetEmployeeMasterList() {
                     </label><br>`;
                 });
                 $('#checkboxOptions2').html(html1);
+                $('#SddlEmployeeName').val(UserName);
             } else {
                 $('#ddlEmployeeName').empty();
             }
