@@ -24,7 +24,6 @@ $(document).ready(async function () {
     } else {
         $("#txtAllUser").hide();
     }
-    GetGenerateTaskTicketDateList('Get');
     $('.select-checkbox-multi').click(function () {
         let inputWidth = $(this).outerWidth();
         $('#dropdownList').css({
@@ -50,6 +49,12 @@ $(document).ready(async function () {
         updateSelected();
     });
     GetEmployeeMasterList();
+    //GetGenerateTaskTicketDateList('Get');
+    $('input[type=radio][name=ticktOrderStatus1]').change(function () {
+        GetPendingTaskReport('Load');
+    });
+    Show();
+    
 });
 $('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
     GetGenerateTaskTicketDateList('Get');
@@ -86,63 +91,163 @@ $("#txtStatus").on('change', function () {
     }
 
 });
+
 $(document).on('change', '.option', function () {
     GetGenerateTaskTicketDateList('Get');
 });
+
+$(document).on('change', '#ddlReportType', function () {
+    var ReportType = $('#ddlReportType').val();
+
+    if (ReportType === 'Default') {
+        $("#txtCreatepagereport").hide();
+        GetGenerateTaskTicketDateList('Get');
+        $("#txtConsolidated").show();
+        $("#txtConsolidateda").show();
+        $("#txtSummary").show();
+    } else {
+        GetPendingTaskReport('Get');
+        $("#txtCreatepagereport").show();
+        $("#txtSummary").hide();
+        $("#txtConsolidated").hide();
+        $("#txtConsolidateda").hide();
+        $("#txtshowDate").hide();
+        $("#txtshowDate1").hide();
+        
+    }
+});
+
+$("#txtfromdate").on('click', function () {
+    $("#txtshowDate").show();
+    $("#txtshowDate1").show();
+});
+
+$("#txtPending").on('click', function () {
+    $("#txtshowDate").hide();
+    $("#txtshowDate1").hide();
+});
+
+//function GetGenerateTaskTicketDateList(Type) {
+
+//    let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
+//    let ReportType = $("#ddlReportType").val();
+//    let TaskNo = $("#txtTaskNo").val();
+//    TaskNo = TaskNo ? TaskNo.value : 0;
+//    let EmployeeName = GetEmpCodes();
+//    let Employee_Codes = EmployeeName.length > 0 ? EmployeeName.join(',') : null;
+//        $.ajax({
+//            url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDatePending?EmployeeName=${Employee_Codes}&Status=${Status}&ticketNo=0&ReportType=${ReportType}`,
+//            type: 'POST',
+//            dataType: "json",
+//            beforeSend: function (xhr) {
+//                xhr.setRequestHeader('Auth-Key', authKeyData);
+//            },
+//            success: function (response) {
+//                if (response.length > 0) {
+//                    $("#txtSummary").show();
+//                    const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project / Client", "Ticket No"];
+//                    const NumericFilterColumn = [];
+//                    const DateFilterColumn = ["Log Date"];
+//                    const Button = false;
+//                    const showButtons = [];
+//                    const StringdoubleFilterColumn = [];
+//                    const hiddenColumns = ["ACode", "Attachment", "CallTicketMaster_Code", "AttachmentFileName", "ResolutionTime", "Remarks", "ResolvedDate", "RaisedBy", "Module", "Source", "FirstCheckBy", "CommitedDate", "ContactNo", "Status", "EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType", "ContactEMail", "ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code", "EmployeeMaster_Code", "Code"];
+//                    const ColumnAlignment = {
+//                    };
+//                    const updatedResponse = response.map(item => ({
+//                        ...item, 'Action':
+//                            `
+//                    <a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
+//                    <button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
+//                    <button class="btn btn-primary icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}','${UserMaster_Code}')"><i class="fa-solid fa-pencil"></i></button>`
+//                    }));
+
+//                    BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+
+//                } else {
+//                    $("#txtSummary").hide();
+//                    if (Type == 'Get') {
+//                        toastr.error("Record not found...!");
+//                    }
+
+
+//                }
+//            },
+//            error: function (xhr, status, error) {
+//                console.error("Error:", error);
+//            }
+//        });
+
+//}
+$(document).on('change', '#txtToDate, #txtFromDate', function () {
+    GetGenerateTaskTicketDateList('Get');
+});
+
 function GetGenerateTaskTicketDateList(Type) {
-    let EmployeeName = document.getElementById('dropdownButton').value;
-    //EmployeeName = UserName;
-    let showBy = "";
-    //$('input[type=radio][name="ticktOrder"]:checked').val();
     let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
+    let ReportType = $("#ddlReportType").val();
     let TaskNo = $("#txtTaskNo").val();
-    TaskNo = TaskNo ? TaskNo.value : 0; 
-    let codes = GetEmpCodes();
-    let Employee_Codes = codes.length > 0 ? codes.join(',') : null;
-        $.ajax({
-            url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDatePending?EmployeeName=${Employee_Codes}&showBy=${showBy}&Status=${Status}&ticketNo=0`,
-            type: 'POST',
-            dataType: "json",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Auth-Key', authKeyData);
-            },
-            success: function (response) {
-                if (response.length > 0) {
-                    $("#txtSummary").show();
-                    const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project / Client", "Ticket No"];
-                    const NumericFilterColumn = [];
-                    const DateFilterColumn = ["Log Date"];
-                    const Button = false;
-                    const showButtons = [];
-                    const StringdoubleFilterColumn = [];
-                    const hiddenColumns = ["ACode", "Attachment", "CallTicketMaster_Code", "AttachmentFileName", "ResolutionTime", "Remarks", "ResolvedDate", "RaisedBy", "Module", "Source", "FirstCheckBy", "CommitedDate", "ContactNo", "Status", "EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType", "ContactEMail", "ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code", "EmployeeMaster_Code", "Code"];
-                    const ColumnAlignment = {
-                    };
-                    const updatedResponse = response.map(item => ({
-                        ...item, 'Action':
-                            `
-                    <a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
-                    <button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
-                    <button class="btn btn-primary icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}','${UserMaster_Code}')"><i class="fa-solid fa-pencil"></i></button>`
-                    }));
+    TaskNo = TaskNo ? TaskNo.value : 0;
 
-                    BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+    let fromDate = convertDateFormat($("#txtFromDate").val());
+    let toDate = convertDateFormat($("#txtToDate").val());
 
-                } else {
-                    $("#txtSummary").hide();
-                    if (Type == 'Get') {
-                        toastr.error("Record not found...!");
-                    }
-
-
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error:", error);
-            }
-        });
+    if (Status === 'P') {
+     
+        fromDate = "";
+        toDate = "";
+    } else if (Status === 'C') {
     
+        if (!fromDate || !toDate) {
+            toastr.error("Please select both From Date and To Date.");
+            return; 
+        }
+    }
+    let EmployeeName = GetEmpCodes();
+    let Employee_Codes = EmployeeName.length > 0 ? EmployeeName.join(',') : null;
+
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDatePending?EmployeeName=${Employee_Codes}&Status=${Status}&ticketNo=0&ReportType=${ReportType}&FromDate=${fromDate}&ToDate=${toDate}`,
+        type: 'POST',
+        dataType: "json",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                $("#txtSummary").show();
+                const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project / Client", "Ticket No"];
+                const NumericFilterColumn = [];
+                const DateFilterColumn = ["Log Date"];
+                const Button = false;
+                const showButtons = [];
+                const StringdoubleFilterColumn = [];
+                const hiddenColumns = ["ACode", "Attachment", "CallTicketMaster_Code", "AttachmentFileName", "ResolutionTime", "Remarks", "ResolvedDate", "RaisedBy", "Module", "Source", "FirstCheckBy", "CommitedDate", "ContactNo", "Status", "EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType", "ContactEMail", "ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code", "EmployeeMaster_Code", "Code"];
+                const ColumnAlignment = {};
+                const updatedResponse = response.map(item => ({
+                    ...item, 'Action':
+                        `
+                        <a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
+                        <button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
+                        <button class="btn btn-primary icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}','${UserMaster_Code}')"><i class="fa-solid fa-pencil"></i></button>`
+                }));
+
+                BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+
+            } else {
+                $("#txtSummary").hide();
+                if (Type == 'Get') {
+                    toastr.error("Record not found...!");
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+
 }
+
 function ViewAttachment(code) {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAttachment?Code=${code}`,
@@ -272,10 +377,10 @@ function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
 
-    $('txtResolutionDates').val(defaultDate);
+    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
 
-    $('#txtResolutionDates').val(defaultDate);
-    $('#txtResolutionDates').datepicker({
+    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
+    $('#txtResolutionDates,#txtToDate,#txtFromDate').datepicker({
         format: 'dd/mm/yyyy',
         autoclose: true,
         todayHighlight: true
@@ -651,6 +756,7 @@ function GetEmployeeMasterList() {
                     </label><br>`;
                 });
                 $('#checkboxOptions').html(html);
+                //$('#dropdownButton').val(UserName);
             }
         },
         error: function () {
@@ -671,4 +777,53 @@ function GetEmpCodes() {
     });
 
     return selectedCodes;
+}
+function GetPendingTaskReport(Type) {
+    let Pending = $('input[type=radio][name="ticktOrderStatus1"]:checked').val();
+
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetPendingTaskReport?Code=${UserMaster_Code}&Status=${Pending}`,
+        type: 'POST',
+        dataType: "json",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                $("#txtTable").show();
+                const StringFilterColumn = ["Ticket No", "Work Type", "	Client Name", "Ticket Created By", "Assigned", "ssignedBy", ""];
+                const NumericFilterColumn = [""];
+                const DateFilterColumn = [""];
+                const Button = false;
+                const showButtons = [""];
+                const StringdoubleFilterColumn = [""];
+                const hiddenColumns = ["WorkByCode", "ReAssign_Code", "TicketAssignedBy", "CreateTicketBy_Code"];
+                const ColumnAlignment = {
+
+                };
+                BizsolCustomFilterGrid.CreateDataTable("table-header1", "table-body1", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+            } else {
+                $("#txtTable").hide();
+                if (Type != 'Load') {
+                    toastr.error("Record not found...!");
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+}
+function Show() {
+    $('input:radio[name=ticktOrderStatus1]').filter(function () {
+        this.checked = false;
+        GetPendingTaskReport('Load');
+    });
+    $('input:radio[name=ticktOrderStatus1]').filter(function () {
+
+        if (this.value == $('#hfStatus').val())
+            this.checked = true;
+        GetPendingTaskReport('Load');
+    });
+
 }
