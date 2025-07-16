@@ -11,17 +11,18 @@ let highlightedDates = [];
 $(document).ready(async function () {
     DatePicker();
     $("#ERPHeading").text("Time Sheet");
+    GetDepartmentList(UserMaster_Code);
     await GetEmployeeMasterList();
     await GetWorkTypeList();
     setupDateInputFormatting();
+  
     if (UserTypes === "A") {
         $("#ddlEmployeeName").prop('disabled', false);
         
     } else {
         $("#ddlEmployeeName").prop('disabled', true);
-        GetDepartmentList(UserName);
+        GetDepartmentList(UserMaster_Code);
     }
-    GetDepartmentList(UserName);
     $('#ddlEmployeeName').on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtFromDate").focus();
@@ -120,9 +121,8 @@ function GetEmployeeMasterList() {
                     width: '-webkit-fill-available'
                 });
                 SelectOptionByText('ddlEmployeeName', UserName);
-               let selectedCode = $('#ddlEmployeeName').val();
                 if (UserTypes !== "A") {
-                    GetDepartmentList(selectedCode);
+                    
                     GetEmpDateList();
                    // BindSelect2(`txtddlDipartment_${item.Code}`, G_DepartmentList);
                    // $(`#txtddlDipartment_${item.Code}`).val(item.ClientMaster_Code).select2({ width: '100%' });
@@ -140,17 +140,12 @@ function GetEmployeeMasterList() {
 }
 async function GetDepartmentList(EmployeeName) {
     try {
-        const response = await fetch(`${appBaseURL}/api/Master/GetClientList?EmployeeName=${encodeURIComponent(EmployeeName)}`, {
+        const response = await fetch(`${appBaseURL}/api/Master/GetClientList?EmployeeName=${EmployeeName}`,{
             method: 'GET',
             headers: {
                 'Auth-Key': authKeyData
             }
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const data = await response.json();
 
         if (Array.isArray(data) && data.length > 0) {
@@ -705,7 +700,6 @@ async function updateTimeSheetRemark() {
 function ClearData() {
     $("#txtRemarks").val("");
 }
-
 $('#ManualTimeCheckDefault').on('change', function () {
     ShowHideFooter();
 });

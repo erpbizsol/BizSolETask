@@ -114,6 +114,7 @@ function Save() {
     var Password = $("#txtPassword").val();
     var ConfirmPassword = $("#txtConfirmPassword").val();
     var Numberofdays = $("#txtnumberofdays").val();
+    var WorkingHours = $("#txtWorkingHours").val();
     var Code = $("#hftxtCode").val();
     if (EmployeeCard == "") {
         toastr.error('Please enter Employee Card.');
@@ -156,6 +157,11 @@ function Save() {
         $("#txtnumberofdays").focus();
         return;
     }
+    else if (WorkingHours == 0) {
+        toastr.error('Please enter valid Working Hours.');
+        $("#txtWorkingHours").focus();
+        return;
+    }
     else {
         const payload = {
             Code: Code,
@@ -166,7 +172,8 @@ function Save() {
             Password: Password,
             EmployeeType: EmployeeType,
             EmployeeId: UserMaster_Code,
-            Numberofdays: Numberofdays
+            Numberofdays: Numberofdays,
+            WorkingHours: WorkingHours
         };
         $.ajax({
             url: `${appBaseURL}/api/Master/SaveEmployeeMaster`,
@@ -265,6 +272,7 @@ function Create() {
     $("#dvConfirmPassword").show();
     $("#txtnumberofdays").show();
     $("#dvExcel").show();
+    $("#txtWorkingHours").show();
 }
 function Back() {
     $("#txtListpage").show();
@@ -288,7 +296,8 @@ function Edit(code) {
     $("#dvPassword").hide();
     $("#dvConfirmPassword").hide();
     $("#dvExcel").hide();
- /*   $("#txtnumberofdays").hide();*/
+    $("#txtnumberofdays").show();
+    $("#txtWorkingHours").show();
     $.ajax({
         url: ` ${appBaseURL}/api/Master/GetEmployeeMasterByCode?Code=${code}`,
         type: 'GET',
@@ -304,6 +313,7 @@ function Edit(code) {
                 $("#txtMobileNo").val(response[0].MobileNo);
                 $("#txtEmployeeType").val(response[0].EmployeeType);
                 $("#txtnumberofdays").val(response[0].NumberOfdays);
+                $("#txtWorkingHours").val(response[0].WorkingHours);
             } else {
                 toastr.error("Record not found...!");
             }
@@ -329,6 +339,8 @@ function ChangePassword(code) {
     $("#dvExcel").hide();
     $("#btnSave").hide();
     $("#btnPass").show();
+    $("#divnumber").hide();
+    $("#divWorkingHours").hide();
 }
 function ClearData() {
     $("#hftxtCode").val("0");
@@ -341,6 +353,7 @@ function ClearData() {
     $("#txtEmployeeType").val("A");
     $("#txtExcelFile").val("");
     $("#txtnumberofdays").val("");
+    $("#txtWorkingHours").val("");
     G_Edit = false;
 }
 function ActionStatus(code) {

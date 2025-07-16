@@ -77,18 +77,16 @@ $(document).ready(async function () {
         }
     });
 
-    GetGenerateTaskTicketDateList('Get');
+   // GetGenerateTaskTicketDateList('Get');
     if (UserTypes == "A") {
         $("#txtAllUser").show();
     } else {
         $("#txtAllUser").hide();
     }
 });
-
 $('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
     GetGenerateTaskTicketDateList('Get');
 });
-
 function GetTicketType() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetTicketType`,
@@ -252,6 +250,7 @@ function GetClientMasterDetails() {
         }
     });
 }
+
 $('#txtProjectClient').on('change', function () {
     let selectedCode = $(this).val();
     if (selectedCode && selectedCode !== "0") {
@@ -547,9 +546,12 @@ function SaveData() {
                 if (response[0].Status === "Y") {
                     toastr.success(response[0].Msg);
                     ClearData();
-                    GetGenerateTaskTicketDateList('Get');
+                    //GetGenerateTaskTicketDateList('Get');
+
+                    SenEmailMassage(response[0].Code);
                 }
                 else {
+                    
                     toastr.error(response[0].Msg);
                 }
             },
@@ -715,7 +717,6 @@ function Edit(code) {
         }
     });
 }
-
 function ViewAttachment(code) {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAttachment?Code=${code}`,
@@ -906,4 +907,25 @@ function GetAssingData(TickatNo) {
         }
     });
 
+}
+function SenEmailMassage(Code) {
+    $.ajax({
+        url: `${appBaseURL}/api/Email/SenEmailMassage?Code=${Code}&Mode=NEW`,
+        type: 'Get',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response[0].Status === 'Y') {
+                //toastr.success(response[0].Msg);
+                
+            } else {
+                toastr.error("Unexpected response format.");
+            }
+        },
+        error: function (xhr, status, error) {
+            toastr.error("Error deleting item:");
+        }
+    });
+    
 }

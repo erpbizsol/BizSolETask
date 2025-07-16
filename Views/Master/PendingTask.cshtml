@@ -147,6 +147,39 @@
         margin-top: -8px;
         overflow-y: auto;
     }
+
+    .modal {
+        position: fixed;
+        z-index: 999;
+        background: rgba(0,0,0,0.4);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        width: 500px;
+        border-radius: 8px;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    .modal-body {
+        position: relative;
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: var(--bs-modal-padding);
+        height: 400px !important;
+    }
 </style>
 @* ----------------Modal-------------------- *@
 <div id="attachmentModal" class="modal" style="display:none;">
@@ -167,7 +200,34 @@
 
     </div>
 </div>
+<div id="attachmentModal1" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Activity  Details:</h3>
 
+        <div id="attachmentContainer1" style="margin-top: 20px;"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-wrapper" style="overflow: auto;">
+                    <table id="table" class="table">
+                        <thead id="table-header1">
+                        <th>Worked By</th>
+                        <th>Work Date</th>
+                        <th>Time (Minutes)</th>
+                        <th>Remarks</th>
+                        </thead>
+                        <tbody id="table-body1"></tbody>
+                    </table>
+                </div>
+                @* <div class="paginator" id="paginator-table">
+                </div> *@
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button class="btn btn-secondary" onclick="$('#attachmentModal1').hide()">Close</button>
+        </div>
+
+    </div>
+</div>
 
 <div id="txtCreatepage">
     <div class="card shadow-sm">
@@ -234,7 +294,7 @@
         <div class="summary-section p-2">
             <div class="summary-title" style="text-align:center">Task Records</div>
             <div class="row">
-                <div class="col s4 m4" style="display:none;">
+            @*     <div class="col s4 m4" style="display:none;">
                     <strong>User</strong>
                     <div class="col s6 m4">
                         <label>
@@ -247,7 +307,7 @@
                         </label>
 
                     </div>
-                </div>
+                </div> *@
                 <div class="col-md-3  col-sm-6 dropdown-container" style="margin-top:-10px;" id="txtConsolidated">
                     <label for="dropdownButton" class="col-form-label-sm fw-bold">
                         <strong>User</strong> <span class="text-danger">*</span>
@@ -275,13 +335,13 @@
                             <span class="font-size1-3rem">Pending</span>
                         </label>
                         <label>
-                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="C"  id="txtfromdate"/>
+                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" id="txtfromdate1" />
                             <span class="font-size1-3rem">Completed </span>
                         </label>
-                        <label style="display:none;">
+                       @*  <label style="display:none;">
                             <input type="radio" name="ticktOrderStatus" class="with-gap" value="PR" />
                             <span class="font-size1-3rem">Re-Assigned </span>
-                        </label>
+                        </label> *@
 
                     </div>
                 </div>
@@ -293,27 +353,27 @@
                     <label for="txtToDate" class="col-form-label-sm fw-bold">To Date</label>
                     <input type="text" id="txtToDate" name="txtToDate" autocomplete="off" class="form-control form-control-sm box_border" placeholder="To Date.." maxlength="12">
                 </div>
-                <div class="col s4">
+                @* <div class="col s4">
                     <label></label>
                     <div class="col s6 m4">
                         <label style="display:none;">
-                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" />
+                            <input type="radio"  class="with-gap" value="C" />
                             <span class="font-size1-3rem">Completed </span>
                         </label>
                       
 
                         <label style="display:none;">
-                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="LC" />
+                            <input type="radio" class="with-gap" value="LC" />
                             <span class="font-size1-3rem">Last 30 day Completed </span>
                         </label>
 
                         <label style="display:none;">
-                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="A" />
+                            <input type="radio" class="with-gap" value="A" />
                             <span class="font-size1-3rem">All  </span>
                         </label>
                         <input id="hfDataattach" type="hidden" value="" />
                     </div>
-                </div>
+                </div> *@
             </div>
             <div class="row" id="txtSummary">
                 <div class="col-sm-12">
