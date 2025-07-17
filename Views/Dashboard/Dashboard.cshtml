@@ -1,5 +1,376 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link href="~/assets/css/filter.css" rel="stylesheet" />
+<!-- Bootstrap Datepicker JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<script src="~/assets/js/xlsx.full.min.js"></script>
+
+<style>
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #ede8e8 !important;
+        border: 0px solid #aaa !important;
+    }
+
+    .datepicker td, .datepicker th {
+        border-radius: 20px !important;
+    }
+
+    .datepicker table tr td, .datepicker table tr td {
+        padding: 8px 9px !important;
+        height: 16px !important;
+    }
+
+    .datepicker table tfoot {
+        display: none;
+    }
+
+    .active {
+        background-color: #0ba4af;
+        color: #fff;
+    }
+
+    .datepicker {
+        top: 157.766px !important;
+        left: 262px;
+        z-index: 10;
+        display: block;
+    }
+
+    .tabs {
+        width: 100%;
+        max-width: 2000px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 0.7rem;
+        /* background: linear-gradient(90deg, rgb(165 206 223) 0%, rgb(179 233 201) 56%, rgb(250 244 194) 100%); */
+    }
+
+    .tabs {
+        width: 100%;
+        max-width: 2000px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 0.7rem;
+    }
+
+    th, td {
+        border: 1px solid #2e6c7b;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        border: 1px solid #d0d9db;
+        background-color: #0c666e;
+        color: white;
+    }
+
+    tfoot td {
+        background-color: #e6f2f5;
+        font-weight: bold;
+    }
+
+    .summary-title {
+        font-weight: bold;
+        font-size: 18px;
+        color: #004d66;
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .remarks-box {
+        width: 100%;
+        padding: 8px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .without-label-field {
+        margin-top: 2.1rem;
+    }
+
+    .card1 {
+        --bs-card-bg: #e9eaee !important;
+    }
+
+    .business-card {
+        width: 269px;
+        height: 219px;
+        margin: 4px;
+        color: #fff;
+        display: flex;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 22px 20px rgb(142 123 123);
+        border-radius: 10px;
+        background-color: white;
+    }
+
+    .right-section {
+        width: 100%;
+        padding: 10px;
+        background-color: #fff;
+        background: linear-gradient(115deg, rgb(165 206 223) 0%, rgb(179 233 201) 56%, rgb(173 221 210) 127%);
+        border-top-left-radius: 90px;
+        border-bottom-right-radius: 90px;
+    }
+
+        .right-section .name {
+            font-size: 20px;
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .right-section .role {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+    .carddiv {
+        margin-top: 0;
+        margin-bottom: 0rem;
+        color: black;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .modal {
+        position: fixed;
+        z-index: 999;
+        background: rgba(0,0,0,0.4);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        width: 500px;
+        border-radius: 8px;
+    }
+    .modal {
+        position: fixed;
+        z-index: 999;
+        background: rgba(0,0,0,0.4);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        width: 500px;
+        border-radius: 8px;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    .modal-body {
+        position: relative;
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: var(--bs-modal-padding);
+        height: 400px !important;
+    }
+</style>
+@* ----Modal-- *@
+<div id="attachmentModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h4>Client  Wise Details:</h4>
+        <div id="attachmentContainer" style="margin-top: 20px;"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-wrapper" style="overflow: auto;">
+                    <table id="tableClient" class="">
+                        <thead id="table-headerClient">
+                        <th>Client</th>
+                        <th>Time (in Hrs)</th>
+                        </thead>
+                        <tbody id="table-bodyClient"></tbody>
+                        <tfoot>
+                        <th style="text-align:left">Total :</th>
+                        <th id="footerTotalMinutesClient"></th>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="paginator" id="paginator-tableClient">
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button class="btn btn-secondary" onclick="$('#attachmentModal').hide()">Close</button>
+        </div>
+    </div>
+</div>
+<div id="attachmentWorkType" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h4>WorkType Details:</h4>
+        <div id="attachmentContainer" style="margin-top: 20px;"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-wrapper" style="overflow: auto;">
+                    <table id="tableWorkType" class="">
+                        <thead id="table-headerWorkType">
+                        <th>Work Type</th>
+                        <th>Time (in Hrs)</th>
+                        </thead>
+                        <tbody id="table-bodyWorkType"></tbody>
+                        <tfoot>
+                        <th style="text-align:left">Total :</th>
+                        <th id="footerTotalMinutesWorkType"></th>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="paginator" id="paginator-tableWorkType">
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button class="btn btn-secondary" onclick="$('#attachmentWorkType').hide()">Close</button>
+        </div>
+    </div>
+</div>
+<div id="attachmentEmployeeType" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h4>EmployeeType Details:</h4>
+        <div id="attachmentContainer2" style="margin-top: 20px;"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-wrapper" style="overflow: auto;">
+                    <table id="EmployeeType" class="">
+                        <thead id="table-headerEmployeeType">
+                        <th>Employee Name</th>
+                        <th>Time (in Hrs)</th>
+                        </thead>
+                        <tbody id="table-bodyEmployeeType"></tbody>
+                        <tfoot>
+                        <th style="text-align:left">Total :</th>
+                        <th id="footerTotalMinutesEmployeeType"></th>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="paginator" id="paginator-EmployeeType">
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button class="btn btn-secondary" onclick="$('#attachmentEmployeeType').hide()">Close</button>
+        </div>
+    </div>
+</div>
+<div id="attachmentModal3" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h4>Working Hours Details:</h4>
+        <div id="attachmentContainer3" style="margin-top: 20px;"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-wrapper" style="overflow: auto;">
+                    <table id="working" class="">
+                        <thead id="table-headerworking">
+                       
+                        </thead>
+                        <tbody id="table-bodyworking"></tbody>
+                    </table>
+                </div>
+                <div class="paginator" id="paginator-working">
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button class="btn btn-secondary" onclick="$('#attachmentModal3').hide()">Close</button>
+        </div>
+    </div>
+</div>
+@* ----Modal-- *@
+<div id="txtCreatepage">
+    <div class="card shadow-sm card1">
+        <div class="tabs">
+            <div class="row p-2">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 col-6">
+                            <label for="txtFromDate" class="col-form-label-sm fw-bold">From Date</label>
+                            <input type="text" id="txtFromDate" name="txtFromDate" autocomplete="off" class="form-control form-control-sm box_border" placeholder="From Date.." maxlength="15">
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-6">
+                            <label for="txtToDate" class="col-form-label-sm fw-bold">To Date</label>
+                            <input type="text" id="txtToDate" name="txtToDate" autocomplete="off" class="form-control form-control-sm box_border" placeholder="To Date.." maxlength="15">
+                        </div>
+                        <div class="col-md-3 col-sm-6 without-label-field">
+                            @* <button type="button" class="btn btn-primary btn-height" title="Show" id="txtShow" style="background:#0c666e">Show</button> *@
+                            <button type="button" class="btn btn-danger btn-height" title="Reset" onclick="Reset()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row p-2">
+                <div class="col-md-3" id="txtClientWise">
+                    <div class="business-card">
+                        <div class="right-section">
+                            <div class="carddiv">
+                                <h5>Client Wise</h5>
+                                <i class="fa fa-mouse-pointer"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" id="txtWorkTypeWise">
+                    <div class="business-card">
+                        <div class="right-section">
+
+                            <div class="carddiv">
+                                <h5>WorkType Wise</h5>
+                                <i class="fa fa-mouse-pointer"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" id="txtEmployeeWise">
+                    <div class="business-card">
+                        <div class="right-section">
+
+                            <div class="carddiv">
+                                <h5>Employee Wise</h5>
+                                <i class="fa fa-mouse-pointer"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" id="Workinghour">
+                    <div class="business-card">
+                        <div class="right-section">
+                            <div class="carddiv">
+                                <h5>Working/Remaining Hours</h5>
+                                <i class="fa fa-mouse-pointer"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/filter.js"></script>
+<script src="~/assets/script/dashboard.js"></script>
