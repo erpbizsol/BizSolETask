@@ -45,6 +45,7 @@ $(document).ready(async function () {
             $('#selectAll').prop('checked', true);
         } else {
             $('#selectAll').prop('checked', false);
+            
         }
         updateSelectedText();
         GetEmpCodes();
@@ -148,17 +149,20 @@ function convertDateFormat(dateString) {
     const monthAbbreviation = monthNames[parseInt(month) - 1];
     return `${year}-${month}-${day}`;
 }
-$(document).on("click", "#txtShow", function () {
+
+$(document).on('change', '#checkboxOptions,#selectAll,#txtFromDate', function () {
+    if ($('.option:checked').length === $('.option').length) {
+        $('#selectAll').prop('checked', true);
+        GetGenerateTaskTicketDateList();
+    } else {
+        $('#selectAll').prop('checked', false);
+        $("#txtSummary").hide();
+        $("#txtstatus").hide();
+    }
     GetGenerateTaskTicketDateList();
-   
 });
 function GetGenerateTaskTicketDateList() {
-    let Employee_name = $("#dropdownButton").val();
-    if (Employee_name == "") {
-        toastr.error("Please select Employee Id-Card!");
-        $("#dropdownButton").focus();
-        return;
-    }else {
+  
     let Date = convertDateFormat($("#txtFromDate").val());
         let codes = GetEmpCodes();
         let Employee_Codes = Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',');
@@ -172,6 +176,7 @@ function GetGenerateTaskTicketDateList() {
             success: function (response) {
                 if (response.length > 0) {
                     $("#txtSummary").show();
+                    $("#txtstatus").show();
                     const StringFilterColumn = [];
                     const NumericFilterColumn = [];
                     const DateFilterColumn = [];
@@ -214,9 +219,9 @@ function GetGenerateTaskTicketDateList() {
                         };
                     });
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
-                    $("#txtstatus").show();
                 } else {
                     $("#txtSummary").hide();
+                    $("#txtstatus").hide();
                     toastr.error("Record not found...!");
                 }
             },
@@ -224,7 +229,7 @@ function GetGenerateTaskTicketDateList() {
                 console.error("Error:", error);
             }
         });
-    }
+    
 }
 function updateSelectedText() {
     let selectedNames = $('.option:checked').map(function () {
@@ -315,6 +320,7 @@ function SaveEmployeeStatuss(codes, status, date) {
         success: function (response) {
             if (response[0].Status === 'Y') {
                 toastr.success(response[0].Msg);
+                GetGenerateTaskTicketDateList();
             } else {
                 toastr.error(response[0].Msg);
             }
