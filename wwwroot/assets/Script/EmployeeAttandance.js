@@ -146,7 +146,7 @@ function convertDateFormat(dateString) {
     const [day, month, year] = dateString.split('/');
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthAbbreviation = monthNames[parseInt(month) - 1];
-    return `${day}-${monthAbbreviation}-${year}`;
+    return `${year}-${month}-${day}`;
 }
 $(document).on("click", "#txtShow", function () {
     GetGenerateTaskTicketDateList();
@@ -290,6 +290,8 @@ function Reset() {
     $("#txtSummary").hide();
     $("#txtstatus").hide();
     $('#txtEmployeeName').val("");
+    $('#txtddlStatus').val("");
+    $('.ddlStatus').val("");
     $('#dropdownButton').val(null).trigger('change');
     DatePicker();
     G_selectedCodes = [];
@@ -299,9 +301,9 @@ function Reset() {
 $(document).on('change', '#txtddlStatus', function () {
     const status = $(this).val();  
     const date = convertDateFormat($("#txtFromDate").val());
-    SaveEmployeeStatus(G_selectedCodes, status, date);
+    SaveEmployeeStatuss(G_selectedCodes, status, date);
 });
-function SaveEmployeeStatus(codes, status, date) {
+function SaveEmployeeStatuss(codes, status, date) {
     let empCode = Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',');
     $.ajax({
         url: `${appBaseURL}/api/Master/SaveEmployeeStatus?EmployeeCode=${empCode}&Date=${date}&Status=${status}&UserMaster_Code=${UserMaster_Code}`,

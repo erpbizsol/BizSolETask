@@ -1,7 +1,7 @@
 ﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
 var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
-//let UserTypes = authKeyData.UserType;
+let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
     DatePicker();
