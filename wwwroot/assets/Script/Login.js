@@ -234,3 +234,36 @@ function getCookie1(name) {
     }
     return null;
 }
+
+function Create() {
+    var CompanyCode = $('#txtModalCompanyCode').val();
+    var CompanyName = $('#txtModalCompanyName').val();
+    var Email = $('#txtModalEmailid').val();
+    var MobileNo = $('#txtModalMobileNo').val();
+    $.ajax({
+        url: `${AppBaseURLMenu}/Company/CreateNewCompany`,
+        type: 'POST',
+        data: { CCode: CompanyCode, CompanyName: CompanyName, Email: Email, MobileNo: MobileNo },
+        success: function (response) {
+            if (response.success) {
+                alert("sdfghjk");
+                window.location.href = `${AppBaseURLMenu}/Login/Login`;
+            } else {
+                toastr.warning("No attachment found.");
+            }
+        },
+        error: function () {
+            toastr.error("Failed to retrieve attachments.");
+        }
+    });
+}
+
+document.addEventListener('keydown', function (event) {
+    if (event.ctrlKey && event.key === 'a') {
+        event.preventDefault();
+        openMyPopup();
+    }
+});
+function openMyPopup() {
+    $("#attachmentModal").show();
+}

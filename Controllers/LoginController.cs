@@ -256,8 +256,9 @@ namespace Bizsol_ETask.Controllers
                 using (IDbConnection conn = new SqlConnection(connectionString))
                 {
                     var parameters = new DynamicParameters();
-                    parameters.Add("ExistingPassword", CommonFunction.Encrypt(ExistingPassword.Trim(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"));
+                    parameters.Add("ExistingPassword", ExistingPassword);
                     parameters.Add("Password", CommonFunction.Encrypt(Password.Trim(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"));
+
                     parameters.Add("UserId", UserId);
 
                     var user = await conn.QueryAsync<dynamic>("USP_ChangePassword", parameters, commandType: CommandType.StoredProcedure);
@@ -418,5 +419,7 @@ namespace Bizsol_ETask.Controllers
                 return Json("[{Msg='',Status='N'}]");
             }
         }
+       
+
     }
 }

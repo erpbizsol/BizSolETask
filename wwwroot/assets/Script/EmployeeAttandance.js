@@ -4,7 +4,6 @@ let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 let G_selectedCodes = [];
-
 $(document).ready(async function () {
     DatePicker();
     $("#ERPHeading").text("Employee Attandance");
@@ -149,7 +148,6 @@ function convertDateFormat(dateString) {
     const monthAbbreviation = monthNames[parseInt(month) - 1];
     return `${year}-${month}-${day}`;
 }
-
 $(document).on('change', '#checkboxOptions,#selectAll,#txtFromDate', function () {
     if ($('.option:checked').length === $('.option').length) {
         $('#selectAll').prop('checked', true);
@@ -249,7 +247,6 @@ function GetEmpCodes() {
     }
     return G_selectedCodes;
 }
-
 $(document).on('change', '.ddlStatus,.txtWorkingHours', function () {
     var id = this.id;
     let parts = id.split("_");
@@ -302,7 +299,6 @@ function Reset() {
     G_selectedCodes = [];
     $(".option").prop("checked", false);
 }
-
 $(document).on('change', '#txtddlStatus', function () {
     const status = $(this).val();  
     const date = convertDateFormat($("#txtFromDate").val());
