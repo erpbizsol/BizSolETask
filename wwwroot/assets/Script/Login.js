@@ -234,7 +234,6 @@ function getCookie1(name) {
     }
     return null;
 }
-
 function Create() {
     var CompanyCode = $('#txtModalCompanyCode').val();
     var CompanyName = $('#txtModalCompanyName').val();

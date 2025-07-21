@@ -39,6 +39,7 @@ $(document).ready(async function () {
     $('#selectAll').on('change', function () {
         $('.option').prop('checked', this.checked);
         updateSelected();
+        GetGenerateTaskTicketDateList('GET')
     });
     $(document).on('change', '.option', function () {
         if ($('.option:checked').length === $('.option').length) {
@@ -775,11 +776,11 @@ function GetPendingTaskReport(Type) {
                 const Button = false;
                 const showButtons = [""];
                 const StringdoubleFilterColumn = [""];
-                const hiddenColumns = ["WorkByCode", "ReAssign_Code", "TicketAssignedBy", "CreateTicketBy_Code"];
+                const hiddenColumns = ["WorkByCode", "ReAssign_Code", "TicketAssignedBy", "CreateTicketBy_Code","Remarks"];
                 const ColumnAlignment = {
 
                 };
-                BizsolCustomFilterGrid.CreateDataTable("table-header1", "table-body1", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+                BizsolCustomFilterGrid.CreateDataTable("table-headerC", "table-bodyC", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
             } else {
                 $("#txtTable").hide();
                 if (Type != 'Load') {
