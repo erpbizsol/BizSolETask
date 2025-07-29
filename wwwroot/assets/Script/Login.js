@@ -2,6 +2,8 @@
 let G_IsCompanyValidate = false;
 let G_Goligin = false;
 let G_OTP = false;
+let G_ValidatePassword = false;
+const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
     $('#txtCompanyCode').on('keydown', function (e) {
         if (e.key === "Enter") {
@@ -27,7 +29,7 @@ $(document).ready(function () {
         if (e.key === "Enter") {
             $("#btnProceed").focus();
         }
-    }); 
+    });
     $('#btnProceed').click(function () {
         Login();
     });
@@ -58,7 +60,7 @@ $(document).ready(function () {
         CheckOtp();
     });
     let RememberMe = getCookie1("ETaskIsRememberMe");
-    if (RememberMe !='') {
+    if (RememberMe != '') {
         let decodedStr = decodeURIComponent(RememberMe);
         let parts = decodedStr.split("()");
         $('#txtUserID').val(parts[1]);
@@ -104,7 +106,7 @@ function Login() {
     var CompanyCode = $('#txtCompanyCode').val();
     var UserID = $('#txtUserID').val();
     var Password = $('#txtPassword').val();
-    var RememberMe = $('#chkIsRememberMe').is(":checked")?'Y':'N';
+    var RememberMe = $('#chkIsRememberMe').is(":checked") ? 'Y' : 'N';
     if (CompanyCode.trim() === "") {
         toastr.error("Please enter Company Code.!");
         $('#txtCompanyCode').focus();
@@ -123,7 +125,7 @@ function Login() {
         G_Goligin = true;
         return;
     }
-    
+
     $.ajax({
         url: `${AppBaseURLMenu}/Login/Authenticate`,
         type: 'POST',
@@ -131,6 +133,7 @@ function Login() {
         success: function (response) {
             if (response.success && response.isFirstLogin == 'N') {
                 window.location.href = `${AppBaseURLMenu}/Dashboard/Dashboard`;
+              
             } else if (response.success && response.isFirstLogin == 'Y') {
                 window.location.href = `${AppBaseURLMenu}/login/ChangePassword`;
             }
@@ -178,7 +181,7 @@ function SendOtp() {
     $.ajax({
         url: `${AppBaseURLMenu}/Login/SendOTP`,
         type: 'POST',
-        data: { CompanyCode: CompanyCode, UserID: UserID},
+        data: { CompanyCode: CompanyCode, UserID: UserID },
         success: function (response) {
             if (response.status == "Y") {
                 $("#dvOTP").show();
@@ -239,24 +242,42 @@ function Create() {
     var CompanyName = $('#txtModalCompanyName').val();
     var Email = $('#txtModalEmailid').val();
     var MobileNo = $('#txtModalMobileNo').val();
-    $.ajax({
-        url: `${AppBaseURLMenu}/Company/CreateNewCompany`,
-        type: 'POST',
-        data: { CCode: CompanyCode, CompanyName: CompanyName, Email: Email, MobileNo: MobileNo },
-        success: function (response) {
-            if (response.success) {
-                alert("sdfghjk");
-                window.location.href = `${AppBaseURLMenu}/Login/Login`;
-            } else {
-                toastr.warning("No attachment found.");
-            }
-        },
-        error: function () {
-            toastr.error("Failed to retrieve attachments.");
-        }
-    });
-}
+    if (CompanyCode.trim() === "") {
+        toastr.error("Please enter a Company Code.!");
+        $("#txtModalCompanyCode").focus();
+        return;
+    } else if (CompanyName.trim() === "") {
+        toastr.error("Please enter a Employee Name.!");
+        $("#txtModalCompanyName").focus();
+        return;
+    }else if (Email.trim() === "") {
+        toastr.error("Please enter a Email.!");
+        $("#txtModalEmailid").focus();
+        return;
+    }else if (MobileNo.trim() === "") {
+        toastr.error("Please enter a Mobile No.!");
+        $("#txtModalMobileNo").focus();
+        return;
+    }else {
+        $.ajax({
+            url: `${AppBaseURLMenu}/Company/CreateNewCompany`,
+            type: 'POST',
+            data: { CCode: CompanyCode, CompanyName: CompanyName, Email: Email, MobileNo: MobileNo },
+            success: function (response) {
+                if (response.success) {
 
+                    window.location.href = `${AppBaseURLMenu}/Login/Login`;
+                } else {
+                    toastr.warning("No attachment found.");
+                }
+            },
+            error: function () {
+                toastr.error("Failed to retrieve attachments.");
+            }
+        });
+    }
+
+}
 document.addEventListener('keydown', function (event) {
     if (event.ctrlKey && event.key === 'a') {
         event.preventDefault();
@@ -265,4 +286,30 @@ document.addEventListener('keydown', function (event) {
 });
 function openMyPopup() {
     $("#attachmentModal").show();
+}
+function ValidatePassword() {
+    let Password = $("#txtValidatePassword").val();
+    if (Password.trim() === "") {
+        toastr.error("Please enter a Password.!");
+        $("#txtValidatePassword").focus();
+        return;
+    } else {
+        $.ajax({
+            url: `${AppBaseURLMenu}/Login/ValidatePassword`,
+            type: 'POST',
+            data: { Password: Password },
+            success: function (response) {
+                if (response.success) {
+                    $('#txtValidatePassword').prop('readonly', true);
+                    $("#txtValidateP").hide();
+                    $("#txtcreatecompany").show();
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function () {
+                toastr.error("An error occurred while validating the Password. Please try again.");
+            }
+        });
+    }
 }

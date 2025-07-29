@@ -1,66 +1,472 @@
 ﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
 var UserName = sessionStorage.getItem('UserName');
-let UserMaster_Code = authKeyData.UserMaster_Code;
-let UserTypes = authKeyData.UserType;
+let UserMaster_Code = sessionStorage.getItem('UserMaster_Code');
+let UserTypes = sessionStorage.getItem('UserType');
+//let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
+let employeeChart = null;
+let employeeChart1 = null;
+let employeeChart2 = null;
+let G_selectedCodes = [];
 $(document).ready(function () {
-    DatePicker();
     $("#ERPHeading").text("Dashboard");
+
     $("#txtFromDate").on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtToDate").focus();
         }
     });
+
     $("#txtToDate").on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtShow").focus();
         }
     });
-});
-$("#txtClientWise").click(async function () {
-    await GetClientType();
-});
-$("#txtWorkTypeWise").click(async function () {
-    await GetWorkType();
-});
-$("#txtEmployeeWise").click(async function () {
-    await GetEmployeeType();
-});
 
-$("#Workinghour").click(async function () {
-    LoadWorkingHours();
+    $('.select-checkbox-multi').click(function () {
+        let inputWidth = $(this).outerWidth();
+        $('#dropdownList').css({
+            'position': 'absolute',
+            'width': inputWidth + 'px',
+        }).toggle();
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown-container').length) {
+            $('#dropdownList').hide();
+        }
+    });
+
+    $('#selectAll').on('change', function () {
+        $('.option').prop('checked', this.checked);
+        updateSelected();
+        GetEmpCodes();
+        
+    });
+
+    $(document).on('change', '.option', function () {
+        if ($('.option:checked').length === $('.option').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+        updateSelected();
+        GetEmpCodes();
+    });
+
+    DatePicker();
+    GetEmployeeType('LOAD');
+    loadPieChartFromAPI('LOAD');
+    GetClientPending('LOAD');
+    GetEmployeeMasterList();
 });
+function GetEmployeeType(Mode) {
+    const FDate = $('#txtFromDate').val();
+    const FromDate = convertToYearMonthDay(FDate);
+    const TDate = $('#txtToDate').val();
+    const ToDate = convertToYearMonthDay(TDate);
+    let EmployeeName = GetEmpCodes();
+    let Employee_Codes = EmployeeName.length > 0 ? EmployeeName.join(',') : null;
+    $.ajax({
+        url: `${appBaseURL}/api/Dashboard/GetEmployeeType?Mode=${Mode}&FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}&EmployeeMaster_Code=${Employee_Codes}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+
+                //// --- Chart Binding Below ---
+                const chartLabels = response.map(item => item["Employee Name"] || 'Unknown');
+                const chartData = response.map(item => parseFloat(item["WorkingHours"]) || 0);
+                //// Create tooltip information per employee
+                const tooltipData = response.map(item => ({
+                    name: item["WorkingHours"],
+                    name: item["Employee Name"] || 'Unknown',
+                    remainingHours: item.RemainingHours || 0
+                }));
+                //// Alternate colors (optional)
+                const tooltipData1 = response.map(item => ({
+                    name: item["Employee Name"] || 'Unknown',
+                    remainingHours: item.RemainingHours || 0
+                }));
+
+                const baseColors = [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#66ff66', '#ff66cc',
+                    '#00BFFF', '#FFD700', '#DC143C', '#8A2BE2'
+                ];
+
+                const backgroundColors = response.map((_, index) => baseColors[index % baseColors.length]);
+
+                const chartConfig = {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Working Hours',
+                            data: chartData,
+                            backgroundColor: backgroundColors,
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                font: {
+                                    weight: 'bold',
+                                    size: 12
+                                },
+                                callbacks: {
+                                    title: function (tooltipItems) {
+                                        const index = tooltipItems[0].dataIndex;
+                                        return `Employee: ${tooltipData1[index].name}`;
+                                    },
+                                    label: function (tooltipItem) {
+                                        const index = tooltipItem.dataIndex;
+                                        const time = tooltipItem.formattedValue;
+                                        const remaining = tooltipData1[index].remainingHours;
+                                        return [
+                                            `Working Hours: ${time}`,
+                                            `Remaining Hours: ${remaining}`
+                                        ];
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: function (value, context) {
+                                    const index = context.dataIndex;
+                                    const remaining = tooltipData1[index].remainingHours;
+                                    return `WH: ${value}\nRH: ${remaining}`;
+                                },
+                                font: {
+                                    weight: 'bold',
+                                    size: 12
+                                },
+                                color: '#000'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    autoSkip: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Employee',
+                                    color: '#000',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 15
+                                    },
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                anchor: 'end',
+                                align: 'top',
+                                title: {
+                                    display: true,
+                                    text: 'Working Hours',
+                                    color: '#000',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 15
+                                    },
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                };
+                // Destroy previous chart if exists
+                if (employeeChart !== null) {
+                    employeeChart.destroy();
+                }
+                // Draw chart
+                const ctx = document.getElementById('employeeChartCanvas').getContext('2d');
+                employeeChart = new Chart(ctx, chartConfig);
+
+            } else {
+                $("#txtSummary").hide();
+                $('#table-bodyEmployeeType').empty();
+
+                if (employeeChart !== null) {
+                    employeeChart.destroy();
+                    employeeChart = null;
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#table-bodyEmployeeType').empty();
+        }
+    });
+}
+function GetEmployeeMasterList() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetAssignedss`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                let html = '';
+                response.forEach(item => {
+                    html += `<label>
+                    <input type="checkbox" class="option" value="${item.Code}" data-name="${item.EmployeeName.trim()}"> ${item.EmployeeName.trim()}
+                    </label><br>`;
+                });
+                $('#checkboxOptions').html(html);
+                if (UserTypes === "A") {
+                    $('#checkboxOptions input[type="checkbox"]').prop('disabled', false);
+                    GetEmployeeType('GET');
+                    loadPieChartFromAPI('GET');
+                    GetClientPending('GET');
+                } else {
+                    $('#dropdownButton').val(UserName).prop('disabled', true);
+                    $('#checkboxOptions input[type="checkbox"]').each(function () {
+                        if ($(this).data('name') === UserName.trim()) {
+                            $(this).prop('checked', true);
+                            GetEmployeeType('GET');
+                            loadPieChartFromAPI('GET');
+                            GetClientPending('GET');
+                        } else {
+                            $(this).prop('disabled', true);
+
+                        }
+                    });
+
+
+                }
+
+
+            }
+        },
+        error: function () {
+            alert('Error loading work types');
+        }
+    });
+}
+function loadPieChartFromAPI(Mode) {
+    const FDate = $('#txtFromDate').val();
+    const TDate = $('#txtToDate').val();
+    const FromDate = convertToYearMonthDay(FDate);
+    const ToDate = convertToYearMonthDay(TDate);
+    $.ajax({
+        url: `${appBaseURL}/api/Dashboard/GetEmployeePending?Mode=${Mode}&FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}&Mode=${Mode}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response && response.length > 0) {
+                const ctx1 = document.getElementById('myPieChart').getContext('2d');
+                const chartLabels = response.map(item => item["EmployeeName"] || 'Unknown');
+                const chartData = response.map(item => item["Pending"] || "");
+
+                const pieColors = [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#66ff66', '#ff66cc',
+                    '#00BFFF', '#FFD700', '#DC143C', '#8A2BE2'
+                ];
+                const tooltipData2 = response.map(item => ({
+                    name: item["Pending"],
+                }));
+                // Destroy previous chart
+                if (employeeChart1 !== null) {
+                    employeeChart1.destroy();
+                }
+
+                employeeChart1 = new Chart(ctx1, {
+                    type: 'pie',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: pieColors.slice(0, chartData.length),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: '#000',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+
+                                    label: function (tooltipItem) {
+                                        const index = tooltipItem.dataIndex;
+                                        const label = chartLabels[index];
+                                        //const value = chartData[index];
+                                        //const total = chartData.reduce((a, b) => a + b, 0);
+                                        //const percent = ((value / total) * 100).toFixed(1);
+                                        return `${label}`;
+                                    },
+                                    title: function (tooltipItems) {
+                                        const index = tooltipItems[0].dataIndex;
+                                        return `Pending : ${tooltipData2[index].name}`;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                formatter: (value, context) => {
+                                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${percentage}%`;
+                                },
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold',
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            } else {
+                if (employeeChart1 !== null) {
+                    employeeChart1.destroy();
+                    employeeChart1 = null;
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching data:", error);
+        }
+    });
+}
+function GetClientPending(Mode) {
+    const FDate = $('#txtFromDate').val();
+    const TDate = $('#txtToDate').val();
+    const FromDate = convertToYearMonthDay(FDate);
+    const ToDate = convertToYearMonthDay(TDate);
+    $.ajax({
+        url: `${appBaseURL}/api/Dashboard/GetClientPending?Mode=${Mode}&FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}&Mode=${Mode}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response && response.length > 0) {
+                const ctx2 = document.getElementById('myDountChart').getContext('2d');
+                const chartLabels1 = response.map(item => item["Client Name"] || 'Unknown');
+                const chartData1 = response.map(item => item["Pending"] || 0);
+
+                const pieColors = [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#66ff66', '#ff66cc',
+                    '#00BFFF', '#FFD700', '#DC143C', '#8A2BE2'
+                ];
+
+                const tooltipData3 = response.map(item => ({
+                    name: item["Pending"]
+                }));
+
+                // Destroy previous chart
+                if (employeeChart2 !== null) {
+                    employeeChart2.destroy();
+                }
+
+                employeeChart2 = new Chart(ctx2, {
+                    type: 'doughnut', // <<< changed here
+                    data: {
+                        labels: chartLabels1,
+                        datasets: [{
+                            data: chartData1,
+                            backgroundColor: pieColors.slice(0, chartData1.length),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '50%', // doughnut thickness
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: '#000',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        const index = tooltipItem.dataIndex;
+                                        const label = chartLabels1[index];
+                                        return `${label}`;
+                                    },
+                                    title: function (tooltipItems) {
+                                        const index = tooltipItems[0].dataIndex;
+                                        return `Pending Status : ${tooltipData3[index].name}`;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                formatter: (value, context) => {
+                                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${percentage}%`;
+                                },
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold',
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    //plugins: [ChartDataLabels]
+                });
+            } else {
+                if (employeeChart2 !== null) {
+                    employeeChart2.destroy();
+                    employeeChart2 = null;
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching data:", error);
+        }
+    });
+}
 function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
-    $('#txtToDate').val(defaultDate);
-    $('#txtToDate').datepicker({
+    $('#txtToDate,#txtFromDate').val(defaultDate);
+    $('#txtToDate,#txtFromDate').datepicker({
         format: 'dd/mm/yyyy',
         autoclose: true,
         todayHighlight: true
     }).datepicker('update', defaultDate);
-    setStartOfMonth();
+    //setStartOfMonth();
 }
 function formatDateToString(dateObj) {
     const day = String(dateObj.getDate()).padStart(2, '0');
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const year = dateObj.getFullYear();
     return `${day}/${month}/${year}`;
-}
-function setStartOfMonth() {
-
-    const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    const formatted = formatDateToString(firstDay);
-
-    $('#txtFromDate').val(formatted);
-    $('#txtFromDate').datepicker({
-        format: 'dd/mm/yyyy',
-        autoclose: true,
-        todayHighlight: true
-    }).datepicker('update', formatted);
-
 }
 function setupDateInputFormatting() {
     $('#txtFromDate,#txtToDate').on('input', function () {
@@ -106,203 +512,47 @@ function convertToYearMonthDay(dateStr) {
     const [day, month, year] = parts;
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
-function GetClientType() {
-    const FDate = $('#txtFromDate').val();
-    const FromDate = convertToYearMonthDay(FDate);
-    const TDate = $('#txtToDate').val();
-    const ToDate = convertToYearMonthDay(TDate);
-    $.ajax({
-        url: `${appBaseURL}/api/Dashboard/GetClientType?FromDate=${FromDate}&ToDate=${ToDate}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response.length > 0) {
-                $("#txtSummary").show();
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["TimeInMinutes", "RatePerHr", "TimeInHours","Amount"];
-                const ColumnAlignment = {};
-                const updatedResponse = response.map(item => ({
-                    ...item, 'Action':
-                        `<button class="btn btn-success icon-height mb-1" style="background:#216c4a" title="A.D+" onclick="GetAssingData('${item.Code}')">
-                    <i class="fa-solid fa-plus"></i>
-                    </button>`
-                    }));
+function updateSelected() {
+    let selectedNames = $('.option:checked').map(function () {
+        return $(this).data('name');
+    }).get().join(', ');
+    $('#dropdownButton').val(selectedNames);
+}
+function GetEmpCodes() {
+    G_selectedCodes = [];
+    $('.option:checked').each(function () {
+        G_selectedCodes.push($(this).val());
+    });
 
-                BizsolCustomFilterGrid.CreateDataTable(
-                    "table-headerClient",
-                    "table-bodyClient",
-                    updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, true
-                );
-                const totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time (in Hrs)"]) || 0), 0);
-                document.getElementById("footerTotalMinutesClient").textContent = totalMinutes;
-                $('#attachmentModal').show();
-            } else {
-                $("#txtSummary").hide();
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            $('#table-bodyClient').empty();
-        }
-    });
+    return G_selectedCodes;
 }
-function GetWorkType() {
-    const FDate = $('#txtFromDate').val();
-    const FromDate = convertToYearMonthDay(FDate);
-    const TDate = $('#txtToDate').val();
-    const ToDate = convertToYearMonthDay(TDate);
-    $.ajax({
-        url: `${appBaseURL}/api/Dashboard/GetWorkType?FromDate=${FromDate}&ToDate=${ToDate}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response.length > 0) {
-                $("#txtSummary").show();
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["TimeInMinutes", "RatePerHr","Amount"];
-                const ColumnAlignment = {};
-                BizsolCustomFilterGrid.CreateDataTable(
-                    "table-headerWorkType",
-                    "table-bodyWorkType",
-                    response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, true
-                );
-                const totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time (in Hrs)"]) || 0), 0);
-                document.getElementById("footerTotalMinutesWorkType").textContent = totalMinutes;
 
-                $("#attachmentWorkType").show();
-            } else {
-                $("#txtSummary").hide();
+$('#txtFromDate, #txtToDate').on('change', function () {
+    GetEmployeeType('LOAD');
+    loadPieChartFromAPI('LOAD');
+    GetClientPending('LOAD');
+});
 
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            $('#table-bodyWorkType').empty();
-        }
-    });
-}
-function GetEmployeeType() {
-    const FDate = $('#txtFromDate').val();
-    const FromDate = convertToYearMonthDay(FDate);
-    const TDate = $('#txtToDate').val();
-    const ToDate = convertToYearMonthDay(TDate);
-    $.ajax({
-        url: `${appBaseURL}/api/Dashboard/GetEmployeeType?FromDate=${FromDate}&ToDate=${ToDate}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response.length > 0) {
-                $("#txtSummary").show();
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["TimeInMinutes", "RatePerHr","Amount"];
-                const ColumnAlignment = {};
-                BizsolCustomFilterGrid.CreateDataTable(
-                    "table-headerEmployeeType",
-                    "table-bodyEmployeeType",
-                    response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, true
-                );
-                const totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time (in Hrs)"]) || 0), 0);
-                document.getElementById("footerTotalMinutesEmployeeType").textContent = totalMinutes;
-                $("#attachmentEmployeeType").show();
-            } else {
-                $("#txtSummary").hide();
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            $('#table-bodyEmployeeType').empty();
-        }
-    });
-}
-function LoadWorkingHours() {
-    $.ajax({
-        url: `${appBaseURL}/api/Dashboard/GetEmployeeHours`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response.length > 0) {
-                $("#txtSummary").show();
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = [];
-                const ColumnAlignment = {};
-                BizsolCustomFilterGrid.CreateDataTable(
-                    "table-headerworking",
-                    "table-bodyworking",
-                    response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, true
-                );
-                const totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time (in Hrs)"]) || 0), 0);
-                document.getElementById("footerTotalMinutesClient").textContent = totalMinutes;
-                $('#attachmentModal3').show();
-            } else {
-                $("#txtSummary").hide();
-                toastr.error("Record not found...!");
-            }
-        }
-    });
-}
+$(document).on('change', '#checkboxOptions,#selectAll', function () {
+    if ($('.option:checked').length === $('.option').length) {
+        $('#selectAll').prop('checked', true);
+        GetEmployeeType('GET');
+        loadPieChartFromAPI('GET');
+        GetClientPending('GET');
+    } else {
+        $('#selectAll').prop('checked', false);
+        GetEmployeeType('LOAD');
+        loadPieChartFromAPI('LOAD');
+        GetClientPending('LOAD');
+    }
+    GetEmployeeType('GET');
+    loadPieChartFromAPI('GET');
+    GetClientPending('GET');
+});
+
 function Reset() {
     DatePicker();
-}
-function GetAssingData(Code) {
-    const FDate = $('#txtFromDate').val();
-    const FromDate = convertToYearMonthDay(FDate);
-    const TDate = $('#txtToDate').val();
-    const ToDate = convertToYearMonthDay(TDate);
-    $.ajax({
-        url: `${appBaseURL}/api/Dashboard/GetEmployeeWiseStatus?FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}`,
-        type: 'GET',
-        dataType: "json",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (response.length > 0) {
-                const StringFilterColumn = [];
-                const NumericFilterColumn = [];
-                const DateFilterColumn = [];
-                const Button = false;
-                const showButtons = [];
-                const StringdoubleFilterColumn = [];
-                const hiddenColumns = [];
-                const ColumnAlignment = {
-                };
-                BizsolCustomFilterGrid.CreateDataTable("table-headerworking", "table-bodyworking", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
-                $('#attachmentModal3').show();
-            } else {
-                toastr.error("Record not found...!");
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-        }
-    });
-
+    $('#dropdownButton').val(null).trigger('change');
+    G_selectedCodes = [];
+    $(".option").prop("checked", false);
 }

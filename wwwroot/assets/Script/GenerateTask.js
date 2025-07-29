@@ -549,6 +549,7 @@ function SaveData() {
                     //GetGenerateTaskTicketDateList('Get');
 
                     SenEmailMassage(response[0].Code);
+                    SendWhatsApp(response[0].Code);
                 }
                 else {
                     
@@ -598,6 +599,8 @@ function GetGenerateTaskTicketDateList(Type) {
                              <button class="btn btn-success icon-height mb-1" style="background:#216c4a" title="A.D+" onclick="GetAssingData('${item[`Ticket No`]}')">
                             <i class="fa-solid fa-plus"></i>
                             </button> 
+                           
+                            
                             `;
 
                         if (UserTypes === 'A') {
@@ -928,4 +931,25 @@ function SenEmailMassage(Code) {
         }
     });
     
+}
+
+function SendWhatsApp() {
+    //$.ajax({
+    //    url: `${appBaseURL}/api/Email/SenEmailMassage?Code=${Code}&Mode=NEW`,
+    //    type: 'Get',
+    //    beforeSend: function (xhr) {
+    //        xhr.setRequestHeader('Auth-Key', authKeyData);
+    //    },
+    //    success: function (response) {
+    //        if (response[0].Status === 'Y') {
+    //            //toastr.success(response[0].Msg);
+
+    //        } else {
+    //            toastr.error("Unexpected response format.");
+    //        }
+    //    },
+    //    error: function (xhr, status, error) {
+    //        toastr.error("Error deleting item:");
+    //    }
+    //});
 }

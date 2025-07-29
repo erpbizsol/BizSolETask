@@ -4,9 +4,13 @@ let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 let G_selectedCodes = [];
+let G_workingHours = [];
 $(document).ready(async function () {
     DatePicker();
     $("#ERPHeading").text("Employee Attandance");
+    $(".Number").keyup(function (e) {
+        if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9]/g, '')
+    });
     $('#ddlEmployeeCard').on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtEmployeeName").focus();
@@ -186,9 +190,9 @@ function GetGenerateTaskTicketDateList() {
                     const statusOptions = [
                         'Present',
                         'Absent',
-                        'Weekly Off',
+                      /*  'Weekly Off',*/
                         'Holiday',
-                        'Sick Leave',
+                        /*'Sick Leave',*/
                         'Leave',
                         'Half Day'
                     ];
@@ -203,17 +207,26 @@ function GetGenerateTaskTicketDateList() {
 
                         const workingHoursInput = `
                 <input type="number" id="txtWorkingHours_${item.Code}"
-                class="txtWorkingHours box_border form-control form-control-sm"
+                class="txtWorkingHours box_border form-control form-control-sm Number"
                 data-index="${index}" 
                 value="${item.WorkingHours ?? ''}" 
                 min="0" max="24" step="0.5" 
                 autocomplete="off" />
                 `;
 
+                const RemainingHoursInput = `
+                <input type="number" id="txtRemainingHours_${item.Code}"
+                class="txtRemainingHours box_border form-control form-control-sm"
+                data-index="${index}" 
+                value="${item.RemainingHours}" 
+                min="0" max="24" step="0.5" 
+                autocomplete="off" readonly/>
+                `;
                         return {
                             ...item,
                             "Status": statusSelect,
-                            "WorkingHours": workingHoursInput
+                            "WorkingHours": workingHoursInput,
+                            "RemainingHours": RemainingHoursInput
                         };
                     });
                     BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
@@ -247,22 +260,24 @@ function GetEmpCodes() {
     }
     return G_selectedCodes;
 }
+
 $(document).on('change', '.ddlStatus,.txtWorkingHours', function () {
     var id = this.id;
     let parts = id.split("_");
     var EmployeeMaster_Code = parts[1];
-    var status = $("#ddlStatus_"+EmployeeMaster_Code).val()
-    var workingHours = $("#txtWorkingHours_"+EmployeeMaster_Code).val()
+    var status = $("#ddlStatus_" + EmployeeMaster_Code).val();
+    G_workingHours = $("#txtWorkingHours_" + EmployeeMaster_Code).val();
+    let RemainingHourss = $("#txtRemainingHours_" + EmployeeMaster_Code).val();
     const date = convertDateFormat($("#txtFromDate").val());
-    SaveEmployeeStatus(EmployeeMaster_Code, date, status, workingHours);
+    SaveEmployeeStatus(EmployeeMaster_Code, date, status, G_workingHours,RemainingHourss);
 });
-function SaveEmployeeStatus(Employee_Codes, date, status, workingHours) {
-
+function SaveEmployeeStatus(Employee_Codes, date, status, workingHours, RemainingHourss) {
         const payload = {
             EmployeeMaster_Code: Employee_Codes,
             Date: date,
             Status: status,
             WorkingHours: workingHours,
+            RemainingHours: RemainingHourss,
             UserMaster_Code: UserMaster_Code
         };
         $.ajax({
@@ -276,6 +291,7 @@ function SaveEmployeeStatus(Employee_Codes, date, status, workingHours) {
             success: function (response) {
                 if (response[0].Status =='Y') {
                     toastr.success(response[0].Msg);
+                    GetGenerateTaskTicketDateList();
                 } else {
                     toastr.success(response[0].Msg);
                 }
@@ -286,7 +302,6 @@ function SaveEmployeeStatus(Employee_Codes, date, status, workingHours) {
                 toastr.error("Failed to save status.");
             }
         });
-    
 }
 function Reset() {
     $("#txtSummary").hide();
