@@ -1,28 +1,24 @@
-﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
-var UserName = sessionStorage.getItem('UserName');
-let UserMaster_Code = sessionStorage.getItem('UserMaster_Code');
-let UserTypes = sessionStorage.getItem('UserType');
-//let UserTypes = authKeyData.UserType;
-const appBaseURL = sessionStorage.getItem('AppBaseURL');
+﻿var authKeyData = JSON.parse($("#txtAuthKey").val());
+var UserName = $("#txtUserName").val();
+let UserTypes = authKeyData.UserType;
+let UserMaster_Code = authKeyData.UserMaster_Code;
+const appBaseURL = $("#txtAppBaseUrl").val();
 let employeeChart = null;
 let employeeChart1 = null;
 let employeeChart2 = null;
 let G_selectedCodes = [];
 $(document).ready(function () {
     $("#ERPHeading").text("Dashboard");
-
     $("#txtFromDate").on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtToDate").focus();
         }
     });
-
     $("#txtToDate").on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtShow").focus();
         }
     });
-
     $('.select-checkbox-multi').click(function () {
         let inputWidth = $(this).outerWidth();
         $('#dropdownList').css({
@@ -30,20 +26,17 @@ $(document).ready(function () {
             'width': inputWidth + 'px',
         }).toggle();
     });
-
     $(document).on('click', function (e) {
         if (!$(e.target).closest('.dropdown-container').length) {
             $('#dropdownList').hide();
         }
     });
-
     $('#selectAll').on('change', function () {
         $('.option').prop('checked', this.checked);
         updateSelected();
         GetEmpCodes();
         
     });
-
     $(document).on('change', '.option', function () {
         if ($('.option:checked').length === $('.option').length) {
             $('#selectAll').prop('checked', true);
@@ -233,27 +226,9 @@ function GetEmployeeMasterList() {
                     GetClientPending('GET');
                 } else {
                     $('#dropdownButton').val(UserName).prop('disabled', true);
-                    $('#checkboxOptions input[type="checkbox"]').each(function () {
-                        if ($(this).data('name') === UserName.trim()) {
-                            $(this).prop('checked', true);
-                            GetEmployeeType('GET');
-                            loadPieChartFromAPI('GET');
-                            GetClientPending('GET');
-                        } else {
-                            $(this).prop('disabled', true);
-
-                        }
-                    });
-
-
                 }
-
-
             }
         },
-        error: function () {
-            alert('Error loading work types');
-        }
     });
 }
 function loadPieChartFromAPI(Mode) {
@@ -261,8 +236,10 @@ function loadPieChartFromAPI(Mode) {
     const TDate = $('#txtToDate').val();
     const FromDate = convertToYearMonthDay(FDate);
     const ToDate = convertToYearMonthDay(TDate);
+    let EmployeeName = GetEmpCodes();
+    let Employee_Codes = EmployeeName.length > 0 ? EmployeeName.join(',') : null;
     $.ajax({
-        url: `${appBaseURL}/api/Dashboard/GetEmployeePending?Mode=${Mode}&FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}&Mode=${Mode}`,
+        url: `${appBaseURL}/api/Dashboard/GetEmployeePending?Mode=${Mode}&FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}&EmployeeMaster_Code=${Employee_Codes}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -359,8 +336,10 @@ function GetClientPending(Mode) {
     const TDate = $('#txtToDate').val();
     const FromDate = convertToYearMonthDay(FDate);
     const ToDate = convertToYearMonthDay(TDate);
+    let EmployeeName = GetEmpCodes();
+    let Employee_Codes = EmployeeName.length > 0 ? EmployeeName.join(',') : null;
     $.ajax({
-        url: `${appBaseURL}/api/Dashboard/GetClientPending?Mode=${Mode}&FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}&Mode=${Mode}`,
+        url: `${appBaseURL}/api/Dashboard/GetClientPending?Mode=${Mode}&FromDate=${FromDate}&ToDate=${ToDate}&UserMaster_Code=${UserMaster_Code}&EmployeeMaster_Code=${Employee_Codes}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -528,23 +507,23 @@ function GetEmpCodes() {
 }
 
 $('#txtFromDate, #txtToDate').on('change', function () {
-    GetEmployeeType('LOAD');
-    loadPieChartFromAPI('LOAD');
-    GetClientPending('LOAD');
+    GetEmployeeType('GET');
+    loadPieChartFromAPI('GET');
+    GetClientPending('GET');
 });
 
 $(document).on('change', '#checkboxOptions,#selectAll', function () {
-    if ($('.option:checked').length === $('.option').length) {
-        $('#selectAll').prop('checked', true);
-        GetEmployeeType('GET');
-        loadPieChartFromAPI('GET');
-        GetClientPending('GET');
-    } else {
-        $('#selectAll').prop('checked', false);
-        GetEmployeeType('LOAD');
-        loadPieChartFromAPI('LOAD');
-        GetClientPending('LOAD');
-    }
+    //if ($('.option:checked').length === $('.option').length) {
+    //    $('#selectAll').prop('checked', true);
+    //    GetEmployeeType('GET');
+    //    loadPieChartFromAPI('GET');
+    //    GetClientPending('GET');
+    //} else {
+    //    $('#selectAll').prop('checked', false);
+    //    GetEmployeeType('GET');
+    //    loadPieChartFromAPI('GET');
+    //    GetClientPending('GET');
+    //}
     GetEmployeeType('GET');
     loadPieChartFromAPI('GET');
     GetClientPending('GET');

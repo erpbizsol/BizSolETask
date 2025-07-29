@@ -231,17 +231,6 @@
     }
 
 </style>
-<script>
-    var authKey = '@Html.Raw(ViewBag.AuthKey)';
-    if (authKey !== '') {
-    
-        sessionStorage.setItem('UserMaster_Code', '@Html.Raw(ViewBag.UserMaster_Code)');
-        sessionStorage.setItem('UserType', '@Html.Raw(ViewBag.UserType)');
-       
-
-    }
-</script>
-
 <div id="txtCreatepage">
     <div class="card shadow-sm card1">
         <div class="tabs">
@@ -250,6 +239,9 @@
                     <div class="row">
                         <div class="col-md-3 col-sm-6 col-6">
                             <label for="txtFromDate" class="col-form-label-sm fw-bold">From Date</label>
+                            <input type="hidden" id="txtAuthKey" value="@ViewBag.AuthKey" />
+                            <input type="hidden" id="txtAppBaseUrl" value="@ViewBag.AppBaseURL" />
+                            <input type="hidden" id="txtUserName" value="@ViewBag.UserName" />
                             <input type="text" id="txtFromDate" name="txtFromDate" autocomplete="off" class="form-control form-control-sm box_border" placeholder="From Date.." maxlength="15">
                         </div>
                         <div class="col-md-3 col-sm-6 col-6">

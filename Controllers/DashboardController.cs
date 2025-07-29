@@ -32,6 +32,8 @@ namespace Bizsol_ETask.Controllers
             ViewBag.AppBaseURLMenu = _configuration["AppBaseURLMenu"];
             ViewBag.UserName = UserName;
             ViewBag.AuthKey = jsonAuthKey;
+            ViewBag.UserMaster_Code = UserMaster_Code;
+            ViewBag.UserType = UserType;
             return View();
         }
     }

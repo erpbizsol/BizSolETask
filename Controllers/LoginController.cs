@@ -419,7 +419,61 @@ namespace Bizsol_ETask.Controllers
                 return Json("[{Msg='',Status='N'}]");
             }
         }
-       
 
+        [HttpPost]
+        public IActionResult ValidatePassword(string Password)
+        {
+            if (string.IsNullOrEmpty(Password))
+            {
+                return Json(new { success = false, message = "Company code is required!" });
+            }
+            string connectionString = _configuration.GetConnectionString("DefaultConnectionSQL");
+            string ConnectionString1 = _configuration.GetConnectionString("ConnectionString");
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT * FROM ETaskCompanyConfiguration WHERE UniquePassword = @Password";
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Password", Password);
+                    int count = Convert.ToInt32(command.ExecuteScalar());
+                    SqlDataReader dr = command.ExecuteReader();
+
+                    if (count > 0)
+                    {
+
+                        if (dr.HasRows)
+                        {
+                            if (dr.Read())
+                            {
+                                ConnectionString1 = ConnectionString1.Replace("IP", dr["SQLIp"].ToString());
+                                ConnectionString1 = ConnectionString1.Replace("DatabaseName", dr["DataBaseName"].ToString());
+                                ConnectionString1 = ConnectionString1.Replace("UserID", dr["DataBaseUser"].ToString());
+                                ConnectionString1 = ConnectionString1.Replace("Password", dr["DataBasePassword"].ToString());
+
+                                HttpContext.Session.SetString("ConnectionString", ConnectionString1);
+                                CookieOptions options = new CookieOptions
+                                {
+
+                                    Expires = DateTime.UtcNow.AddMinutes(60 * 60 * 1000),
+                                    HttpOnly = false,
+                                    Secure = true,
+                                    SameSite = SameSiteMode.Strict
+                                };
+                                Response.Cookies.Append("Password", Password, options);
+                                ViewBag.CompanyLogin = true;
+                                ViewBag.IsValidCompanyCode = false;
+                                return Json(new { success = true, message = "Password is valid.", Password });
+                            }
+                        }
+                        dr.Close();
+                    }
+                    connection.Close();
+                    Response.Cookies.Delete("Password");
+                }
+
+                return Json(new { success = false, message = "Invalid Password!" });
+            }
+        }
     }
 }
