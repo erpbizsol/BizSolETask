@@ -409,7 +409,7 @@ function GetTimeSheetReport() {
             $("#footerTotalMinutes").empty();
             if (response.length > 0) {
                 $("#AllTable").show();
-                const StringFilterColumn = ["Client"];
+                const StringFilterColumn = ["Employee Name","Client"];
                 const NumericFilterColumn = [];
                 const DateFilterColumn = [];
                 const Button = false;

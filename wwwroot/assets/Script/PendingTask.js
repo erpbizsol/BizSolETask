@@ -770,7 +770,7 @@ function GetPendingTaskReport(Type) {
         success: function (response) {
             if (response.length > 0) {
                 $("#txtTable").show();
-                const StringFilterColumn = ["Ticket No", "Work Type", "	Client Name", "Ticket Created By", "Assigned", "ssignedBy", ""];
+                const StringFilterColumn = ["Employee Name","Ticket No", "Work Type", "	Client Name", "Ticket Created By", "Assigned", "ssignedBy", ""];
                 const NumericFilterColumn = [""];
                 const DateFilterColumn = [""];
                 const Button = false;
