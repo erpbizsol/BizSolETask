@@ -5,8 +5,10 @@ let UserTypes = authKeyData.UserType;
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 let G_selectedCodes = [];
 let G_workingHours = [];
+let G_EmployeeMasterList = [];
 $(document).ready(async function () {
     DatePicker();
+    GetEmployeeIdCard();
     $("#ERPHeading").text("Employee Attandance");
     $(".Number").keyup(function (e) {
         if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9]/g, '')
@@ -53,9 +55,10 @@ $(document).ready(async function () {
         updateSelectedText();
         GetEmpCodes();
     });
-    GetEmployeeIdCard();
+  
+   
 });
-function GetEmployeeIdCard() {
+async function GetEmployeeIdCard() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeIdCard`,
         type: 'GET',
@@ -71,10 +74,21 @@ function GetEmployeeIdCard() {
                     </label><br>`;
                 });
                 $('#checkboxOptions').html(html);
+                if (UserTypes === "A") {
+                    $("#dropdownButton").prop('disabled', false);
+                } else {
+                    $("#dropdownButton").prop('disabled', true);
+                    let filtered = response.filter(x => x.Code == UserMaster_Code);
+                    $("#dropdownButton").val(filtered[0]["EmployeeCard"])
+                    GetGenerateTaskTicketDateList();
+                    $("#txtEmployeeName").val(UserName);
+                }
             }
         },
     });
 }
+
+
 async function GetCardwiseEmployeeName(cardCodesArray) {
     const cardCodes = cardCodesArray.join(',');
     $.ajax({
@@ -166,8 +180,9 @@ $(document).on('change', '#checkboxOptions,#selectAll,#txtFromDate', function ()
 function GetGenerateTaskTicketDateList() {
   
     let Date = convertDateFormat($("#txtFromDate").val());
-        let codes = GetEmpCodes();
-        let Employee_Codes = Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',');
+    let codes = GetEmpCodes();
+    let Employee_Codes = UserType=='A'?Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',') : UserMaster_Code;
+
         $.ajax({
             url: `${appBaseURL}/api/Master/GetEmployeeAttandance?EmployeeCode=${Employee_Codes}&Date=${Date}`,
             type: 'POST',

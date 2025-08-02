@@ -276,7 +276,7 @@ function GetWorkTypes() {
             const $select = $('#txtWorkType');
             $select.empty();
             if (response && response.length > 0) {
-               $select.append(new Option("Select Work Type..", "0", true));
+               //$select.append(new Option("Select Work Type..", "0", true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.WorkType, item.Code));
                 });

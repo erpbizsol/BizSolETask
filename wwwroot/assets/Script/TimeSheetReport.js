@@ -8,7 +8,7 @@ $(document).ready(function () {
     DatePicker();
    
     //GetWorkTypeList();
-   // GetClientList();
+   //GetClientList();
     $("#ERPHeading").text("Time Sheet Report");
     $("#txtFromDate").on('keydown', function (e) {
         if (e.key === "Enter") {

@@ -469,7 +469,8 @@ function validateExcelFormat(data) {
 }
 function GetEmployeeMasterList() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=U`,
+        //url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=U`,
+        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);

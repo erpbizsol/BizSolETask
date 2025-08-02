@@ -8,6 +8,7 @@ let G_WorkTypeList = [];
 let G_TimeSheetMaster_Code = 0;
 let G_Remark_Code = 0;
 let highlightedDates = [];
+let G_Code = 0;
 $(document).ready(async function () {
     DatePicker();
     $("#ERPHeading").text("Time Sheet");
@@ -28,20 +29,25 @@ $(document).ready(async function () {
             $("#txtFromDate").focus();
         }
     });
-    $("#ddlEmployeeName,#txtFromDate").on("change", function () {
-        document.getElementById("footerTotalMinutes").textContent = 0;
-        document.getElementById("footerTotalMinutes1").textContent = 0;
-        document.getElementById("footerTotalMinutes2").textContent = 0;
-        GetEmpDateList();
-        ClearData();
-    });
-    $("#ddlEmployeeName").on("change", function () {
-        GetDate();
-    });
-    $("#ManualTimeCheckDefault").on("change", function () {
-        GetEmpDateList();
-    });
+    const selectedDate = $('#txtFromDate').val();
+    addHighlightedDate(selectedDate);
     
+});
+
+$("#ddlEmployeeName,#txtFromDate").on("change", function () {
+    document.getElementById("footerTotalMinutes").textContent = 0;
+    document.getElementById("footerTotalMinutes1").textContent = 0;
+    document.getElementById("footerTotalMinutes2").textContent = 0;
+    GetEmpDateList();
+    ClearData();
+});
+
+$("#ddlEmployeeName").on("change", function () {
+    GetDate();
+});
+
+$("#ManualTimeCheckDefault").on("change", function () {
+    GetEmpDateList();
 });
 function NumericValue(e) {
     if (/\D/g.test(e.value)) e.value = e.value.replace(/[^0-9]/g, '')
@@ -59,8 +65,9 @@ function GetDate() {
                 const dateArray = response.map(item => item.EntryDate);
                 const formattedDates = dateArray;
                 highlightedDates = formattedDates;
-                $('#txtFromDate').datepicker('refresh');
-               
+                //$('#txtFromDate').datepicker('refresh');
+                const selectedDate = $('#txtFromDate').val();
+                addHighlightedDate(selectedDate);
             }
         },
         error: function (xhr, status, error) {
@@ -68,6 +75,7 @@ function GetDate() {
         }
     });
 }
+
 function DatePicker() {
     const today = new Date();
     const defaultDate = formatDateToString(today);
@@ -92,7 +100,6 @@ function DatePicker() {
         const selectedDate = e.date;
         const now = new Date();
 
-        // Reset time to 00:00:00 for comparison
         selectedDate.setHours(0, 0, 0, 0);
         now.setHours(0, 0, 0, 0);
 
@@ -102,6 +109,14 @@ function DatePicker() {
         }
     });
 }
+function addHighlightedDate(dateString) {
+    if (!highlightedDates.includes(dateString)) {
+        highlightedDates.push(dateString);
+    }
+    // refresh datepicker UI
+    $('#txtFromDate').datepicker('update');
+}
+
 function GetEmployeeMasterList() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
@@ -187,6 +202,12 @@ function formatDateToString(dateObj) {
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const year = dateObj.getFullYear();
     return `${day}/${month}/${year}`;
+}
+function convertDateFormat(dateString) {
+    const [day, month, year] = dateString.split('/');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthAbbreviation = monthNames[parseInt(month) - 1];
+    return `${year}-${month}-${day}`;
 }
 function setupDateInputFormatting() {
     $('#txtFromDate').on('input', function () {
@@ -281,12 +302,12 @@ function addNewRow() {
         newRow.innerHTML += `
             <td style="display:none"><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
             <td style="display:none"><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes" autocomplete="off" maxlength="6"></td>`;
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes" autocomplete="off" maxlength="4"></td>`;
     } else {
         newRow.innerHTML += `
             <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
             <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes" disabled autocomplete="off" maxlength="6"></td>`;
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes"  autocomplete="off" maxlength="4"></td>`;
     }
     newRow.innerHTML += `
         <td>
@@ -366,9 +387,9 @@ async function GetEmpDateList() {
                 ...item,
                 "Department": `
                 <select class="txtddlDipartment mandatory form-control form-control-sm box_border"id="txtddlDipartment_${item.Code}" autocomplete="off" maxlength="50"></select>`,
-                "From Hr": `<input type="time" autocomplete="off" id="txtfromHr_${item.Code}" class="txtfromHr form-control form-control-sm box_border" value="${item['From Hr']}" maxlength="15"/>`,
-                "To Hr": `<input type="time" autocomplete="off" id="txttoHr_${item.Code}" class="txttoHr form-control form-control-sm box_border" value="${item['To Hr']}" maxlength="15"/>`,
-                "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" ${Disabled} value="${item['Time in Minutes']}" maxlength="15"/>`,
+                "From Hr": `<input type="time" autocomplete="off" id="txtfromHr_${item.Code}" class="txtfromHr form-control form-control-sm box_border" ${Disabled} value="${item['From Hr']}" maxlength="5"/>`,
+                "To Hr": `<input type="time" autocomplete="off" id="txttoHr_${item.Code}" class="txttoHr form-control form-control-sm box_border"  ${Disabled} value="${item['To Hr']}" maxlength="5"/>`,
+                "Time in Minutes": `<input type="text" autocomplete="off" id="txttimeInMinutes_${item.Code}" class="txttimeInMinutes form-control form-control-sm box_border" value="${item['Time in Minutes']}" maxlength="4"/>`,
                 "Work Type": `<select class="txtddlWorkType mandatory form-control form-control-sm box_border" id="txtddlWorkType_${item.Code}" autocomplete="off" maxlength="50"></select>`,
                 "Remarks": `<input type="text" autocomplete="off" id="txtRemarks1_${item.Code}" class="txtRemarks1 form-control form-control-sm box_border" value="${item.Remarks || ''}"/>`,
                 "Action": `
@@ -540,7 +561,9 @@ function convertToISO(dateStr) {
 
     return `${year}-${month}-${day}`;
 }
+
 function SaveData(Code) {
+    G_Code = Code;
     let isManualChecked = $('#ManualTimeCheckDefault').is(':checked') ? 'Y' : 'N';
     const EmployeeName = $("#ddlEmployeeName").val();
     const Remarks = $("#Remarks").val();
@@ -630,6 +653,8 @@ function SaveData(Code) {
             success: function (response) {
                 if (response[0].Status === "Y") {
                     toastr.success(response[0].Msg);
+                    const selectedDate = $('#txtFromDate').val(); 
+                    addHighlightedDate(selectedDate);
                     GetEmpDateList();
                 }
                 else {
