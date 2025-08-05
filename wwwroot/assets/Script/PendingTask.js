@@ -670,6 +670,9 @@ function Save(){
                     ClearData();
                     SenEmailMassage(response[0].Code);
                     GetGenerateTaskTicketDateList('Get');
+                    $("#txtpage").hide();
+                    //$("#txthide1").hide();
+                    //$("#txthide2").hide();
                 }
                 else {
                     toastr.error(response[0].Msg);
