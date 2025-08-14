@@ -27,6 +27,8 @@ namespace Bizsol_ETask.Controllers
                 parameters.Add("@EmployeeName ", EmployeeName);
                 parameters.Add("@Email", Email);
                 parameters.Add("@MobileNo", MobileNo);
+                parameters.Add("@QueryFilePath ", "C:\\ANTU_Etask_Script.txt");
+
                 var result = await conn.QueryAsync<dynamic>("Usp_CreateDatabase_test", parameters, commandType: CommandType.StoredProcedure);
                 return Json(result);
             }

@@ -41,18 +41,9 @@
         max-width: 2000px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
         border-radius: 8px;
-        overflow: hidden;
+        /* overflow: hidden; */
         padding: 0.7rem;
     }
-
- /*    .tabs {
-        width: 100%;
-        max-width: 2000px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-        border-radius: 8px;
-        overflow: hidden;
-        padding: 0.7rem;
-    } */
 
     th, td {
         border: 1px solid #2e6c7b;
@@ -207,7 +198,7 @@
         <div id="attachmentContainer1" style="margin-top: 20px;"></div>
         <div class="row">
             <div class="col-sm-12">
-                <div class="table-wrapper" style="overflow: auto;">
+                <div class="table-wrapper">
                     <table id="table" class="table">
                         <thead id="table-header1">
                         <th>Worked By</th>
@@ -278,9 +269,9 @@
                             <label for="txtAttachment" class="col-form-label-sm fw-bold">Attachment</label>
                             <input type="file" id="txtAttachment" name="txtAttachment" autocomplete="off" class="form-control form-control-sm box_border" accept=".jpg, .png, .jpeg" multiple>
                         </div>
-                        <div class="col-md-3 col-sm-6" id="txthide1">
+                        <div class="col-md-4 col-sm-6" id="txthide1">
                             <label for="txtRemarks" class="col-form-label-sm fw-bold">Remarks</label>
-                            <input type="text" id="txtRemarks" name="txtRemarks" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Remarks.." maxlength="15">
+                            <input type="text" id="txtRemarks" name="txtRemarks" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Remarks.." maxlength="500">
                         </div>
                         <div class="col-md-3 col-sm-6" style="margin-top: 30px;" id="txthide">
                             <button type="button" class="btn btn-primary btn-height" title="UPDATE" style="background:#216c4a" onclick="Save()">UPDATE</button>
@@ -377,7 +368,7 @@
             </div>
             <div class="row" id="txtSummary">
                 <div class="col-sm-12">
-                    <div class="table-wrapper" style="overflow: auto;">
+                    <div class="table-wrapper">
                         <table id="table" class="table">
                             <thead id="table-header">
                             <th>Ticket No</th>
@@ -431,8 +422,7 @@
                 <div class="summary-section p-2">
                     <div class="row" id="txtTable">
                         <div class="col-sm-12">
-
-                            <div class="table-wrapper" style="overflow: auto;">
+                            <div class="table-wrapper">
                                 <table id="table1" class="fixed-width-table table">
                                     <thead id="table-headerC">
                                     </thead>

@@ -919,20 +919,18 @@ function SenEmailMassage(Code) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (response) {
-            if (response[0].Status === 'Y') {
-                //toastr.success(response[0].Msg);
-                
+            if (response[0].Status == 'Y') {
+               // toastr.success(response[0].Msg);
             } else {
                 toastr.error("Unexpected response format.");
             }
         },
         error: function (xhr, status, error) {
-            toastr.error("Error deleting item:");
+           // toastr.error("Error deleting item:");
         }
     });
     
 }
-
 function SendWhatsApp() {
     //$.ajax({
     //    url: `${appBaseURL}/api/Email/SenEmailMassage?Code=${Code}&Mode=NEW`,
@@ -952,4 +950,24 @@ function SendWhatsApp() {
     //        toastr.error("Error deleting item:");
     //    }
     //});
+}
+function validateCommittedDate() {
+    let committedDateStr = document.getElementById("txtCommittedDate").value; // dd/mm/yyyy
+    if (!committedDateStr) return;
+
+    // Convert dd/mm/yyyy → JS Date
+    let parts = committedDateStr.split("/");
+    let committedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+
+    // Get today's date without time
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (committedDate < today) {
+        alert("Committed Date cannot be in the past!");
+        document.getElementById("txtCommittedDate").value = "";
+        document.getElementById("txtCommittedDate").focus();
+        return false;
+    }
+    return true;
 }

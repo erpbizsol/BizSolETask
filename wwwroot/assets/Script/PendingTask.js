@@ -15,9 +15,7 @@ $(document).ready(async function () {
     $(".Number").keyup(function (e) {
         if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9]/g, '')
     });
-   
     GetStatuss();
-
     DatePicker();
     if (UserTypes == "A") {
         $("#txtAllUser").show();
@@ -39,7 +37,7 @@ $(document).ready(async function () {
     $('#selectAll').on('change', function () {
         $('.option').prop('checked', this.checked);
         updateSelected();
-        GetGenerateTaskTicketDateList('GET')
+        GetGenerateTaskTicketDateList('Get')
     });
     $(document).on('change', '.option', function () {
         if ($('.option:checked').length === $('.option').length) {
@@ -49,13 +47,13 @@ $(document).ready(async function () {
         }
         updateSelected();
     });
-    GetEmployeeMasterList();
-    GetGenerateTaskTicketDateList('Get');
+    GetEmployeeMasterList('Load');
+    GetGenerateTaskTicketDateList('Load');
     $('input[type=radio][name=ticktOrderStatus1]').change(function () {
-        GetPendingTaskReport('Load');
+        GetPendingTaskReport('Get');
     });
     Show();
-    
+
 });
 $('input[name="ticktOrderStatus"]').on('change', function () {
     GetGenerateTaskTicketDateList('Get');
@@ -72,7 +70,7 @@ $("#txtStatus").on('change', function () {
         $("#txtReAssign1").hide();
         GetResolvedBy();
         StatusType();
-      
+
     } else if (Status == "4") {
         $("#txtTotalResolutionM1").show();
         $("#txtResolutionDate").show();
@@ -82,7 +80,7 @@ $("#txtStatus").on('change', function () {
         $("#txtUpdateBy1").hide();
         StatusType();
         GetReAssign();
-     
+
     } else {
         $("#txtTotalResolutionM1").hide();
         $("#txtResolutionDate").hide();
@@ -113,7 +111,10 @@ $(document).on('change', '#ddlReportType', function () {
         $("#txtConsolidateda").hide();
         $("#txtshowDate").hide();
         $("#txtshowDate1").hide();
+        $("#table-header").empty();
+        $("#table-body").empty();
         
+
     }
 });
 
@@ -138,15 +139,15 @@ function GetGenerateTaskTicketDateList(Type) {
 
     let fromDate = convertDateFormat($("#txtFromDate").val());
     let toDate = convertDateFormat($("#txtToDate").val());
-    if (Status === 'P')  {
-     
+    if (Status === 'P') {
+
         fromDate = "";
         toDate = "";
     } else if (Status === 'C') {
-    
+
         if (!fromDate || !toDate) {
             toastr.error("Please select both From Date and To Date.");
-            return; 
+            return;
         }
     }
     let EmployeeName = GetEmpCodes();
@@ -167,7 +168,7 @@ function GetGenerateTaskTicketDateList(Type) {
         success: function (response) {
             if (response.length > 0) {
                 $("#txtSummary").show();
-                const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project / Client", "Ticket No"];
+                const StringFilterColumn = ["Assigned", "Description", "Work Type", "ProjectClient", "TicketNo"];
                 const NumericFilterColumn = [];
                 const DateFilterColumn = ["Log Date"];
                 const Button = false;
@@ -181,18 +182,16 @@ function GetGenerateTaskTicketDateList(Type) {
                         <a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
                         <button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
                         <button class="btn btn-primary icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}','${UserMaster_Code}')"><i class="fa-solid fa-pencil"></i></button>
-                          <button class="btn btn-success icon-height mb-1" style="background:#216c4a" title="Activity Details" onclick="GetAssingData('${item[`Ticket No`]}')">
+                          <button class="btn btn-success icon-height mb-1" style="background:#216c4a" title="Activity Details" onclick="GetAssingData('${item[`TicketNo`]}')">
                        A D
                         </button>
                         `
                 }));
-
                 BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
-
             } else {
                 $("#txtSummary").hide();
-                if (Type == 'Get') {
-                    toastr.error("Record not found...!");
+                if (Type != 'Load') {
+                    // toastr.error("Record not found...!");
                 }
             }
         },
@@ -200,7 +199,6 @@ function GetGenerateTaskTicketDateList(Type) {
             console.error("Error:", error);
         }
     });
-
 }
 function ViewAttachment(code) {
     $.ajax({
@@ -325,7 +323,7 @@ $("#txtBack").click(function () {
     $("#txtAttachment1").hide();
     $("#txtResolvedBy1").hide();
     $("#txtUpdateBy1").hide();
- 
+
 });
 function DatePicker() {
     const today = new Date();
@@ -463,9 +461,7 @@ function StatusType() {
                     $("#txtResolvedBy").val(response[0].Code);
                     $("#txtReAssign").val(response[0].Code);
                 }
-                
-            } else {
-                toastr.error("Record not found...!");
+
             }
         },
         error: function (xhr, status, error) {
@@ -482,10 +478,8 @@ $("#txtAttachment").on('change', (event) => {
     }
 });
 $('#txtAttachment').bind('change', function () {
-
     $.each($('#txtAttachment')[0].files, function (key, file) {
         reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
-
             ConvertFileToByteArry(blob).then(function (ByteArray) {
                 AttachmentDetail.push({
                     CallTicketMaster_Code: 0,
@@ -625,7 +619,7 @@ function convertDateFormat(dateString) {
     const monthAbbreviation = monthNames[parseInt(month) - 1];
     return `${day}-${monthAbbreviation}-${year}`;
 }
-function Save(){
+function Save() {
     let Status = $("#txtStatus").val();
     let TotalResolutionM = $("#txtTotalResolutionM").val();
     let ResolutionDates = convertDateFormat($("#txtResolutionDates").val());
@@ -646,11 +640,11 @@ function Save(){
                     status: parseInt(Status),
                     ResolutionTime: parseInt(TotalResolutionM || 0),
                     resolutiondDate: ResolutionDates,
-                    reAssign: ReAssign||0,
-                    resolvedBy: parseInt(ResolvedBy||0),
-                    updateBy: parseInt(UpdateBy||0),
+                    reAssign: ReAssign || 0,
+                    resolvedBy: parseInt(ResolvedBy || 0),
+                    updateBy: parseInt(UpdateBy || 0),
                     remarks: Remarks,
-                    userMaster_Code: parseInt(UserMaster_Code ||0),
+                    userMaster_Code: parseInt(UserMaster_Code || 0),
                 }
             ],
             Attachment: AttachmentDetail
@@ -689,7 +683,7 @@ function ClearData() {
     $("#hftxtCode").val("0");
     $("#txtStatus").val("0").trigger('change');
     $("#txtTotalResolutionM").val("");
-   // $("#txtResolutionDates").val("");
+    // $("#txtResolutionDates").val("");
     $("#txtRemarks").val("");
     $("#txtReAssign").val("0").trigger('change');
     $("#txtResolvedBy").val("0").trigger('change');
@@ -773,21 +767,19 @@ function GetPendingTaskReport(Type) {
         success: function (response) {
             if (response.length > 0) {
                 $("#txtTable").show();
-                const StringFilterColumn = ["Employee Name","Ticket No", "Work Type", "	Client Name", "Ticket Created By", "Assigned", "ssignedBy", ""];
+                const StringFilterColumn = ["TicketNo", "Employee Name", "WorkType", "ClientName", "TicketCreatedBy", "Assigned", "assignedBy"];
                 const NumericFilterColumn = [""];
                 const DateFilterColumn = [""];
                 const Button = false;
                 const showButtons = [""];
                 const StringdoubleFilterColumn = [""];
-                const hiddenColumns = ["WorkByCode", "ReAssign_Code", "TicketAssignedBy", "CreateTicketBy_Code","Remarks"];
-                const ColumnAlignment = {
-
-                };
+                const hiddenColumns = ["WorkByCode", "ReAssign_Code", "TicketAssignedBy", "CreateTicketBy_Code", "Remarks"];
+                const ColumnAlignment = {};
                 BizsolCustomFilterGrid.CreateDataTable("table-headerC", "table-bodyC", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
             } else {
                 $("#txtTable").hide();
                 if (Type != 'Load') {
-                    toastr.error("Record not found...!");
+                   // toastr.error("Record not found...!");
                 }
             }
         },
@@ -799,13 +791,13 @@ function GetPendingTaskReport(Type) {
 function Show() {
     $('input:radio[name=ticktOrderStatus1]').filter(function () {
         this.checked = false;
-        GetPendingTaskReport('Load');
+        GetPendingTaskReport('Get');
     });
     $('input:radio[name=ticktOrderStatus1]').filter(function () {
 
         if (this.value == $('#hfStatus').val())
             this.checked = true;
-        GetPendingTaskReport('Load');
+        GetPendingTaskReport('Get');
     });
 
 }
@@ -828,7 +820,6 @@ function SenEmailMassage(Code) {
             toastr.error("Error deleting item:");
         }
     });
-
 }
 function GetAssingData(TickatNo) {
     $.ajax({
@@ -851,8 +842,6 @@ function GetAssingData(TickatNo) {
                 };
                 BizsolCustomFilterGrid.CreateDataTable("table-header1", "table-body1", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
                 $('#attachmentModal1').show();
-            } else {
-                toastr.error("Record not found...!");
             }
         },
         error: function (xhr, status, error) {

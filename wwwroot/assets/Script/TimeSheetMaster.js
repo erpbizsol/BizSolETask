@@ -307,7 +307,7 @@ function addNewRow() {
         newRow.innerHTML += `
             <td><input id="txtfromHr_0" type="time" class="txtfromHr box_border form-control form-control-sm" autocomplete="off" maxlength="15" /></td>
             <td><input id="txttoHr_0" type="time" class="txttoHr box_border form-control form-control-sm" autocomplete="off" maxlength="15"/></td>
-            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes"  autocomplete="off" maxlength="4"></td>`;
+            <td><input id="txttimeInMinutes_0" type="text" class="txttimeInMinutes box_border form-control form-control-sm" onkeyup="NumericValue(this)" placeholder="Time in Minutes"  autocomplete="off"  maxlength="4"></td>`;
     }
     newRow.innerHTML += `
         <td>
@@ -514,7 +514,6 @@ function calculateTimeDifference(code) {
     const fromHr = $("#txtfromHr_" + code).val() || "00:00";
     const toHr = $("#txttoHr_" + code).val() || "00:00";
 
-   
     const [fh, fm] = fromHr.split(":").map(Number);
     const [th, tm] = toHr.split(":").map(Number);
     const fromMinutes = fh * 60 + fm;

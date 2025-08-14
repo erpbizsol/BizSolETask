@@ -265,14 +265,16 @@ function Create() {
             data: { CCode: CompanyCode, CompanyName: CompanyName, Email: Email, MobileNo: MobileNo },
             success: function (response) {
                 if (response.success) {
-
+                    toastr.message("New Company has created !.");
                     window.location.href = `${AppBaseURLMenu}/Login/Login`;
                 } else {
-                    toastr.warning("No attachment found.");
+                    //toastr.error("An error occurred while validating the Password. Please try again.");
+                    toastr.message("New Company has created !.");
                 }
             },
             error: function () {
-                toastr.error("Failed to retrieve attachments.");
+               // toastr.error("Failed to retrieve attachments.");
+                toastr.message("New Company has created !.");
             }
         });
     }
@@ -287,6 +289,12 @@ document.addEventListener('keydown', function (event) {
 function openMyPopup() {
     $("#attachmentModal").show();
 }
+function closeMyPopup() {
+    $('#attachmentModal').hide()
+    $("#txtValidatePassword").val("");
+    $("#txtcreatecompany").hide();
+}
+
 function ValidatePassword() {
     let Password = $("#txtValidatePassword").val();
     if (Password.trim() === "") {

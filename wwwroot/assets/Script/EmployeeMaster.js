@@ -10,6 +10,7 @@ $(document).ready(function () {
     $(".Number").keyup(function (e) {
         if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9]/g, '')
     });
+  
     $('#txtEmployeeId').on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtEmployeeName").focus();
@@ -597,7 +598,7 @@ function validateExcelFormat(data) {
     }
 
     const headers = data[0].map(header => header.replace(/[\s.]+/g, ''));
-    const requiredColumns = ['Status', 'EmployeeCard', 'EmployeeName', 'Password', 'Email', 'MobileNo', 'EmployeeType'];
+    const requiredColumns = ['Status', 'EmployeeCard', 'EmployeeName', 'Password', 'Email', 'MobileNo', 'EmployeeType', 'NumberOfdays','WorkingHours'];
 
     const missingColumns = requiredColumns.filter(col => !headers.includes(col));
     if (missingColumns.length > 0) {

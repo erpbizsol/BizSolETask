@@ -3,10 +3,10 @@ var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
 let G_ReportType = "";
+let selectedCodes = [];
 const appBaseURL = sessionStorage.getItem('AppBaseURL');
 $(document).ready(function () {
     DatePicker();
-   
     //GetWorkTypeList();
    //GetClientList();
     $("#ERPHeading").text("Time Sheet Report");
@@ -139,16 +139,15 @@ function updateSelectedTextC() {
     }).get().join(', ');
     $('#CddlClientName').val(selectedNamess);
 }
-
 function GetSelectedWorkTypeCodes() {
-    let selectedCodes = [];
+     selectedCodes = [];
     $('.option:checked').each(function () {
         selectedCodes.push($(this).val());
     });
     return selectedCodes;
 }
 function GetSelectedClientCodes() {
-    let selectedCodes = [];
+     selectedCodes = [];
     $('.option1:checked').each(function () {
         selectedCodes.push($(this).val());
     });
@@ -573,6 +572,13 @@ function Reset() {
     document.getElementById("footerTotalMinutesWorkType").textContent = '';
     document.getElementById("footerTotalMinutesEmployeeType").textContent = '';
     DatePicker();
+    $('#SddlWorkType').val(null).trigger('change');
+    $('#CddlClientName').val(null).trigger('change');
+    G_selectedCodes = [];
+    $(".option").prop("checked", false);
+    $(".option1").prop("checked", false);
+    $("#selectAll").prop("checked", false);
+    $("#selectAllClient").prop("checked", false);
 }
 function DataExport() {
     const emp = $('#ddlEmployeeName').val();
