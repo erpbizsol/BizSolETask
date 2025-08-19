@@ -7,10 +7,10 @@ let G_JsonData = [];
 let G_Edit =false;
 $(document).ready(function () {
     $("#ERPHeading").text("Employee Master");
-    $(".Number").keyup(function (e) {
-        if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9]/g, '')
-    });
-  
+    //$(".Number").keyup(function (e) {
+    //    if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9.]/g, '')
+    //});
+   
     $('#txtEmployeeId').on('keydown', function (e) {
         if (e.key === "Enter") {
             $("#txtEmployeeName").focus();

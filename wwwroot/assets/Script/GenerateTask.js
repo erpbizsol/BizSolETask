@@ -931,26 +931,26 @@ function SenEmailMassage(Code) {
     });
     
 }
-function SendWhatsApp() {
-    //$.ajax({
-    //    url: `${appBaseURL}/api/Email/SenEmailMassage?Code=${Code}&Mode=NEW`,
-    //    type: 'Get',
-    //    beforeSend: function (xhr) {
-    //        xhr.setRequestHeader('Auth-Key', authKeyData);
-    //    },
-    //    success: function (response) {
-    //        if (response[0].Status === 'Y') {
-    //            //toastr.success(response[0].Msg);
+//function SendWhatsApp() {
+//    $.ajax({
+//        url: `${appBaseURL}/api/Email/SenEmailMassage?Code=${Code}&Mode=NEW`,
+//        type: 'Get',
+//        beforeSend: function (xhr) {
+//            xhr.setRequestHeader('Auth-Key', authKeyData);
+//        },
+//        success: function (response) {
+//            if (response[0].Status === 'Y') {
+//                //toastr.success(response[0].Msg);
 
-    //        } else {
-    //            toastr.error("Unexpected response format.");
-    //        }
-    //    },
-    //    error: function (xhr, status, error) {
-    //        toastr.error("Error deleting item:");
-    //    }
-    //});
-}
+//            } else {
+//                toastr.error("Unexpected response format.");
+//            }
+//        },
+//        error: function (xhr, status, error) {
+//            toastr.error("Error deleting item:");
+//        }
+//    });
+//}
 function validateCommittedDate() {
     let committedDateStr = document.getElementById("txtCommittedDate").value; // dd/mm/yyyy
     if (!committedDateStr) return;

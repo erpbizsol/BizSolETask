@@ -246,36 +246,39 @@ function Create() {
         toastr.error("Please enter a Company Code.!");
         $("#txtModalCompanyCode").focus();
         return;
-    } else if (CompanyName.trim() === "") {
-        toastr.error("Please enter a Employee Name.!");
-        $("#txtModalCompanyName").focus();
-        return;
-    }else if (Email.trim() === "") {
-        toastr.error("Please enter a Email.!");
-        $("#txtModalEmailid").focus();
-        return;
-    }else if (MobileNo.trim() === "") {
-        toastr.error("Please enter a Mobile No.!");
-        $("#txtModalMobileNo").focus();
-        return;
-    }else {
+    }
+    //else if (CompanyName.trim() === "") {
+    //    toastr.error("Please enter a Employee Name.!");
+    //    $("#txtModalCompanyName").focus();
+    //    return;
+    //}else if (Email.trim() === "") {
+    //    toastr.error("Please enter a Email.!");
+    //    $("#txtModalEmailid").focus();
+    //    return;
+    //}else if (MobileNo.trim() === "") {
+    //    toastr.error("Please enter a Mobile No.!");
+    //    $("#txtModalMobileNo").focus();
+    //    return;
+    //}
+    else {
         $.ajax({
             url: `${AppBaseURLMenu}/Company/CreateNewCompany`,
             type: 'POST',
             data: { CCode: CompanyCode, CompanyName: CompanyName, Email: Email, MobileNo: MobileNo },
             success: function (response) {
-                if (response.success) {
-                    toastr.message("New Company has created !.");
+                if (response.ErrorMsg === "" || response.ErrorMsg == null) {
+                    toastr.success("New company has been created!");
+                    //$('#attachmentModal').hide();
+                    //$("#txtcreatecompany").hide();
                     window.location.href = `${AppBaseURLMenu}/Login/Login`;
                 } else {
-                    //toastr.error("An error occurred while validating the Password. Please try again.");
-                    toastr.message("New Company has created !.");
+                    toastr.error("New company not created! Error: " + response.ErrorMsg);
                 }
             },
-            error: function () {
-               // toastr.error("Failed to retrieve attachments.");
-                toastr.message("New Company has created !.");
+            error: function (xhr, status, error) {
+                toastr.error("AJAX request failed: " + error);
             }
+           
         });
     }
 

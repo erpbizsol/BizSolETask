@@ -665,8 +665,6 @@ function Save() {
                     SenEmailMassage(response[0].Code);
                     GetGenerateTaskTicketDateList('Get');
                     $("#txtpage").hide();
-                    //$("#txthide1").hide();
-                    //$("#txthide2").hide();
                 }
                 else {
                     toastr.error(response[0].Msg);
@@ -692,7 +690,7 @@ function ClearData() {
 }
 function GetEmployeeMasterList() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=U`,
+        url: `${appBaseURL}/api/Master/GetAssignedss`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
