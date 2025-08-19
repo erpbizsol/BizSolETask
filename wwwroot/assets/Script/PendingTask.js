@@ -168,13 +168,13 @@ function GetGenerateTaskTicketDateList(Type) {
         success: function (response) {
             if (response.length > 0) {
                 $("#txtSummary").show();
-                const StringFilterColumn = ["Assigned", "Description", "Work Type", "ProjectClient", "TicketNo"];
+                const StringFilterColumn = ["Assigned", "Description", "Work Type", "Project Client", "TicketNo"];
                 const NumericFilterColumn = [];
                 const DateFilterColumn = ["Log Date"];
                 const Button = false;
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["ACode", "Attachment", "CallTicketMaster_Code", "AttachmentFileName", "ResolutionTime", "Remarks", "ResolvedDate", "RaisedBy", "Module", "Source", "FirstCheckBy", "CommitedDate", "ContactNo", "Status", "EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType", "ContactEMail", "ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code", "EmployeeMaster_Code", "Code"];
+                const hiddenColumns = ["ACode", "Attachment", "CallTicketMaster_Code", "AttachmentFileName", "ResolutionTime", "Remarks", "ResolvedDate", "RaisedBy", "Module", "Source", "FirstCheckBy", "CommitedDate", "ContactNo", "Status", "EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "ContactEMail", "ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code", "EmployeeMaster_Code", "Code"];
                 const ColumnAlignment = {};
                 const updatedResponse = response.map(item => ({
                     ...item, 'Action':
