@@ -9,59 +9,103 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Bizsol_ETask
 build_property.RootNamespace = Bizsol_ETask
-build_property.ProjectDir = D:\All Project\BizSolETask\
+build_property.ProjectDir = D:\WebERP2.4Core\BizSolETask\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\All Project\BizSolETask
+build_property.MSBuildProjectDirectory = D:\WebERP2.4Core\BizSolETask
 build_property._RazorSourceGeneratorDebug = 
 
-[D:/All Project/BizSolETask/Views/Dashboard/Dashboard.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Dashboard/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXERhc2hib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Home/Index.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Home/Privacy.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Login/ChangePassword.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Login/ChangePassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cQ2hhbmdlUGFzc3dvcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Login/Login.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Login/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Master/EmployeeMaster.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Login/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cUmVzZXRQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/ClientMaster.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXENsaWVudE1hc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/EmployeeAttandance.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXEVtcGxveWVlQXR0YW5kYW5jZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/EmployeeMaster.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXEVtcGxveWVlTWFzdGVyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Shared/Error.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Master/EmployeeRatePerDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXEVtcGxveWVlUmF0ZVBlckRldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/GenerateTask.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXEdlbmVyYXRlVGFzay5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/PendingTask.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXFBlbmRpbmdUYXNrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/PendingTaskReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXFBlbmRpbmdUYXNrUmVwb3J0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/StatusMaster.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXFN0YXR1c01hc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/TimeSheetMaster.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXFRpbWVTaGVldE1hc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/TimeSheetReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXFRpbWVTaGVldFJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Master/WorkTypeMaster.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyXFdvcmtUeXBlTWFzdGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/WebERP2.4Core/BizSolETask/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Shared/_LayoutLogin.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Shared/_LayoutLogin.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Shared/_ValidationScriptsPartial.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/_ViewImports.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/_ViewStart.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/All Project/BizSolETask/Views/Shared/_Layout.cshtml]
+[D:/WebERP2.4Core/BizSolETask/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-91novsauli

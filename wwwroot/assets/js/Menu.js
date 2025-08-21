@@ -1,13 +1,14 @@
 ﻿$(document).ready(function () {
     UserMenuRightsList();
+    TicketsRating();
+    GetWorksTime();
 });
 var authKeyData1 = JSON.parse(sessionStorage.getItem('authKey'));
 var authKeyData = sessionStorage.getItem('authKey');
 const UserType = authKeyData1.UserType;
 var baseUrl1 = sessionStorage.getItem('AppBaseURL');
 var baseUrl = sessionStorage.getItem('AppBaseURLMenu');
-var authKeyData2 = JSON.parse(sessionStorage.getItem('authKey'));
-let UserMaster_Code1 = authKeyData2.UserMaster_Code;
+let UserMasterCode = authKeyData1.UserMaster_Code;
 function UserMenuRightsList() {
         $.ajax({
             url: `${baseUrl1}/api/Master/GetUserModuleMasterList?UserType=${UserType}`,
@@ -36,7 +37,6 @@ function UserMenuRightsList() {
             }
         });
 }
-
 function setActiveMenu() {
     var currentUrl = window.location.pathname;
 
@@ -54,10 +54,9 @@ function setActiveMenu() {
         }
     });
 }
-
 function GetWorksTime() {
     $.ajax({
-        url: `${baseUrl1}/api/Master/GetWorksTimes?Code=${UserMaster_Code1}`,
+        url: `${baseUrl1}/api/Master/GetWorksTimes?Code=${UserMasterCode}`,
         type: 'POST',
         contentType: 'application/json',
         beforeSend: function (xhr) {
@@ -73,6 +72,22 @@ function GetWorksTime() {
         error: function (xhr, status, error) {
             console.error("Error:", error);
             alert("Server connection error. Please check if the API is running.");
+        }
+    });
+}
+function TicketsRating() {
+    $.ajax({
+        url: ` ${baseUrl1}/api/Master/TICKETSRATING?UserMaster_Code=${UserMasterCode}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                let STotal = response[0].Total;
+                $("#txtTickets").text("Tickets Rating(" +STotal+")");
+
+            }
         }
     });
 }

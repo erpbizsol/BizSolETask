@@ -1,0 +1,113 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link href="~/assets/css/filter.css" rel="stylesheet" />
+<script src="~/assets/js/xlsx.full.min.js"></script>
+<style>
+    .tabs {
+        width: 100%;
+        max-width: 2500px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 0.7rem;
+    }
+
+    .modal-body {
+        position: relative;
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: var(--bs-modal-padding);
+        /* height: 400px !important; */
+    }
+
+    .stars span {
+        font-size: 30px;
+        cursor: pointer;
+        color: #ccc; /* default grey */
+        transition: color 0.2s;
+    }
+
+        .stars span.active {
+            color: gold; /* yellow stars only when clicked */
+        }
+
+    #starRating span {
+        font-size: 28px;
+        cursor: pointer;
+        color: #ccc; /* default grey */
+    }
+
+        #starRating span.selected {
+            color: gold; /* selected yellow */
+        }
+</style>
+<div class="container">
+    <div class="mt-1" id="txtListpage">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-md-3 col-sm-3" id="txtSerch">
+                    <label><span><b>Search</b></span></label>
+                    <input type="text" id="txtSerch" name="txtSerch" autocomplete="off" class="form-control form-control-sm box_border" maxlength="100" onkeydown="filterTickets(this.value)">
+                </div>
+            </div>
+        </div>
+        <div class="card-body mt-2" id="txtTable">
+            <div class="table-wrapper fixed-height-table">
+                <table id="table" class="fixed-width-table table">
+                    <thead id="table-header">
+                    </thead>
+                    <tbody id="table-body">
+                    </tbody>
+                </table>
+            </div>
+            <!-- Paginator -->
+            <div class="paginator" id="paginator-table">
+            </div>
+        </div>
+        <!-- Button trigger modal -->
+        <div class="modal position-absolute" id="staticBackdrop" style="padding-top:30px;" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="modal-header tab-header" style="background-color:#033764">
+                            <level style="color:white">Edit</level>
+                            <button type="button" class="close modal-close btn-sm" aria-label="Close" onclick="CloseModal()"><span aria-hidden="true">x</span></button>
+                        </div>
+                        <div class="row" style="margin-top:10px;">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-5 col-sm-5">
+                                        <label>Star Rating <span style="color:red">*</span></label>
+                                        <div id="starRating" class="stars">
+                                            <span data-value="1">★</span>
+                                            <span data-value="2">★</span>
+                                            <span data-value="3">★</span>
+                                            <span data-value="4">★</span>
+                                            <span data-value="5">★</span>
+                                        </div>
+                                        <input type="hidden" id="ddlStar" />
+                                    </div>
+                                    <div class="col-md-7  col-sm-7">
+                                        <label>Remark <span style="color:red"></span></label>
+                                        <textarea id="txtRemark" rows="3" class="form-control form-control-sm box_border" placeholder="Enter remark..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-sm-6">
+                                    <button type="button" id="btnModelShow" class="btn btn-success btn-height" title="Save" onclick="Ratingfunction()">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/filter.js"></script>
+<script src="~/assets/script/ticketsratingpending.js"></script>
+
