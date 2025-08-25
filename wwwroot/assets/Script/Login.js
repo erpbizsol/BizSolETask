@@ -242,29 +242,34 @@ function Create() {
     var CompanyName = $('#txtModalCompanyName').val();
     var Email = $('#txtModalEmailid').val();
     var MobileNo = $('#txtModalMobileNo').val();
+    var Password = $('#txtModalPassword').val();
     if (CompanyCode.trim() === "") {
         toastr.error("Please enter a Company Code.!");
         $("#txtModalCompanyCode").focus();
         return;
+    }else if (CompanyName.trim() === "") {
+        toastr.error("Please enter a Employee Name.!");
+        $("#txtModalCompanyName").focus();
+        return;
+    }else if (Email.trim() === "") {
+        toastr.error("Please enter a Email.!");
+        $("#txtModalEmailid").focus();
+        return;
+    }else if (MobileNo.trim() === "") {
+        toastr.error("Please enter a Mobile No.!");
+        $("#txtModalMobileNo").focus();
+        return;
     }
-    //else if (CompanyName.trim() === "") {
-    //    toastr.error("Please enter a Employee Name.!");
-    //    $("#txtModalCompanyName").focus();
-    //    return;
-    //}else if (Email.trim() === "") {
-    //    toastr.error("Please enter a Email.!");
-    //    $("#txtModalEmailid").focus();
-    //    return;
-    //}else if (MobileNo.trim() === "") {
-    //    toastr.error("Please enter a Mobile No.!");
-    //    $("#txtModalMobileNo").focus();
-    //    return;
-    //}
+    else if (Password.trim() === "") {
+        toastr.error("Please enter a Password.!");
+        $("#txtModalPassword").focus();
+        return;
+    }
     else {
         $.ajax({
             url: `${AppBaseURLMenu}/Company/CreateNewCompany`,
             type: 'POST',
-            data: { CCode: CompanyCode, CompanyName: CompanyName, Email: Email, MobileNo: MobileNo },
+            data: { CCode: CompanyCode, EmployeeName: CompanyName, Email: Email, MobileNo: MobileNo, Password: Password },
             success: function (response) {
                 if (response.ErrorMsg === "" || response.ErrorMsg == null) {
                     toastr.success("New company has been created!");

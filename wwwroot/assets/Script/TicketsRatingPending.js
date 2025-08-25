@@ -9,9 +9,13 @@ $(document).ready(function () {
     $("#ERPHeading").text("Tickets Rating");
     TicketsRatingPending('Load');
 });
+$(document).on('change', '#txtReportType', function () {
+    TicketsRatingPending('Get');
+});
 function TicketsRatingPending(Type) {
+    reportType = $("#txtReportType").val();
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetTicketsRatingPending`,
+        url: `${appBaseURL}/api/Master/GetTicketsRatingPending?ReportType=${reportType}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -19,7 +23,7 @@ function TicketsRatingPending(Type) {
         success: function (response) {
             if (response.length > 0) {
                 $("#txtTable").show();
-                const StringFilterColumn = ["Ticket No", "Log Date", "Employee", "Client Name", "Work Type", "Rating Status"];
+                const StringFilterColumn = ["Ticket No","Created by","Log Date","Close By","Client Name", "Work Type", "Rating Status"];
                 const NumericFilterColumn = [];
                 const DateFilterColumn = [];
                 const Button = false;
@@ -158,7 +162,7 @@ function Ratingfunction() {
                     CloseModal();
                     TicketsRatingPending('Get');
                 } else {
-                    toastr.error(response.Msg);
+                    toastr.error(response[0].Msg);
                 }
             },
             error: function (xhr, status, error) {

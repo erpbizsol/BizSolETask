@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
+using Bizsol_ESMS.Models;
 
 namespace Bizsol_ETask.Controllers
 {
@@ -17,7 +18,7 @@ namespace Bizsol_ETask.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNewCompany(string CCode, string EmployeeName, string Email, string MobileNo)
+        public async Task<IActionResult> CreateNewCompany(string CCode, string EmployeeName, string Email, string MobileNo,string? Password)
         {
             string connectionString = _configuration.GetConnectionString("DefaultConnectionSQL");
             using (IDbConnection conn = new SqlConnection(connectionString))
@@ -27,6 +28,7 @@ namespace Bizsol_ETask.Controllers
                 parameters.Add("@EmployeeName ", EmployeeName);
                 parameters.Add("@Email", Email);
                 parameters.Add("@MobileNo", MobileNo);
+                parameters.Add("@Password",CommonFunction.Encrypt((Password ?? "").Trim(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"));
                 parameters.Add("@QueryFilePath ", "C:\\ANTU_Etask_Script.txt");
 
                 var result = await conn.QueryAsync<dynamic>("Usp_CreateDatabase_test", parameters, commandType: CommandType.StoredProcedure);
