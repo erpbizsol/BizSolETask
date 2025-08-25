@@ -222,7 +222,7 @@ function GetGenerateTaskTicketDateList() {
 
                         const workingHoursInput = `
                 <input type="number" id="txtWorkingHours_${item.Code}"
-                class="txtWorkingHours box_border form-control form-control-sm Number"
+                class="txtWorkingHours Amount box_border form-control form-control-sm Number"
                 data-index="${index}" 
                 value="${item.WorkingHours ?? ''}" 
                 min="0" max="24" step="0.5" 
