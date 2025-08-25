@@ -227,6 +227,17 @@ function CheckOtp() {
         $('#txtOtp').focus();
     }
 }
+function isEmail(email) {
+    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regex.test(email);
+}
+function IsMobileNumber(txtMobId) {
+    var mob = /^[6-9]{1}[0-9]{9}$/;
+    if (mob.test(txtMobId) == false) {
+        return false;
+    }
+    return true;
+}
 function getCookie1(name) {
     let cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
@@ -243,24 +254,34 @@ function Create() {
     var Email = $('#txtModalEmailid').val();
     var MobileNo = $('#txtModalMobileNo').val();
     var Password = $('#txtModalPassword').val();
-    if (CompanyCode.trim() === "") {
+    if (CompanyCode.trim() == "") {
         toastr.error("Please enter a Company Code.!");
         $("#txtModalCompanyCode").focus();
         return;
-    }else if (CompanyName.trim() === "") {
+    }else if (CompanyName.trim() == "") {
         toastr.error("Please enter a Employee Name.!");
         $("#txtModalCompanyName").focus();
         return;
-    }else if (Email.trim() === "") {
+    }else if (Email.trim() == "") {
         toastr.error("Please enter a Email.!");
         $("#txtModalEmailid").focus();
         return;
-    }else if (MobileNo.trim() === "") {
+
+    }else if (!isEmail(Email)) {
+        toastr.error("Please enter valid Email .!");
+        $("#txtModalEmailid").focus();
+        return;
+    }else if (MobileNo.trim() == "") {
         toastr.error("Please enter a Mobile No.!");
         $("#txtModalMobileNo").focus();
         return;
     }
-    else if (Password.trim() === "") {
+    else if (!IsMobileNumber(MobileNo)) {
+        toastr.error("Please enter valid Mobile No .!");
+        $("#txtModalMobileNo").focus();
+        return;
+    }
+    else if (Password.trim() == "") {
         toastr.error("Please enter a Password.!");
         $("#txtModalPassword").focus();
         return;
@@ -271,8 +292,8 @@ function Create() {
             type: 'POST',
             data: { CCode: CompanyCode, EmployeeName: CompanyName, Email: Email, MobileNo: MobileNo, Password: Password },
             success: function (response) {
-                if (response[0].Status == "Y") {
-                    toastr.success(response[0].Msg);
+                if (response[0].Status == "Y" || response[0].ErrorMsg === "" || response[0].ErrorMsg == null) {
+                    toastr.success("New company created successfully");
                     window.location.href = `${AppBaseURLMenu}/Login/Login`;
                 }
                 else {
@@ -299,7 +320,7 @@ function openMyPopup() {
 function closeMyPopup() {
     $('#attachmentModal').hide()
     $("#txtValidatePassword").val("");
-    //$("#txtcreatecompany").hide();
+    $("#txtcreatecompany").hide();
 }
 
 function ValidatePassword() {
