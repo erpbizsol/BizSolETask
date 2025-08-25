@@ -271,13 +271,12 @@ function Create() {
             type: 'POST',
             data: { CCode: CompanyCode, EmployeeName: CompanyName, Email: Email, MobileNo: MobileNo, Password: Password },
             success: function (response) {
-                if (response.ErrorMsg === "" || response.ErrorMsg == null) {
-                    toastr.success("New company has been created!");
-                    //$('#attachmentModal').hide();
-                    //$("#txtcreatecompany").hide();
+                if (response[0].Status == "Y") {
+                    toastr.success(response[0].Msg);
                     window.location.href = `${AppBaseURLMenu}/Login/Login`;
-                } else {
-                    toastr.error("New company not created! Error: " + response.ErrorMsg);
+                }
+                else {
+                    toastr.error(response[0].Msg);
                 }
             },
             error: function (xhr, status, error) {
@@ -300,7 +299,7 @@ function openMyPopup() {
 function closeMyPopup() {
     $('#attachmentModal').hide()
     $("#txtValidatePassword").val("");
-    $("#txtcreatecompany").hide();
+    //$("#txtcreatecompany").hide();
 }
 
 function ValidatePassword() {
