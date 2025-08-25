@@ -287,21 +287,28 @@ function Create() {
         return;
     }
     else {
+        blockUI();
         $.ajax({
             url: `${AppBaseURLMenu}/Company/CreateNewCompany`,
             type: 'POST',
             data: { CCode: CompanyCode, EmployeeName: CompanyName, Email: Email, MobileNo: MobileNo, Password: Password },
             success: function (response) {
+                
                 if (response[0].Status == "Y" || response[0].ErrorMsg === "" || response[0].ErrorMsg == null) {
                     toastr.success("New company created successfully");
-                    window.location.href = `${AppBaseURLMenu}/Login/Login`;
+                    setTimeout(function () {
+                        window.location.href = `${AppBaseURLMenu}/Login/Login`;
+                        unblockUI();
+                    }, 4000);
                 }
                 else {
                     toastr.error(response[0].Msg);
+                    unblockUI();
                 }
             },
             error: function (xhr, status, error) {
                 toastr.error("AJAX request failed: " + error);
+                unblockUI();
             }
            
         });
@@ -349,3 +356,5 @@ function ValidatePassword() {
         });
     }
 }
+
+
