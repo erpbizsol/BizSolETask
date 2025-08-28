@@ -105,6 +105,11 @@ function GetEmployeeType(Mode) {
                     },
                     options: {
                         responsive: true,
+                        layout: {
+                            padding: {
+                                top: 10   // upar extra space for labels
+                            }
+                        },
                         plugins: {
                             legend: { display: false },
                             tooltip: {
@@ -162,6 +167,7 @@ function GetEmployeeType(Mode) {
                                 }
                             },
                             y: {
+                                suggestedMax: 12 ,  // thoda zyada rakhna taki labels upar cut na ho
                                 beginAtZero: true,
                                 anchor: 'end',
                                 align: 'top',

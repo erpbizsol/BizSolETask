@@ -6,6 +6,7 @@ using Bizsol_ESMS.Models;
 
 namespace Bizsol_ETask.Controllers
 {
+    
     public class CompanyController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -18,13 +19,14 @@ namespace Bizsol_ETask.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNewCompany(string CCode, string EmployeeName, string Email, string MobileNo,string? Password)
+        public async Task<IActionResult> CreateCompany(string CCode, string CompanyName, string EmployeeName, string Email, string MobileNo,string? Password)
         {
             string connectionString = _configuration.GetConnectionString("DefaultConnectionSQL");
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@CompanyCode", CCode);
+                parameters.Add("@CompanyName ", CompanyName);
                 parameters.Add("@EmployeeName ", EmployeeName);
                 parameters.Add("@Email", Email);
                 parameters.Add("@MobileNo", MobileNo);

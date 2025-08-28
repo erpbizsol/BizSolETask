@@ -251,6 +251,7 @@ function getCookie1(name) {
 function Create() {
     var CompanyCode = $('#txtModalCompanyCode').val();
     var CompanyName = $('#txtModalCompanyName').val();
+    var EmployeeName = $('#txtModalEmployeeName').val();
     var Email = $('#txtModalEmailid').val();
     var MobileNo = $('#txtModalMobileNo').val();
     var Password = $('#txtModalPassword').val();
@@ -259,8 +260,12 @@ function Create() {
         $("#txtModalCompanyCode").focus();
         return;
     }else if (CompanyName.trim() == "") {
-        toastr.error("Please enter a Employee Name.!");
+        toastr.error("Please enter a Company Name.!");
         $("#txtModalCompanyName").focus();
+        return;
+    } else if (EmployeeName.trim() == "") {
+        toastr.error("Please enter a Employee Name.!");
+        $("#txtModalEmployeeName").focus();
         return;
     }else if (Email.trim() == "") {
         toastr.error("Please enter a Email.!");
@@ -289,9 +294,9 @@ function Create() {
     else {
         blockUI();
         $.ajax({
-            url: `${AppBaseURLMenu}/Company/CreateNewCompany`,
+            url: `${AppBaseURLMenu}/Company/CreateCompany`,
             type: 'POST',
-            data: { CCode: CompanyCode, EmployeeName: CompanyName, Email: Email, MobileNo: MobileNo, Password: Password },
+            data: { CCode: CompanyCode, CompanyName: CompanyName, EmployeeName: EmployeeName,Email: Email, MobileNo: MobileNo, Password: Password },
             success: function (response) {
                 
                 if (response[0].Status == "Y" || response[0].ErrorMsg === "" || response[0].ErrorMsg == null) {

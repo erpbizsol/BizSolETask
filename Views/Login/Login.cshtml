@@ -11,28 +11,28 @@
 <title>Login E-task</title>
 <style>
     /* .login-containers {
-            color: #ef6c00;
-            padding: 10px 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 11px 1px #999999;
-            max-width: 480px;
-            margin: 0 auto;
-            margin-top: 2rem;
-            font-size:15px;
-        } */
+                color: #ef6c00;
+                padding: 10px 10px;
+                border-radius: 10px;
+                box-shadow: 0 0 11px 1px #999999;
+                max-width: 480px;
+                margin: 0 auto;
+                margin-top: 2rem;
+                font-size:15px;
+            } */
 
     /* .Esms-logo {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            position: relative;
-            bottom: 4rem;
-            border: 1px solid #e0e4e8;
-        }
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                position: relative;
+                bottom: 4rem;
+                border: 1px solid #e0e4e8;
+            }
 
-        .Esms-login-logo {
-            height: 50px;
-        } */
+            .Esms-login-logo {
+                height: 50px;
+            } */
 
     .modal {
         position: fixed;
@@ -233,49 +233,60 @@
             </div>
         </div>
         @* <div id="attachmentContainer" style="margin-top:10px;"></div> *@
-        <div class="col-sm-12">
-            <div class="row">
-                <form class="login-Validate" method="post" action="/Company/CreateNewCompany">
-                    <div class="col-md-12">
-                        <label for="txtValidatePassword" class="col-form-label-sm fw-bold">Password<span class="text-danger">*</span></label>
-                        <input id="txtValidatePassword" name="txtValidatePassword" class="login-test-field form-control login-form-text"
-                         placeholder="Enter Password" type="password" autocomplete="off" maxlength="15">
-                        <button type="button" id="txtValidateP" title="Validate Password" onclick="ValidatePassword()" class="btn btn-success btn-height">Validate</button>
-                    </div>
-                    <div id="txtcreatecompany" style="display:none">
-                        <div class="col-md-12">
+        @*  <div class="col-sm-12"> *@
+        <div class="row">
+            <form class="login-Validate" method="post">
+                <div class="col-md-12">
+                    <label for="txtValidatePassword" class="col-form-label-sm fw-bold">Password<span class="text-danger">*</span></label>
+                    <input id="txtValidatePassword" name="txtValidatePassword" class="login-test-field form-control login-form-text"
+                     placeholder="Enter Password" type="password" autocomplete="off" maxlength="15">
+                    <button type="button" id="txtValidateP" title="Validate Password" onclick="ValidatePassword()" class="btn btn-success btn-height">Validate</button>
+                </div>
+                <div id="txtcreatecompany" style="display:none">
+                    <div class="row">
+                        <div class="col-md-6">
                             <label for="txtModalCompanyCode" class="col-form-label-sm fw-bold">Company Code<span class="text-danger">*</span></label>
                             <input id="txtModalCompanyCode" name="txtModalCompanyCode" class="login-test-field form-control login-form-text"
-                             placeholder="Enter Company Code" type="text" autocomplete="off" maxlength="15">
+                                   placeholder="Enter Company Code" type="text" autocomplete="off" maxlength="15">
                         </div>
-                        <div class="col-md-12">
-                            <label for="txtModalCompanyName" class="col-form-label-sm fw-bold">Employee Name<span class="text-danger">*</span> </label>
+                        <div class="col-md-6">
+                            <label for="txtModalCompanyName" class="col-form-label-sm fw-bold">Company Name<span class="text-danger">*</span></label>
                             <input id="txtModalCompanyName" name="txtModalCompanyName" class="login-test-field form-control login-form-text"
+                                   placeholder="Enter Company Name" type="text" autocomplete="off" maxlength="200">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="txtModalEmployeeName" class="col-form-label-sm fw-bold">Employee Name<span class="text-danger">*</span> </label>
+                            <input id="txtModalEmployeeName" name="txtModalEmployeeName" class="login-test-field form-control login-form-text"
                                    placeholder="Enter Employee Name" type="text" maxlength="150" autocomplete="off">
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label for="txtModalEmailid" class="col-form-label-sm fw-bold">Email<span class="text-danger">*</span></label>
                             <input id="txtModalEmailid" name="txtModalEmailid" class="login-test-field form-control login-form-text"
                                    placeholder="Enter Email" type="text" maxlength="50" autocomplete="off">
                         </div>
-                        <div class="col-md-12">
-                            <label for="txtModalMobileNo" class="col-form-label-sm fw-bold">Mobile No<span class="text-danger">*</span></label>
-                            <input id="txtModalMobileNo" name="txtModalMobileNo" class="login-test-field form-control login-form-text"
-                                   placeholder="Enter Mobile No" type="text" maxlength="15" autocomplete="off">
-                        </div>
-                        <div class="col-md-12">
-                            <label for="txtModalPassword" class="col-form-label-sm fw-bold">Password<span class="text-danger">*</span></label>
-                            <input id="txtModalPassword" name="txtModalPassword" class="login-test-field form-control login-form-text"
-                                   placeholder="Enter Password" type="password" maxlength="100" autocomplete="off">
-                        </div>
-                        <div class="text-end">
-                            <button type="button" class="btn btn-success btn-height" title="CREATE NEW" onclick="Create()">CREATE NEW</button>
-                            @* <button class="btn btn-danger btn-height " onclick="closeMyPopup()">Close</button> *@
-                        </div>
                     </div>
-                </form>
-            </div>
+                    <div class="row">
+                    <div class="col-md-6">
+                        <label for="txtModalMobileNo" class="col-form-label-sm fw-bold">Mobile No<span class="text-danger">*</span></label>
+                        <input id="txtModalMobileNo" name="txtModalMobileNo" class="login-test-field form-control login-form-text"
+                               placeholder="Enter Mobile No" type="text" maxlength="15" autocomplete="off">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="txtModalPassword" class="col-form-label-sm fw-bold">Password<span class="text-danger">*</span></label>
+                        <input id="txtModalPassword" name="txtModalPassword" class="login-test-field form-control login-form-text"
+                               placeholder="Enter Password" type="password" maxlength="100" autocomplete="off">
+                    </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-success btn-height" title="CREATE NEW" onclick="Create()">CREATE NEW</button>
+                        @* <button class="btn btn-danger btn-height " onclick="closeMyPopup()">Close</button> *@
+                    </div>
+                </div>
+            </form>
         </div>
+        @* </div> *@
     </div>
 </div>
 
