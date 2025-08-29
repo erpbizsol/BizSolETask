@@ -135,13 +135,13 @@ function GetEmployeeMasterList() {
                 $('#ddlEmployeeName').select2({
                     width: '-webkit-fill-available'
                 });
-                SelectOptionByText('ddlEmployeeName', UserName);
-                if (UserTypes !== "A") {
+                //SelectOptionByText('ddlEmployeeName', UserName);
+                //if (UserTypes !== "A") {
                     
                     GetEmpDateList();
                    // BindSelect2(`txtddlDipartment_${item.Code}`, G_DepartmentList);
                    // $(`#txtddlDipartment_${item.Code}`).val(item.ClientMaster_Code).select2({ width: '100%' });
-                }
+               // }
                
             } else {
                 $('#ddlEmployeeName').empty();

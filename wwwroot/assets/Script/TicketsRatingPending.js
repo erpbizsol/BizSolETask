@@ -295,11 +295,11 @@ function Ratingfunction(EmployeeMaster_Code) {
     var star = $("#ddlStar_" + EmployeeMaster_Code).val();
     var Remark = $("#txtRemark_" + EmployeeMaster_Code).val();
     let payload = {
-        CallTicketMaster_Code: G_Code,
-        EmployeeCode: EmployeeMaster_Code,
-        Star: parseInt(star),
-        Remark: Remark,
-        UserMaster_Code: UserMaster_Code
+            CallTicketMaster_Code: G_Code,
+            EmployeeCode: EmployeeMaster_Code,
+            Star: parseInt(star),
+            Remark: Remark,
+            UserMaster_Code: UserMaster_Code
     };
     $.ajax({
         url: `${appBaseURL}/api/Master/SaveTicketsRating`,

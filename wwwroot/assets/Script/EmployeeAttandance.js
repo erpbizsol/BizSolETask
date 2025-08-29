@@ -99,7 +99,7 @@ async function GetCardwiseEmployeeName(cardCodesArray) {
         },
         success: function (response) {
             if (response.length > 0) {
-                $("#txtEmployeeName").val(response[0].EmployeeName);
+                $("#txtEmployeeName").val(response[0].EmployeeNames);
             }
         },
         error: function () {
@@ -248,7 +248,7 @@ function GetGenerateTaskTicketDateList() {
                 } else {
                     $("#txtSummary").hide();
                     $("#txtstatus").hide();
-                    toastr.error("Record not found...!");
+                    //toastr.error("Record not found...!");
                 }
             },
             error: function (xhr, status, error) {
