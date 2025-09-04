@@ -549,7 +549,7 @@ function SaveData() {
                     //GetGenerateTaskTicketDateList('Get');
 
                     SenEmailMassage(response[0].Code);
-                    SendWhatsApp(response[0].Code);
+                   // SendWhatsApp(response[0].Code);
                 }
                 else {
                     

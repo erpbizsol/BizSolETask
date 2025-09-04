@@ -446,7 +446,7 @@ function StatusType() {
                 if (Status == "2") {
                     $("#txtTotalResolutionM").val(response[0].Times);
                     $("#txtResolutionDates").val(response[0].Dates);
-                    $("#txtRemarks").val(response[0].Remarks);
+                    //$("#txtRemarks").val(response[0].Remarks);
                     $("#txtResolvedBy").val(response[0].Code);
                     $("#txtReAssign").val(response[0].Code);
                     response.forEach(item => {
@@ -457,7 +457,7 @@ function StatusType() {
                 else if (Status == "4") {
                     $("#txtTotalResolutionM").val(response[0].Times);
                     $("#txtResolutionDates").val(response[0].Dates);
-                    $("#txtRemarks").val(response[0].Remarks);
+                    //$("#txtRemarks").val(response[0].Remarks);
                     $("#txtResolvedBy").val(response[0].Code);
                     $("#txtReAssign").val(response[0].Code);
                 }

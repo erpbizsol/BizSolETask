@@ -312,7 +312,7 @@ function Ratingfunction(EmployeeMaster_Code) {
         success: function (response) {
             if (response[0].Status === "Y") {
                 toastr.success(response[0].Msg);
-                CloseModal();
+                //CloseModal();
                 TicketsRatingPending('Get');
             } else {
                 toastr.error(response[0].Msg);
