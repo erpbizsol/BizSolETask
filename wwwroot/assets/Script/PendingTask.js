@@ -201,6 +201,7 @@ function GetGenerateTaskTicketDateList(Type) {
     });
 }
 function ViewAttachment(code) {
+    blockUI();
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAttachment?Code=${code}`,
         type: 'GET',
@@ -226,13 +227,16 @@ function ViewAttachment(code) {
                 });
 
                 $('#attachmentModal').show();
+                unblockUI();
             } else {
                 container.append('<p>No attachments found.</p>');
                 toastr.warning("No attachment found.");
+                unblockUI();
             }
         },
         error: function () {
             toastr.error("Failed to retrieve attachments.");
+            unblockUI();
         }
     });
 }
@@ -325,19 +329,44 @@ $("#txtBack").click(function () {
     $("#txtUpdateBy1").hide();
 
 });
+//function DatePicker() {
+//    const today = new Date();
+//    const defaultDate = formatDateToString(today);
+
+//    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
+
+//    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
+//    $('#txtResolutionDates,#txtToDate,#txtFromDate').datepicker({
+//        format: 'dd/mm/yyyy',
+//        autoclose: true,
+//        todayHighlight: true
+//    });
+//}
 function DatePicker() {
     const today = new Date();
+
+    // Format today
     const defaultDate = formatDateToString(today);
 
-    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
+    // set default values
+    $('#txtResolutionDates,#txtToDate').val(defaultDate);
 
-    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
-    $('#txtResolutionDates,#txtToDate,#txtFromDate').datepicker({
+    // ResolutionDate & ToDate -> current date
+    $('#txtResolutionDates,#txtToDate').datepicker({
         format: 'dd/mm/yyyy',
         autoclose: true,
         todayHighlight: true
-    });
+    }).datepicker('setDate', today);
+
+    // FromDate -> start from 1st of current month
+    $('#txtFromDate').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true,
+        startDate: new Date(today.getFullYear(), today.getMonth(), 1)
+    }).datepicker('setDate', new Date(today.getFullYear(), today.getMonth(), 1));
 }
+
 function formatDateToString(dateObj) {
     const day = String(dateObj.getDate()).padStart(2, '0');
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -649,6 +678,7 @@ function Save() {
             ],
             Attachment: AttachmentDetail
         };
+        blockUI();
         $.ajax({
             url: `${appBaseURL}/api/Master/SavePendingTask`,
             type: "POST",
@@ -665,14 +695,17 @@ function Save() {
                     SenEmailMassage(response[0].Code);
                     GetGenerateTaskTicketDateList('Get');
                     $("#txtpage").hide();
+                    unblockUI();
                 }
                 else {
                     toastr.error(response[0].Msg);
+                    unblockUI();
                 }
             },
             error: function (xhr) {
                 console.error("Error:", xhr.responseText);
                 toastr.error("An error occurred while saving the data.");
+                unblockUI();
             }
         });
     }

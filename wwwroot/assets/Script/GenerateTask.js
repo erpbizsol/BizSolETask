@@ -533,6 +533,7 @@ function SaveData() {
             ],
             Attachment: AttachmentDetail
         };
+        blockUI();
         $.ajax({
             url: `${appBaseURL}/api/Master/SaveGenerateTaskTicket`,
             type: "POST",
@@ -549,16 +550,18 @@ function SaveData() {
                     //GetGenerateTaskTicketDateList('Get');
 
                     SenEmailMassage(response[0].Code);
-                   // SendWhatsApp(response[0].Code);
+                    // SendWhatsApp(response[0].Code);
+                    unblockUI();
                 }
                 else {
-                    
                     toastr.error(response[0].Msg);
+                    unblockUI();
                 }
             },
             error: function (xhr) {
                 console.error("Error:", xhr.responseText);
                 toastr.error("An error occurred while saving the data.");
+                unblockUI();
             }
         });
     }
