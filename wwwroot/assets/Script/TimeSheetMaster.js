@@ -318,10 +318,10 @@ function addNewRow() {
         <td><input type="text" id="txtRemarks1_0" class="txtRemarks1 box_border form-control form-control-sm" autocomplete="off" maxlength="500"/></td>
         <td style="text-align:center;">
 
-             <button class="btn btn-success icon-height mb-1" style="background:#216c4a" title="Add New Row" onclick="SaveData(0)">
+             <button class="btn btn-success icon-height mb-1" title="Add New Row" onclick="SaveData(0)">
              <i class="fa-solid fa-plus"></i>
              </button>
-            <button class="btn btn-danger icon-height mb-1" id="deleteRow" title="Delete">
+            <button class="btn icon-height btn-danger mb-1" id="deleteRow" title="Delete">
                 <i class="fa-solid fa-trash"></i>
             </button>
         </td>`;

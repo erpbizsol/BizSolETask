@@ -1,0 +1,169 @@
+/* Header: black → navy gradient with white accent */
+#page-topbar .navbar-header {
+	/*background: linear-gradient(135deg, #000000 -91%, #0B1A2A -59%, #4775bd 100%);*/
+	background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));
+	color: #fff;
+	border-bottom: 1px solid rgba(255,255,255,.2);
+}
+
+.navbar-brand-box {
+	padding: 0 1.5rem;
+	width: 250px;
+	background: var(--bs-sidebar-bg);
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+	/* background-color: #40b8c0; */
+	height: 50px;
+	color: #fff;
+	/*background: linear-gradient(135deg, #000000 -91%, #0e4178 -59%, #4775bd 100%);*/
+	border-radius: 5px 4px 24px;
+	background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));
+}
+.simplebar-content-wrapper {
+	direction: inherit;
+	-webkit-box-sizing: border-box !important;
+	box-sizing: border-box !important;
+	position: relative;
+	display: block;
+	height: 100%;
+	width: auto;
+	visibility: visible;
+	overflow: auto;
+	max-width: 100%;
+	max-height: 100%;
+	scrollbar-width: none;
+	padding: 0 !important;
+	/*background: linear-gradient(135deg, #11132d -91%, #2f5081 -59%, #4775bd 100%);*/
+	/*background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));*/
+	background-image: linear-gradient(rgb(22 160 184), rgb(248 248 248));
+}
+
+.simplebar-mask  {
+	direction: inherit;
+	position: absolute;
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: auto !important;
+	height: auto !important;
+	z-index: 0;
+	font-size: 15px;
+	font-family: ui-serif;
+	font-size: 30px;
+}
+.btn:hover {
+	color: var(--bs-btn-hover-color);
+	text-decoration: none;
+	background-color: #4577b8;
+	border-color: #426db0;
+}
+.bg-light-subtle {
+	background-color: rgba(var(--bs-light-rgb), .4) !important;
+	/*background: linear-gradient(135deg, #4f59ce -91%, #3679be -59%, #4572b7 100%);*/
+	background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));
+}
+.table th {
+	background-color: #175abe;
+	background-image: linear-gradient(#3d75ba, #0da9b7);
+	color: #fff;
+	border: 1px solid #ddd;
+}
+.datepicker thead, th{
+	background-color: #1a9bb8 !important;
+	color: white;
+}
+
+.datepicker thead, th {
+	background-color: #0ba4af;
+	color: white;
+}
+.btn-danger {
+	box-shadow: 0 2px 6px 0 rgb(99 97 97 / 50%);
+	background-color: #be1929;
+	border: none;
+	/*width: 88px;
+	height: 37px;
+	border-radius: 24px 2px 24px 2px;*/
+}
+	.btn-danger:hover {
+		background-image: linear-gradient(#be1929, #be1929, #be1929);
+	}
+.btn-success1 {
+	box-shadow: 0 2px 6px 0 rgb(94 96 95);
+	background-color: #0d9756;
+	border: none;
+}
+.btn-success {
+	box-shadow: 0 2px 6px 0 rgb(94 96 95);
+	background-color: #0d9756;
+	border: none;
+/*	width: 88px;
+	height: 37px;
+	border-radius: 24px 2px 24px 2px;*/
+}
+.btn:hover {
+	color: var(--bs-btn-hover-color);
+	text-decoration: none;
+	background-color: #0d9756;
+	border-color: #0d9756;
+}
+
+.btn-success:hover {
+	background-image: linear-gradient(#216c4a, #32c885, #10e585);
+}
+#sidebar-menu ul li a {
+	display: block;
+	padding: .3rem;
+	padding: .60rem 1.1rem;
+	color: #0a0d17;
+	position: relative;
+	font-size: 14px;
+	-webkit-transition: all .4s;
+	transition: all .4s;
+	font-weight: 500;
+}
+.login-sec1 {
+	border-radius: 0 4rem 4rem 0;
+	/* background: #0c666e; */
+	color: #fff;
+	background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));
+}
+#btnValidateCompany, #btnProcee {
+	width: 100%;
+	background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));
+}
+
+#btnValidateCompany, #btnProceed {
+	width: 100%;
+	background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));
+}
+.btn1:hover {
+	color: var(--bs-btn-hover-color);
+	text-decoration: none;
+	background: linear-gradient(348deg, #1e8c9e, #45b2c5);
+	border-color: #45b2c5;
+}
+#side-menu .active {
+	border-radius: 28px;
+	border-left: 5px solid #3380ba;
+	color: #212529 !important;
+	font-family: Arial;
+	background-color: #cfe8ed;
+	height: 38px;
+}
+#sidebar-menu li > a:hover {
+	border-radius: 28px;
+	border-left: 5px solid #3380ba;
+	color: #000 !important;
+	font-family: Arial;
+	background-color: #cfe8ed;
+	height: 38px;
+}
+.datepicker thead, th {
+	background-color: #1c99b8;
+	color: white;
+	background-image: linear-gradient(#3d75ba, #0da9b7);
+}

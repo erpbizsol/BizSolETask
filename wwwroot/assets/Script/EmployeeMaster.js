@@ -85,9 +85,9 @@ function ShowEmployeeMaster(Type) {
                     "CreatedOn": 'center'
                 };
                 const updatedResponse = response.map(item => ({
-                    ...item, 'Action': `<button class="btn btn-primary icon-height mb-1 btn-width-100px"  title="Change Password" onclick="ChangePassword('${item.Code}')">Change Password</button>
-                    <button class="${item.Color} icon-height mb-1"  title="Active/DeActive" onclick="ChangeStaus('${item.Code}')">${item.Action}</i></button>
-                    <button class="btn btn-primary icon-height mb-1"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`
+                    ...item, 'Action': `<button class="btn btn-primary btn1 icon-height mb-1 btn-width-100px"  title="Change Password" onclick="ChangePassword('${item.Code}')">Change Password</button>
+                    <button class="${item.Color} icon-height btn-danger1 mb-1"  title="Active/DeActive" onclick="ChangeStaus('${item.Code}')">${item.Action}</i></button>
+                    <button class="btn btn-primary icon-height mb-1 btn1"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`
                     //'Edit': `<button class="btn btn-primary icon-height mb-1"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>`,
                     //'Action': `<button class="${item.Color} icon-height mb-1"  title="Edit" onclick="Edit('${item.Code}')">${item.Action}</i></button>`
                 }));

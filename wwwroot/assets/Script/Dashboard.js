@@ -83,11 +83,22 @@ function GetEmployeeType(Mode) {
                     name: item["Employee Name"] || 'Unknown',
                     remainingHours: item.RemainingHours || 0
                 }));
-
+               
                 const baseColors = [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                    '#9966FF', '#FF9F40', '#66ff66', '#ff66cc',
-                    '#00BFFF', '#FFD700', '#DC143C', '#8A2BE2'
+                    //'#FF6384', // Pink/Red
+                    '#3D75BA',
+                    '#0DA9B7',
+                    '#36A2EB', // Sky Blue
+                    '#FFCE56', // Yellow
+                    '#4BC0C0', // Teal
+                    '#9966FF', // Purple
+                    '#FF9F40', // Orange
+                    '#66ff66', // Light Green
+                    '#ff66cc', // Pink
+                    '#00BFFF', // Deep Sky Blue
+                    '#FFD700', // Gold
+                    '#DC143C', // Crimson
+                    '#8A2BE2'  // Blue Violet
                 ];
 
                 const backgroundColors = response.map((_, index) => baseColors[index % baseColors.length]);
@@ -257,7 +268,7 @@ function loadPieChartFromAPI(Mode) {
                 const chartData = response.map(item => item["Pending"] || "");
 
                 const pieColors = [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#0DA9B7', '#36A2EB', '#FFCE56', '#4BC0C0',
                     '#9966FF', '#FF9F40', '#66ff66', '#ff66cc',
                     '#00BFFF', '#FFD700', '#DC143C', '#8A2BE2'
                 ];
@@ -357,7 +368,7 @@ function GetClientPending(Mode) {
                 const chartData1 = response.map(item => item["Pending"] || 0);
 
                 const pieColors = [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#0DA9B7', '#36A2EB', '#FFCE56', '#4BC0C0',
                     '#9966FF', '#FF9F40', '#66ff66', '#ff66cc',
                     '#00BFFF', '#FFD700', '#DC143C', '#8A2BE2'
                 ];
