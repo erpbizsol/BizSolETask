@@ -188,7 +188,7 @@ body {
 	max-height: 100%;
 	scrollbar-width: none;
 	padding: 0 !important;
-	background: rgb(2 9 17);
+	background:#071729;
 }
 #sidebar-menu ul li a {
 	display: block;
@@ -403,7 +403,7 @@ th {
 	height: 50px;
 	color: #fff;
 	/* border-radius: 5px 4px 24px; */
-	background-color: rgb(1 17 36);
+	background-color: #071729;
 }
 body:not([data-sidebar-size=sm]) #vertical-menu-btn {
 	margin-right: 9px;
