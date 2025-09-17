@@ -75,14 +75,14 @@
         display: none !important;
     }
 
-    .circle-icon {
+   /* .circle-icon {
         border: 4px solid;
         padding: 10px;
         font-size: 2rem;
         border-radius: 50px;
         color: #0c666e;
         background-color: #fffbff;
-    }
+    }*/
 
     .heading-icon {
         display: block;
@@ -152,5 +152,12 @@
     }*/
 
 }
-
-/* End Overlay styles */
+    .circle-icon {
+        border: 4px solid;
+        padding: 10px;
+        font-size: 2rem;
+        border-radius: 50px;
+        color: #212529;
+        background-color: #fffbff;
+    }
+    /* End Overlay styles */

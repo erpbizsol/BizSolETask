@@ -14,10 +14,16 @@
         padding: 6px 9px !important;
         height: 16px !important;
     }
-    .datepicker thead, th {
+
+    th {
+        position: relative;
+        background-color: #fff;
+        border: 2px solid #ddd;
+    }
+   /*  .datepicker thead, th {
         background-color: #0ba4af;
         color: white;
-    }
+    } */
     :is(.datepicker thead .prev, .datepicker thead .next, .datepicker thead .datepicker-switch) {
         text-align: center;
         padding: 2px 2px 5px 2px !important;
@@ -51,10 +57,10 @@
         overflow: hidden;
         padding: 0.7rem;
     }
-    tfoot td {
+   /*  tfoot td {
         background-color: #e6f2f5;
         font-weight: bold;
-    }
+    } */
     .summary-title {
         font-weight: bold;
         font-size: 18px;
@@ -80,6 +86,13 @@
         background-color: #195c61 !important;
         color: white;
     } */
+    table > thead, th {
+        position: sticky;
+        /* top: 0px; */
+        /* top: -1px; */
+        border-collapse: collapse;
+        z-index: 1;
+    }
     .dynamic-table td select,
     .dynamic-table td input {
         width: 100%;
@@ -144,7 +157,7 @@
                 <div class="col-sm-6">
 
                     <div class="table-wrapper" style="overflow: auto;">
-                        <table id="table1" class="">
+                        <table id="table1" class="table1">
                             <thead id="table-header1">
                             <th>Department</th>
                             <th>Time (in Mins)</th>
@@ -164,7 +177,7 @@
                 <div class="col-sm-6">
                    
                     <div class="table-wrapper" style="overflow: auto;">
-                        <table id="table2" class="">
+                        <table id="table2" class="table2">
                             <thead id="table-header2">
                             <th>Work Type</th>
                             <th>Time (in Mins)</th>
