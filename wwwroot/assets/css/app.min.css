@@ -88,7 +88,7 @@ body {
 }
 
 .navbar-headerimg, img, svg {
-    border-radius: 20px;
+    border-radius: 48px;
 }
 
 .logo {
@@ -100,10 +100,15 @@ body {
         display: none
     }
 
+/*.LogoLg {
+    margin-bottom: 4px;
+}*/
 .LogoLg {
     margin-bottom: 4px;
+    width: 40px;
+    height: 40px;
+    border-radius: 28px;
 }
-
 .svg {
     color: #fff;
 }
