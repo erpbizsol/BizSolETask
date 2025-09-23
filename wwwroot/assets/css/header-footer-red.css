@@ -258,7 +258,7 @@ body {
 	background-color: var(--bs-dropdown-link-hover-bg);
 	background: #4ba6ef;
 }
-.dropdown-item {
+/*.dropdown-item {
 	padding: 10px 16px;
 	cursor: pointer;
 	display: flex;
@@ -266,7 +266,7 @@ body {
 	gap: 8px;
 	background: rgb(2 9 17);
 	color: white;
-}
+}*/
 .navbar-header {
 	display: -webkit-box;
 	display: -ms-flexbox;
