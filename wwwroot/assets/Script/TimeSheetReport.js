@@ -423,6 +423,7 @@ function GetTimeSheetReport() {
                     document.getElementById('myCell1').setAttribute('style', 'display:none');
                     const totalMinutes = response.reduce((sum, item) => sum + (parseInt(item["Time In Minutes"]) || 0), 0);
                     document.getElementById("footerTotalMinutes").textContent = totalMinutes;
+                    setInterval(calculateVisibleTotals, 1000);
                 } else {
                     var dynamicColspan = 2;
                     document.getElementById('myCell1').setAttribute('style', 'display:none');
@@ -645,4 +646,20 @@ function Export(jsonData) {
     XLSX.writeFile(wb, "TimeSheetReport.xlsx");
 }
 
+let totalInterval;
+
+function calculateVisibleTotals() {
+    let totalInterval = 0;
+
+    document.querySelectorAll("#table-body tr").forEach(row => {
+        if (row.style.display !== "none") {  
+            let cell = row.querySelector("td:nth-child(4)"); // 5th column = Time In Minutes (adjust index)
+            if (cell) {
+                let val = parseFloat(cell.textContent.trim()) || 0;
+                totalInterval += val;
+            }
+        }
+    });
+    document.getElementById("footerTotalMinutes").textContent = totalInterval;
+}
 
