@@ -6381,7 +6381,8 @@ th, .filter-table-heading {
 #btnValidateCompany, #btnProceed {
     width: 100%;
     /*background-color: #0c666e;*/
-    background-color: #071729;
+    background-color: #032954;
+    /*background-color: #071729;*/
     /*background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183));*/
 }
 
@@ -6441,7 +6442,8 @@ th, .filter-table-heading {
 
 .login-sec1 {
     border-radius: 0 4rem 4rem 0;
-    background: #071729;
+    /*background: #071729;*/
+    background: #032954;
     color: #fff;
     /*background-image: linear-gradient(rgb(61, 117, 186), rgb(13, 169, 183)); 0c666e*/
 }

@@ -12,16 +12,17 @@
         background-color: #ede8e8 !important;
         border: 0px solid #aaa !important;
     }
-
-    .datepicker td, .datepicker th {
-        border-radius: 20px !important;
-    }
-
     .datepicker table tr td, .datepicker table tr td {
         padding: 8px 9px !important;
         height: 16px !important;
+        border-radius: 20px;
     }
 
+    .datepicker thead, th {
+        background-color: #032954;
+        color: white;
+        border: 2px solid #ddd;
+    }
     .datepicker table tfoot {
         display: none;
     }
@@ -51,12 +52,6 @@
         padding: 10px;
         text-align: center;
     }
-
-    th {
-        background-color: #0ba4af;
-        color: white;
-    }
-
     tfoot td {
         background-color: #e6f2f5;
         font-weight: bold;
@@ -173,10 +168,10 @@
         height: 400px !important;
     }
 
-    th {
+    /* th {
         background-color: #fff;
         color: #212529;
-    }
+    } */
 </style>
 @* ----------------Modal-------------------- *@
 <div id="attachmentModal" class="modal" style="display:none;">
