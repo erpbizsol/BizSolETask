@@ -647,7 +647,6 @@ function Export(jsonData) {
 }
 
 let totalInterval;
-
 function calculateVisibleTotals() {
     let totalInterval = 0;
 

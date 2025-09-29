@@ -67,22 +67,25 @@ $(document).ready(async function () {
     await GetPriorityDetails();
     await GetClientMasterDetails();
     await GetWorkTypes();
-   // await GetAssigneds();
+    // await GetAssigneds();
     $("#txtTaskType").change(function () {
         var selectedValue = $(this).val();
         if (selectedValue === "1") {
             $("#txtTaskNoDiv").hide();
+            UpdateLabelforItemMaster();
         } else {
             $("#txtTaskNoDiv").show();
+            UpdateLabelforItemMaster();
         }
     });
 
-   // GetGenerateTaskTicketDateList('Get');
+    // GetGenerateTaskTicketDateList('Get');
     if (UserTypes == "A") {
         $("#txtAllUser").show();
     } else {
         $("#txtAllUser").hide();
     }
+    UpdateLabelforItemMaster();
 });
 $('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
     GetGenerateTaskTicketDateList('Get');
@@ -126,11 +129,11 @@ function GetTicketNo() {
             const $select = $('#txtTaskNo');
             $select.empty();
             if (response && response.length > 0) {
-              //  $select.append(new Option("Select Ticket No...", "", true, true));
+                //  $select.append(new Option("Select Ticket No...", "", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.UID));
                 });
-               
+
             }
             $select.select2({
                 width: '100%',
@@ -155,7 +158,7 @@ function GetPriorityDetails() {
         success: function (response) {
             const $select = $('#txtPriority');
             $select.empty();
-           // $select.append('<option value="">Select Priority</option>');
+            // $select.append('<option value="">Select Priority</option>');
             $.each(response, function (index, item) {
                 $select.append(`<option value="${item.Code}">${item.Priority}</option>`);
             });
@@ -242,7 +245,7 @@ function GetClientMasterDetails() {
             } else {
                 G_ProjectList = [];
             }
-          
+
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -276,7 +279,7 @@ function GetWorkTypes() {
             const $select = $('#txtWorkType');
             $select.empty();
             if (response && response.length > 0) {
-               //$select.append(new Option("Select Work Type..", "0", true));
+                //$select.append(new Option("Select Work Type..", "0", true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.WorkType, item.Code));
                 });
@@ -315,7 +318,7 @@ function GetAssigneds(selectedCode) {
             const $select = $('#txtAssigned');
             $select.empty();
             if (response && response.length > 0) {
-                 $select.append(new Option("Select Assigned..", "0", true));
+                $select.append(new Option("Select Assigned..", "0", true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
@@ -342,7 +345,7 @@ $("#txtAttachment").on('change', (event) => {
     }
 });
 $('#txtAttachment').bind('change', function () {
-    
+
     $.each($('#txtAttachment')[0].files, function (key, file) {
         reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
 
@@ -377,34 +380,34 @@ function ConvertFileToByteArry(File) {
     });
 }
 function reduceFileSize(file, acceptFileSize, maxWidth, maxHeight, quality, callback) {
-        if (file.size <= acceptFileSize) {
-            callback(file);
-            return;
-        }
-        let img = new Image();
-        img.onerror = function () {
-            URL.revokeObjectURL(this.src);
-            callback(file);
-        };
-        img.onload = function () {
-            URL.revokeObjectURL(this.src);
-            getExifOrientation(file, function (orientation) {
-                let w = img.width, h = img.height;
-                let scale = (orientation > 4 ?
-                    Math.min(maxHeight / w, maxWidth / h, 1) :
-                    Math.min(maxWidth / w, maxHeight / h, 1));
-                h = Math.round(h * scale);
-                w = Math.round(w * scale);
+    if (file.size <= acceptFileSize) {
+        callback(file);
+        return;
+    }
+    let img = new Image();
+    img.onerror = function () {
+        URL.revokeObjectURL(this.src);
+        callback(file);
+    };
+    img.onload = function () {
+        URL.revokeObjectURL(this.src);
+        getExifOrientation(file, function (orientation) {
+            let w = img.width, h = img.height;
+            let scale = (orientation > 4 ?
+                Math.min(maxHeight / w, maxWidth / h, 1) :
+                Math.min(maxWidth / w, maxHeight / h, 1));
+            h = Math.round(h * scale);
+            w = Math.round(w * scale);
 
-                let canvas = imgToCanvasWithOrientation(img, w, h, orientation);
-                canvas.toBlob(function (blob) {
-                    console.log("Resized image to " + w + "x" + h + ", " + (blob.size >> 10) + "kB");
-                    callback(blob);
-                }, 'image/jpeg', quality);
-            });
-        };
-        img.src = URL.createObjectURL(file);
- }
+            let canvas = imgToCanvasWithOrientation(img, w, h, orientation);
+            canvas.toBlob(function (blob) {
+                console.log("Resized image to " + w + "x" + h + ", " + (blob.size >> 10) + "kB");
+                callback(blob);
+            }, 'image/jpeg', quality);
+        });
+    };
+    img.src = URL.createObjectURL(file);
+}
 function getExifOrientation(file, callback) {
     // Suggestion from http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/:
     if (file.slice) {
@@ -512,7 +515,7 @@ function SaveData() {
                 {
                     code: Code,
                     ticketTypeMaster_Code: TaskType,
-                    ticketNo: TicketNo||0,
+                    ticketNo: TicketNo || 0,
                     employeeMaster_Code: 0,
                     priorityMaster_Code: Priority,
                     logDate: LogDate,
@@ -524,7 +527,7 @@ function SaveData() {
                     description: Description,
                     reAssign_Code: Assigned,
                     commitedDate: CommittedDate,
-                    estimatedTime: EstimatedTime ||0,
+                    estimatedTime: EstimatedTime || 0,
                     statusMaster_Code: 1,
                     commonColumn: 'A',
                     status: 'P',
@@ -571,28 +574,28 @@ function GetGenerateTaskTicketDateList(Type) {
     let showBy = $('input[type=radio][name="ticktOrder"]:checked').val();
     let Status = $('input[type=radio][name="ticktOrderStatus"]:checked').val();
     let TaskNo = $("#txtTaskNo").val();
-    TaskNo = TaskNo ? TaskNo.value : 0; 
-        $.ajax({
-            url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDate?EmployeeName=${EmployeeName}&showBy=${showBy}&Status=${Status}&ticketNo=${TaskNo}`,
-            type: 'POST',
-            dataType: "json",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Auth-Key', authKeyData);
-            },
-            success: function (response) {
-                if (response.length > 0) {
-                    $("#txtSummary").show();
-                    const StringFilterColumn = [];
-                    const NumericFilterColumn = [];
-                    const DateFilterColumn = ["Log Date"];
-                    const Button = false;
-                    const showButtons = [];
-                    const StringdoubleFilterColumn = [];
-                    const hiddenColumns = ["ACode","Attachment","CallTicketMaster_Code","AttachmentFileName","ResolutionTime","Remarks","ResolvedDate","RaisedBy","Module","Source","FirstCheckBy","CommitedDate","ContactNo","Status","EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType","ContactEMail","ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code","EmployeeMaster_Code","Code"];
-                    const ColumnAlignment = {
-                    };
-                    const updatedResponse = response.map(item => {
-                        let actionButtons = `
+    TaskNo = TaskNo ? TaskNo.value : 0;
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDate?EmployeeName=${EmployeeName}&showBy=${showBy}&Status=${Status}&ticketNo=${TaskNo}`,
+        type: 'POST',
+        dataType: "json",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                $("#txtSummary").show();
+                const StringFilterColumn = [];
+                const NumericFilterColumn = [];
+                const DateFilterColumn = ["Log Date"];
+                const Button = false;
+                const showButtons = [];
+                const StringdoubleFilterColumn = [];
+                const hiddenColumns = ["ACode", "Attachment", "CallTicketMaster_Code", "AttachmentFileName", "ResolutionTime", "Remarks", "ResolvedDate", "RaisedBy", "Module", "Source", "FirstCheckBy", "CommitedDate", "ContactNo", "Status", "EstimatedTime", "UpdateBy", "Priority", "TicketType", "UpdateDate", "ResolvedBy", "FinalCheckBy", "StatusName", "WorkType", "ContactEMail", "ClientMaster_Code", "ModuleMaster_Code", "ResolvedBy_Code", "SourceMaster_Code", "WorkTypeMaster_Code", "EmployeeMaster_Code", "Code"];
+                const ColumnAlignment = {
+                };
+                const updatedResponse = response.map(item => {
+                    let actionButtons = `
                             <a class="btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')">
                             <i class="fa fa-paperclip"></i>
                             </a>
@@ -606,42 +609,42 @@ function GetGenerateTaskTicketDateList(Type) {
                             
                             `;
 
-                        if (UserTypes === 'A') {
+                    if (UserTypes === 'A') {
 
                         actionButtons += `
                             <button class="btn btn-danger icon-height mb-1" title="Delete" onclick="Delete('${item.Code}')">
                             <i class="fa-solid fa-trash"></i>
                             </button>`;
-                        }
-
-                        return {
-                            ...item,
-                            'Action': actionButtons
-                        };
-                    });
-                    //const updatedResponse = response.map(item => ({
-                    //    ...item, 'Action':
-                    //       `
-                    //<a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
-                    //<button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
-                    //<button class="btn btn-danger icon-height mb-1"  title="Delete" onclick="Delete('${item.Code}')"><i class="fa-solid fa-trash"></i></button>`
-                    //}));
-                   
-                    BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
-
-                } else {
-                    if (Type == 'Get') {
-                        toastr.error("Record not found...!");
-                        $("#txtSummary").hide();
                     }
-                    
+
+                    return {
+                        ...item,
+                        'Action': actionButtons
+                    };
+                });
+                //const updatedResponse = response.map(item => ({
+                //    ...item, 'Action':
+                //       `
+                //<a class= "btn btn-success icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
+                //<button class="btn btn-primary icon-height mb-1" style="background:#20425d"  title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
+                //<button class="btn btn-danger icon-height mb-1"  title="Delete" onclick="Delete('${item.Code}')"><i class="fa-solid fa-trash"></i></button>`
+                //}));
+
+                BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+
+            } else {
+                if (Type == 'Get') {
+                    toastr.error("Record not found...!");
+                    $("#txtSummary").hide();
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error:", error);
+
             }
-        });
-    
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+
 }
 function BindSelect2(elementId, list) {
     let option = '<option value="0">Select</option>';
@@ -695,10 +698,10 @@ function Edit(code) {
                     $(`#txtAssigned`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
                 });
                 //$("#txtProjectClient").val(response[0].ClientMaster_Code);
-               // $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
+                // $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
                 //$("#txtAssigned").val(response[0].EmployeeMaster_Code);
-         
-             
+
+
                 //$('#txtAttachment').off('change').on('change', function () {
                 //    $.each(this.files, function (key, file) {
                 //        const fileName = file.name;
@@ -825,7 +828,7 @@ function ClearData() {
     DatePicker();
 }
 function GetAllDetailsTicketNo() {
-   var TicketNo=$("#txtTaskNo").val();
+    var TicketNo = $("#txtTaskNo").val();
     $.ajax({
         url: `${appBaseURL}/api/Master/GetTicketsDetails?TicketNo=${TicketNo}`,
         type: 'POST',
@@ -838,7 +841,7 @@ function GetAllDetailsTicketNo() {
             $("#txtProjectClient").val(response[0].ClientMaster_Code);
             $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
             $("#txtAssigned").val(response[0].EmployeeMaster_Code);
-           
+
             response.forEach(item => {
                 BindSelect2(`txtProjectClient`, G_ProjectList);
                 $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
@@ -905,7 +908,7 @@ function GetAssingData(TickatNo) {
                 BizsolCustomFilterGrid.CreateDataTable("table-header1", "table-body1", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
                 $('#attachmentModal1').show();
             } else {
-                    toastr.error("Record not found...!");
+                toastr.error("Record not found...!");
             }
         },
         error: function (xhr, status, error) {
@@ -923,16 +926,16 @@ function SenEmailMassage(Code) {
         },
         success: function (response) {
             if (response[0].Status == 'Y') {
-               // toastr.success(response[0].Msg);
+                // toastr.success(response[0].Msg);
             } else {
                 toastr.error("Unexpected response format.");
             }
         },
         error: function (xhr, status, error) {
-           // toastr.error("Error deleting item:");
+            // toastr.error("Error deleting item:");
         }
     });
-    
+
 }
 //function SendWhatsApp() {
 //    $.ajax({
@@ -973,4 +976,42 @@ function validateCommittedDate() {
         return false;
     }
     return true;
+}
+function UpdateLabelforItemMaster() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/ShowConfig`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                const item = response[0];   // ✅ get first object
+
+                if (item.Department) {
+                    $("#txtProjectClientheader").text(item.Department);
+                    $("#txtProjectClient").attr("placeholder", item.Department);
+                } else {
+                    $("#txtProjectClientheader").text("Project / Client");
+                    $("#txtProjectClient").attr("placeholder", "Project / Client");
+                }
+                if (item.WorkType) {
+                    $("#txtWorkTypeheader").text(item.WorkType);
+                    $("#txtWorkType").attr("placeholder", item.WorkType);
+                } else {
+                    $("#txtWorkTypeheader").text("Work Type");
+                    $("#txtWorkType").attr("placeholder", "Work Type");
+                }
+            } else {
+                $("#txtProjectClientheader").text("Project / Client");
+                $("#txtProjectClient").attr("placeholder", "Project / Client");
+                $("#txtWorkTypeheader").text("Work Type");
+                $("#txtWorkType").attr("placeholder", "Work Type");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $("#txtProjectClientheader").text("Error fetching label data");
+        }
+    });
 }

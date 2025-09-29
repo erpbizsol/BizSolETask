@@ -1,0 +1,91 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link href="~/assets/css/filter.css" rel="stylesheet" />
+
+<script src="~/assets/js/xlsx.full.min.js"></script>
+
+<style>
+    .tabs {
+        width: 100%;
+        max-width: 2000px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 0.7rem;
+    }
+
+    .dropdown-container1 {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, sans-serif;
+    }
+
+    .dropdown-button1 {
+        padding: 8px;
+        border: 2px solid black;
+        cursor: pointer;
+        background-color: white;
+        width: 300px;
+        margin-top: 10px;
+    }
+
+    .dropdown-list1 {
+        display: none;
+        background-color: white;
+        border: 1px solid #ccc;
+        z-index: 1000 !important;
+        padding: 5px;
+        max-height: 132px;
+        margin-top: -8px;
+        overflow-y: auto;
+    }
+
+    .modal-body {
+        position: relative;
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: var(--bs-modal-padding);
+        height: 400px !important;
+    }
+</style>
+<div class="container">
+    <div id="txtCreatepage">
+        <div class="card shadow-sm">
+            <div class="tabs">
+                <div class="row p-1">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-3  col-sm-6">
+                                <label for="txtClientName" class="col-form-label-sm fw-bold">
+                                    Client Master<span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="txtClientName" name="txtClientName" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Enter Client Name.." maxlength="50">
+                                <input type="hidden" id="hfCode" class="form-control form-control-sm box_border" value="0" maxlength="10">
+                            </div>
+                            <div class="col-md-3  col-sm-6">
+                                <label for="txtWorkType" class="col-form-label-sm fw-bold">
+                                    Work Type Master<span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="txtWorkType" name="txtWorkType" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Work Type Master.." maxlength="50">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-12 text-right">
+                                <input type="button" class="btn btn-success btn-height" id="txtsave" value="Save" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="~/assets/js/filter.js"></script>
+<script src="~/assets/script/configuration.js"></script>
+
+
+

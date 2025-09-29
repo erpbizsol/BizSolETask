@@ -113,9 +113,9 @@ function GetEmployeeType(Mode) {
 
                 //// --- Chart Binding Below ---
                 const chartLabels = response.map(item => item["Employee Name"] || 'Employee Name');
-                const workedHoursData = response.map(item => parseFloat(item["WorkedHours"]) || 0);
-                const workingHoursData = response.map(item => parseFloat(item["WorkingHours"]) || 0);
-                const RemainingHoursData = response.map(item => parseFloat(item["RemainingHours"]) || 0);
+                const workedHoursData = response.map(item => parseFloat(item["Standard Working Hours"]) || 0);
+                const AttendanceHoursData = response.map(item => parseFloat(item["Attendance Hours"]) || 0);
+                const RemainingHoursData = response.map(item => parseFloat(item["Timesheet Hours"]) || 0);
 
                 // Chart.js config
                 const chartConfig = {
@@ -124,12 +124,17 @@ function GetEmployeeType(Mode) {
                         labels: chartLabels,
                         datasets: [
                             {
-                                label: 'Working Hours',
-                                data: workingHoursData,
+                                label: 'Standard Working Hours',
+                                data: workedHoursData,
                                 backgroundColor: '#4ba6ef' // dark blue
                             },
                             {
-                                label: 'Time Worked',
+                                label: 'Attendance Hours',
+                                data: AttendanceHoursData,
+                                backgroundColor: '#009688' // dark blue
+                            },
+                            {
+                                label: 'Timesheet Hours',
                                 data: RemainingHoursData,
                                 backgroundColor: '#0B4CCA' // dark blue
                             }
@@ -307,6 +312,8 @@ function GetClientPending(Mode) {
         },
         success: function (response) {
             if (response && response.length > 0) {
+                let totalTickets = response.reduce((sum, item) => sum + (parseInt(item['TicketCount']) || 0), 0);
+                $("#TotalTickets").text(totalTickets);
                 const ctx2 = document.getElementById('myDountChart').getContext('2d');
                 const chartLabels1 = response.map(item => item["Client Name"] || 'Unknown');
                 const chartData1 = response.map(item => item["Overdue"] || 0);
