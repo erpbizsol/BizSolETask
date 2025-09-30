@@ -52,6 +52,16 @@ namespace Bizsol_ETask.Controllers
         public IActionResult TicketsRatingPending()
         {
             return View();
-        } 
+        }
+        public IActionResult Configuration()
+        {
+            return View();
+        }
+        public IActionResult HolidayMaster()
+        {
+            return View();
+        }
+
+
     }
 }

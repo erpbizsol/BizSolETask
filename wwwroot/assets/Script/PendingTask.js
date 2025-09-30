@@ -179,7 +179,7 @@ function GetGenerateTaskTicketDateList(Type) {
                 const updatedResponse = response.map(item => ({
                     ...item, 'Action':
                         `
-                        <a class= "btn btn-success1 icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
+                        <a class= "btn1 btn btn-primary icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
                         <button class="btn btn-primary btn1 icon-height mb-1"   title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
                         <button class="btn btn-primary btn1 icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}','${UserMaster_Code}')"><i class="fa-solid fa-pencil"></i></button>
                           <button class="btn btn-success1 icon-height mb-1" style="background:#216c4a" title="Activity Details" onclick="GetAssingData('${item[`TicketNo`]}')">
