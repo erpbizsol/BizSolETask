@@ -42,7 +42,7 @@ function ShowHolidayMasterlist(Type) {
             } else {
                 $("#txtTable").hide();
                 if (Type != 'Load') {
-                    toastr.error("Record not found...!");
+                    //toastr.error("Record not found...!");
                 }
             }
         },

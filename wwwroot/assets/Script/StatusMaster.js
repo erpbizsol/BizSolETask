@@ -57,7 +57,7 @@ function ShowStatusMaster(Type) {
             } else {
                 $("#txtStatusTable").hide();
                 if (Type != 'Load') {
-                    toastr.error("Record not found...!");
+                    //toastr.error("Record not found...!");
                 }
             }
         },
@@ -164,6 +164,7 @@ function Delete(code) {
             success: function (response) {
                 if (response[0].Status === 'Y') {
                     toastr.success(response[0].Msg);
+                    Back();
                     ShowStatusMaster('Get');
                 } else {
                     toastr.error("Unexpected response format.");
