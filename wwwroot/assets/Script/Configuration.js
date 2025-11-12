@@ -22,6 +22,8 @@ $("#txtsave").click(function () {
 function Save() {
     var ClientName = $("#txtClientName").val();
     var WorkType = $("#txtWorkType").val();
+    var TaskNature = $("#txtTaskNature").val();
+    var Priority = $("#txtPriority").val();
 
     if (!ClientName) {
         toastr.error('Please enter a Client Name!');
@@ -33,11 +35,22 @@ function Save() {
         $("#txtWorkType").focus();
         return;
     }
-
+    else if (!TaskNature) {
+        toastr.error('Please select Task Nature!');
+        $("#txtTaskNature").focus();
+        return;
+    }
+    else if (!Priority) {
+        toastr.error('Please select Priority!');
+        $("#txtPriority").focus();
+        return;
+    }
     const payload = {
         Code: $("#hfCode").val() || 0,  
         ClientMaster: ClientName,
-        WorkType: WorkType
+        WorkType: WorkType,
+        TaskNature: TaskNature,
+        Priority: Priority
     };
 
     $.ajax({
@@ -80,6 +93,8 @@ function Edit() {
                         $("#hfCode").val(item.Code || "");
                         $("#txtClientName").val(item.Department || "");
                         $("#txtWorkType").val(item.WorkType || "");
+                        $("#txtTaskNature").val(item.TaskNature || "");
+                        $("#txtPriority").val(item.Priority || "");
                     }
                 });
             } else {

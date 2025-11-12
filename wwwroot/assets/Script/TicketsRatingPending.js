@@ -291,6 +291,7 @@ function highlightStars(containerId, val) {
         }
     });
 }
+
 function Ratingfunction(EmployeeMaster_Code) { 
     var star = $("#ddlStar_" + EmployeeMaster_Code).val();
     var Remark = $("#txtRemark_" + EmployeeMaster_Code).val();
@@ -324,4 +325,41 @@ function Ratingfunction(EmployeeMaster_Code) {
         }
     });
 }
+
+
+// Handle Update All button click
+$(document).on("click", "#btnUpdateAll", function () {
+    let allRatings = [];
+
+    $(".employee-block").each(function () {
+        let empCode = $(this).data("empcode");
+        let starValue = $(this).find(".ddlStar").val();
+        let remark = $(this).find(".txtRemark").val().trim();
+
+        allRatings.push({
+            CallTicketMaster_Code: G_Code,
+            EmployeeMaster_Code: empCode,
+            Star: parseInt(starValue) || 0,
+            RatingRemark: remark
+        });
+    });
+
+    $.ajax({
+        url: `${appBaseURL}/api/Master/SaveTicketsRatingAll`,
+        type: "POST",
+        data: JSON.stringify(allRatings),
+        contentType: "application/json",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Auth-Key", authKeyData);
+        },
+        success: function (response) {
+            toastr.success("All ratings updated successfully!");
+            CloseModal(); 
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            alert("Error updating ratings.");
+        }
+    });
+});
 

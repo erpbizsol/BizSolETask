@@ -55,9 +55,6 @@ $(document).ready(async function () {
     Show();
 
 });
-$('input[name="ticktOrderStatus"]').on('change', function () {
-    GetGenerateTaskTicketDateList('Get');
-});
 
 $("#txtStatus").on('change', function () {
     var Status = $("#txtStatus").val();
@@ -91,9 +88,11 @@ $("#txtStatus").on('change', function () {
     }
 
 });
+
 $(document).on('change', '.option', function () {
     GetGenerateTaskTicketDateList('Get');
 });
+
 $(document).on('change', '#ddlReportType', function () {
     var ReportType = $('#ddlReportType').val();
 
@@ -157,7 +156,6 @@ function GetGenerateTaskTicketDateList(Type) {
             Employee_Codes = "";
         }
     }
-
     $.ajax({
         url: `${appBaseURL}/api/Master/GetGenerateTaskTicketDatePending?EmployeeName=${Employee_Codes}&Status=${Status}&ticketNo=0&ReportType=${ReportType}&FromDate=${fromDate}&ToDate=${toDate}`,
         type: 'POST',
@@ -319,6 +317,7 @@ function GetStatuss() {
         }
     });
 }
+
 $("#txtBack").click(function () {
     $("#txtpage").hide();
     $("#txtTotalResolutionM1").hide();
@@ -329,19 +328,81 @@ $("#txtBack").click(function () {
     $("#txtUpdateBy1").hide();
 
 });
-//function DatePicker() {
-//    const today = new Date();
-//    const defaultDate = formatDateToString(today);
 
-//    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
+$('input[name="ticktOrderStatus"]').on('change', function () {
+    GetGenerateTaskTicketDateList('Get');
+});
+function filterTickets(val) {
+    document.querySelectorAll("#txtSummary tbody tr")
+        .forEach(r => r.style.display = r.innerText.toLowerCase().includes(val.toLowerCase()) ? "" : "none");
+}
 
-//    $('#txtResolutionDates,#txtToDate,#txtFromDate').val(defaultDate);
-//    $('#txtResolutionDates,#txtToDate,#txtFromDate').datepicker({
-//        format: 'dd/mm/yyyy',
-//        autoclose: true,
-//        todayHighlight: true
-//    });
-//}
+let ticketFetchTimeout = null;
+
+$("#txtSerch").on("input", function () {
+    clearTimeout(ticketFetchTimeout);
+
+    let ticketNo = $(this).val().trim();
+
+    ticketFetchTimeout = setTimeout(function () {
+        if (ticketNo !== "") {
+            $.ajax({
+                url: `${appBaseURL}/api/Master/GetTicketNolist?TickatN=${ticketNo}`,
+                type: "GET",
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Auth-Key", authKeyData);
+                },
+                success: function (res) {
+                    var item = null;
+
+                    if (Array.isArray(res)) {
+                        if (res.length > 0) {
+                            item = res[0];
+                        }
+                    } else if (res && typeof res === "object") {
+                        if (Array.isArray(res.data) && res.data.length > 0) {
+                            item = res.data[0];
+                        } else {
+                            item = res;
+                        }
+                    }
+
+                    if (item && (item.Status !== undefined || item.StatusName !== undefined)) {
+                        var statusValue = "";
+
+                        if (item.Status !== undefined && item.Status !== null) {
+                            statusValue = item.Status.toString().trim().toUpperCase();
+                        } else {
+                            var sName = item.StatusName.toString().trim().toLowerCase();
+                            if (sName === "pending" || sName === "p") {
+                                statusValue = "P";
+                            } else if (sName === "completed" || sName === "complete" || sName === "c") {
+                                statusValue = "C";
+                            }
+                        }
+
+                        if (statusValue === "P") {
+                            $("#txtPending").prop("checked", true).trigger("change");
+                        } else if (statusValue === "C") {
+                            $("#txtfromdate1").prop("checked", true).trigger("change");
+                        }
+                        $("#txtTicketNo").val(ticketNo);
+
+                        GetGenerateTaskTicketDateList('Get');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                    toastr.error("Error while fetching status");
+                }
+            });
+        } else {
+            GetGenerateTaskTicketDateList('Get');
+        }
+    }, 400);
+});
+
 function DatePicker() {
     const today = new Date();
 

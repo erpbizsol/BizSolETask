@@ -2,6 +2,8 @@
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Exchange.WebServices.Data;
+using Nancy.Json;
 using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;

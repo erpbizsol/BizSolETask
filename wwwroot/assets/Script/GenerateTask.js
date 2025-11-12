@@ -11,6 +11,9 @@ let G_EmployeeNameList = [];
 let G_ProjectList = [];
 let G_TicketTypetList = [];
 let G_PriorityList = [];
+let G_TestedBY = [];
+let G_TaskNatureList = [];
+
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
     $(".Number").keyup(function (e) {
@@ -67,7 +70,8 @@ $(document).ready(async function () {
     await GetPriorityDetails();
     await GetClientMasterDetails();
     await GetWorkTypes();
-    // await GetAssigneds();
+    GetTestedBY();
+    GetTaskNatureMaster();
     $("#txtTaskType").change(function () {
         var selectedValue = $(this).val();
         if (selectedValue === "1") {
@@ -87,6 +91,7 @@ $(document).ready(async function () {
     }
     UpdateLabelforItemMaster();
 });
+
 $('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
     GetGenerateTaskTicketDateList('Get');
 });
@@ -254,12 +259,92 @@ function GetClientMasterDetails() {
     });
 }
 
+
 $('#txtProjectClient').on('change', function () {
     let selectedCode = $(this).val();
     if (selectedCode && selectedCode !== "0") {
         GetAssigneds(selectedCode);
+        GetUserName(selectedCode);
     }
 });
+function GetUserName(selectedCode) {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetAssigneds?Code=${selectedCode}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            const $select = $('#txtUserName');
+            $select.empty();
+            if (response && response.length > 0) {
+                $select.append(new Option("Select User Name..", "0", true));
+                $.each(response, function (index, item) {
+                    $select.append(new Option(item.EmployeeName, item.Code));
+                });
+                EmployeeName = response.EmployeeName;
+            }
+            $select.select2({
+                width: '100%',
+                closeOnSelect: false,
+                allowClear: true,
+                tags: true,
+            });
+            if (Array.isArray(response) && response.length > 0) {
+                G_TestedBY = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.EmployeeName
+                }));
+            } else {
+                G_TestedBY = [];
+            }
+
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtUserName').empty();
+        }
+
+    });
+}
+function GetTestedBY() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_EmployeeNameList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.WorkType
+                }));
+            } else {
+                G_EmployeeNameList = [];
+            }
+            const $select = $('#txtTestedBY');
+            $select.empty();
+            if (response && response.length > 0) {
+                $select.append(new Option("Select Tested BY..", "0", true));
+                $.each(response, function (index, item) {
+                    $select.append(new Option(item.EmployeeName, item.Code));
+                });
+                EmployeeName = response.Code;
+            }
+            $select.select2({
+                width: '100%',
+                closeOnSelect: false,
+                //placeholder: "Select Work Type...",
+                allowClear: true
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtTestedBY').empty();
+        }
+    });
+}
 function GetWorkTypes() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetWorkTypes`,
@@ -476,6 +561,44 @@ function imgToCanvasWithOrientation(img, rawWidth, rawHeight, orientation) {
     ctx.drawImage(img, 0, 0, rawWidth, rawHeight);
     return canvas;
 }
+function GetTaskNatureMaster() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetTaskNatureMaster`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_TaskNatureList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.Nature
+                }));
+            } else {
+                G_TaskNatureList = [];
+            }
+            const $select = $('#txtTaskNature');
+            $select.empty();
+            if (response && response.length > 0) {
+                $select.append(new Option("Select Task Nature..", "0", true));
+                $.each(response, function (index, item) {
+                    $select.append(new Option(item.Nature, item.Code));
+                });
+                Nature = response.Code;
+            }
+            $select.select2({
+                width: '100%',
+                closeOnSelect: false,
+                //placeholder: "Select Work Type...",
+                allowClear: true
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtTaskNature').empty();
+        }
+    });
+}
 function SaveData() {
     let Code = $("#hftxtCode").val();
     let TaskType = $("#txtTaskType").val();
@@ -488,6 +611,11 @@ function SaveData() {
     let Assigned = $("#txtAssigned").val();
     let CommittedDate = convertDateFormat($("#txtCommittedDate").val());
     let EstimatedTime = $("#txtEstimatedTime").val();
+    let ContactNo = $("#txtContactNo").val();
+    let ContactEMail = $("#txtContactEmail").val();
+    let UserMastrName = $("#txtUserName option:selected").text();
+    let TestedBY_Code = $("#txtTestedBY").val();
+    let TaskNature = $("#txtTaskNature").val();
     if (TaskType == "") {
         toastr.error('Please Select Task Type.');
         $("#txtTaskType").focus();
@@ -520,18 +648,23 @@ function SaveData() {
                     priorityMaster_Code: Priority,
                     logDate: LogDate,
                     clientMaster_Code: ProjectClient,
-                    moduleMaster_Code: 0,
+                    //moduleMaster_Code: 0,
                     bizSolUserMaster_Code: UserMaster_Code,
-                    sourceMaster_Code: 0,
+                   // sourceMaster_Code: 0,
                     workTypeMaster_Code: WorkType,
                     description: Description,
                     reAssign_Code: Assigned,
                     commitedDate: CommittedDate,
                     estimatedTime: EstimatedTime || 0,
                     statusMaster_Code: 1,
-                    commonColumn: 'A',
+                    //commonColumn: 'A',
                     status: 'P',
                     userMaster_Code: UserMaster_Code,
+                    ContactNo : ContactNo,
+                    ContactEMail : ContactEMail,
+                    RaisedBy : UserMastrName,
+                    userMaster_Code : TestedBY_Code,
+                    TaskNatureMaster_Code : TaskNature
                 }
             ],
             Attachment: AttachmentDetail
@@ -682,9 +815,11 @@ function Edit(code) {
                 $("#txtPriority").val(response[0].Priority);
                 $("#txtTaskType").val(response[0].TicketTypeMaster_Code);
                 $("#txtPriority").val(response[0].PriorityMaster_Code);
-                //SelectOptionByText("txtProjectClient", item.ClientMaster_Code);
-                //SelectOptionByText("txtWorkType", item.WorkTypeMaster_Code);
-                //SelectOptionByText("txtAssigned", item.EmployeeMaster_Code);
+                $("#txtContactNo").val(response[0].ContactNo);
+                $("#txtContactEmail").val(response[0].ContactEMail);
+                $("#txtUserName").val(response[0].UserMastrName);
+                $("#txtTestedBY").val(response[0].TestedBY_Code);
+                $("#txtTaskNature").val(response[0].TaskNature);                                  
                 response.forEach(item => {
                     BindSelect2(`txtProjectClient`, G_ProjectList);
                     $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
@@ -696,6 +831,18 @@ function Edit(code) {
                 response.forEach(item => {
                     BindSelect2(`txtAssigned`, G_EmployeeNameList);
                     $(`#txtAssigned`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
+                });
+                response.forEach(item => {
+                    BindSelect2(`txtTestedBY`, G_TestedBY);
+                    $(`#txtTestedBY`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
+                });
+                response.forEach(item => {
+                    BindSelect2(`txtUserName`, G_EmployeeNameList);
+                    $(`#txtUserName`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
+                });
+                response.forEach(item => {
+                    BindSelect2(`txtTaskNature`, G_TaskNatureList);
+                    $(`#txtTaskNature`).val(item.TicketTypeMaster_Code).select2({ width: '100%' });
                 });
                 //$("#txtProjectClient").val(response[0].ClientMaster_Code);
                 // $("#txtWorkType").val(response[0].WorkTypeMaster_Code);
@@ -937,26 +1084,6 @@ function SenEmailMassage(Code) {
     });
 
 }
-//function SendWhatsApp() {
-//    $.ajax({
-//        url: `${appBaseURL}/api/Email/SenEmailMassage?Code=${Code}&Mode=NEW`,
-//        type: 'Get',
-//        beforeSend: function (xhr) {
-//            xhr.setRequestHeader('Auth-Key', authKeyData);
-//        },
-//        success: function (response) {
-//            if (response[0].Status === 'Y') {
-//                //toastr.success(response[0].Msg);
-
-//            } else {
-//                toastr.error("Unexpected response format.");
-//            }
-//        },
-//        error: function (xhr, status, error) {
-//            toastr.error("Error deleting item:");
-//        }
-//    });
-//}
 function validateCommittedDate() {
     let committedDateStr = document.getElementById("txtCommittedDate").value; // dd/mm/yyyy
     if (!committedDateStr) return;
@@ -1001,12 +1128,22 @@ function UpdateLabelforItemMaster() {
                 } else {
                     $("#txtWorkTypeheader").text("Work Type");
                     $("#txtWorkType").attr("placeholder", "Work Type");
+                } if (item.TaskNature == "YES") {
+                    $("#txtTaskNaturediv").show();
+                } else {
+                    $("#txtTaskNaturediv").hide();
+                } if (item.Priority == "YES") {
+                    $("#txtPrioritydiv").show();
+                }else {
+                    $("#txtPrioritydiv").hide();
                 }
             } else {
                 $("#txtProjectClientheader").text("Project / Client");
                 $("#txtProjectClient").attr("placeholder", "Project / Client");
                 $("#txtWorkTypeheader").text("Work Type");
                 $("#txtWorkType").attr("placeholder", "Work Type");
+                $("#txtPrioritydiv").hide();
+                $("#txtTaskNaturediv").hide();
             }
         },
         error: function (xhr, status, error) {
@@ -1015,3 +1152,52 @@ function UpdateLabelforItemMaster() {
         }
     });
 }
+
+$('#txtUserName, #txtContactNo, #txtContactEmail').select2({
+    width: '100%',
+    allowClear: true,
+    tags: true,
+    placeholder: "Select or type"
+});
+
+function setSelect2Value($el, value) {
+    if (!$el.data('select2')) {
+        $el.select2({ width: '100%', allowClear: true, tags: true });
+    }
+    if (value) {
+        if ($el.find("option[value='" + value + "']").length === 0) {
+            $el.append(new Option(value, value, true, true));
+        }
+        $el.val(value).trigger('change');
+    }
+}
+
+$('#txtUserName').on('change', function () {
+    var val = $(this).val();
+    if (!val || val === '0') {
+        return;
+    }
+    var isNumeric = /^\d+$/.test(val);
+    if (!isNumeric) {
+        // manual/new name: user khud Contact/Email type kar sakta hai
+        return;
+    }
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetEmployeeMasterByCode?Code=${val}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (resp) {
+            if (Array.isArray(resp) && resp.length > 0) {
+                var mobile = resp[0].MobileNo || '';
+                var email = resp[0].Email || '';
+                setSelect2Value($('#txtContactNo'), mobile);
+                setSelect2Value($('#txtContactEmail'), email);
+            }
+        }
+    });
+});
+
+
+
