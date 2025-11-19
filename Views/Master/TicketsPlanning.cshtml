@@ -1,0 +1,245 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link href="~/assets/css/filter.css" rel="stylesheet" />
+<script src="~/assets/js/xlsx.full.min.js"></script>
+<style>
+    .tabs {
+        width: 100%;
+        max-width: 2000px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 0.7rem;
+    }
+    label {
+        font-weight: bold;
+        margin-right: 8px;
+    }
+    select, input {
+        margin-bottom: 8px;
+        padding: 4px;
+    }
+    #txtTable th,
+    #txtTable td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #e9eef3;
+        vertical-align: middle;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #txtTable tbody tr:hover {
+        background: #f6fafc;
+    }
+
+    /* Inputs/selects inside cells */
+    #txtTable .assigned-ddl,
+    #txtTable .plan-date-input,
+    #txtTable .priority-input {
+        width: 100% !important;
+        box-sizing: border-box;
+        height: 32px;
+        padding: 4px 8px;
+    }
+
+    /* Column widths (adjust as you like) */
+    #txtTable thead th:nth-child(1) {
+        width: 110px;
+    }
+    /* UID */
+    #txtTable thead th:nth-child(2) {
+        width: 100px;
+    }
+    /* LogDate */
+    #txtTable thead th:nth-child(3) {
+        width: 140px;
+    }
+    /* Client */
+    #txtTable thead th:nth-child(4) {
+        width: auto;
+    }
+    /* Description */
+    #txtTable thead th:nth-child(5) {
+        width: 160px;
+    }
+    /* Assigned */
+    #txtTable thead th:nth-child(6) {
+        width: 110px;
+    }
+    /* Status */
+    #txtTable thead th:nth-child(7) {
+        width: 90px;
+    }
+    /* Priority */
+    #txtTable thead th:nth-child(8) {
+        width: 150px;
+    }
+    /* Plan Date */
+    #txtTable thead th:nth-child(9) {
+        width: 140px;
+    }
+    /* Time Consumed */
+
+    /* Align numeric cells */
+    #txtTable td:nth-child(7),
+    #txtTable td:nth-child(9) {
+        text-align: right;
+    }
+
+    /* Select2 width (if used for Assigned) */
+    #txtTable .assigned-ddl + .select2 {
+        width: 100% !important;
+    }
+
+    .modal {
+        position: fixed;
+        z-index: 999;
+        background: rgba(0,0,0,0.4);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        width: 500px;
+        border-radius: 8px;
+    }
+
+    .time-link {
+        color: #0d6efd;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .row-highlight {
+        background-color: #d4edda !important; /* Light green */
+    }
+
+    .row-pending {
+		background-color: #ffff0094 !important; /* Light yellow */
+    }
+
+	/* Mobile/table scroll: keep header visible and enable scroll */
+	.table-wrapper.fixed-height-table1 {
+		
+		-webkit-overflow-scrolling: touch;
+
+	}
+	/* Sticky table header inside the scroll container */
+	table.fixed-height-table1 thead th {
+		position: sticky;
+		top: 0;
+		background-image: linear-gradient(#032954, #032954);
+		z-index: 2;
+	}
+	/* Ensure table can expand horizontally on small screens */
+	fixed-height-table1 {
+		min-width: 900px;
+		table-layout: auto;
+	}
+
+</style>
+<div class="container">
+    <div id="attachmentModal1" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Activity  Details:</h3>
+
+            <div id="attachmentContainer1" style="margin-top: 20px;"></div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-wrapper">
+                        <table id="table" class="table">
+                            <thead id="table-header1">
+                            <th>Worked By</th>
+                            <th>Work Date</th>
+                            <th>Time (Minutes)</th>
+                            <th>Remarks</th>
+                            </thead>
+                            <tbody id="table-body1"></tbody>
+                        </table>
+                    </div>
+                    @* <div class="paginator" id="paginator-table">
+                </div> *@
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-secondary" onclick="$('#attachmentModal1').hide()">Close</button>
+            </div>
+
+        </div>
+    </div>
+    <div id="txtCreatepage">
+        <div class="card shadow-sm">
+            <div class="tabs">
+                <div class="row p-1">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-3 col-sm-3">
+                                <input type="hidden" id="hftxtCode" value="0" />
+                                <label for="ddlEmployeeName" class="col-form-label-sm fw-bold">Employee Name</label>
+                                <select id="ddlEmployeeName" class="form-control form-control-sm box_border">
+                                </select>
+                            </div>
+                            <div class="col-md-3  col-sm-3">
+                                <label for="yearSelect" class="col-form-label-sm fw-bold">
+                                    Year<span class="text-danger"></span>
+                                </label>
+                                <select id="yearSelect" class="form-control form-control-sm box_border"></select>
+                            </div>
+                            <div class="col-md-3  col-sm-3">
+                                <label for="weekNumber" class="col-form-label-sm fw-bold">
+                                    Week No<span class="text-danger"></span>
+                                </label>
+                                <input type="text" id="weekNumber" class="form-control form-control-sm box_border" maxlength="7" autocomplete="off">
+                                <div id="weekInfo" style="font-size:12px;color:#6c757d;margin-top:4px;"></div>
+                            </div>
+                              <div class="col-md-3  col-sm-3">
+                                <label for="txtdate" class="col-form-label-sm fw-bold">
+                                    Date<span class="text-danger"></span>
+                                </label>
+                                <input type="date" id="txtdate" class="form-control form-control-sm box_border" maxlength="7" autocomplete="off">
+                                <div id="weekInfo" style="font-size:12px;color:#6c757d;margin-top:4px;"></div>
+                            </div>
+							<div class="col-12 text-end">
+                                <label for="" class="col-form-label-sm fw-bold">
+                                
+                                </label>
+                               <input type="button" class="btn btn-primary btn-height btn1" id="btnSave" value="Show" style="margin-top: 12px;" />
+
+                            </div>
+                            
+                        </div>
+                       
+                    </div>
+                </div>
+                <div class="">
+                    <div class="card-body mt-2" id="txtTable">
+                        <div class="table-wrapper fixed-height-table1">
+                            <table id="table" class="fixed-height-table1 table">
+                                <thead id="table-header">
+                                </thead>
+                                <tbody id="table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="paginator" id="paginator-table">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/filter.js"></script>
+<script src="~/assets/script/ticketsplanning.js"></script>
+
