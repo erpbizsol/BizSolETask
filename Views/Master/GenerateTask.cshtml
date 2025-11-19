@@ -140,6 +140,7 @@
         padding: var(--bs-modal-padding);
         height: 400px !important;
     }
+
 </style>
 @* ----------------Modal-------------------- *@
 <div id="attachmentModal" class="modal" style="display:none;">
@@ -259,13 +260,19 @@
                             <select id="txtTestedBY" name="txtTestedBY" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Tested BY..." maxlength="150">
                             </select>
                         </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="txtAttachment" class="col-form-label-sm fw-bold">Attachment</label>
+                            <input type="file" id="txtAttachment" name="txtAttachment" autocomplete="off" class="form-control form-control-sm box_border" accept=".jpg, .png, .jpeg" multiple>
+                        </div>
                         <div class="col-md-9 col-sm-6">
                             <label for="txtDescription" class="col-form-label-sm fw-bold">Description</label>
                             <input type="text" id="txtDescription" name="txtDescription" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Description.." maxlength="500">
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <label for="txtAttachment" class="col-form-label-sm fw-bold">Attachment</label>
-                            <input type="file" id="txtAttachment" name="txtAttachment" autocomplete="off" class="form-control form-control-sm box_border" accept=".jpg, .png, .jpeg" multiple>
+                        <div class="col-md-3 col-sm-6" id="txtMenuNamediv" style="display:none">
+                            <label for="txtMenuName" class="col-form-label-sm fw-bold">Menu Name</label>
+                            <select id="txtMenuName" name="txtMenuName" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Menu Name..." maxlength="10">
+                                <option value="0">Please Select</option>
+                            </select>
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <label for="txtAssigned" class="col-form-label-sm fw-bold">Assigned</label>

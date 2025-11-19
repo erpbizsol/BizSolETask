@@ -24,6 +24,7 @@ function Save() {
     var WorkType = $("#txtWorkType").val();
     var TaskNature = $("#txtTaskNature").val();
     var Priority = $("#txtPriority").val();
+    var MenuName = $("#txtMenuName").val();
 
     if (!ClientName) {
         toastr.error('Please enter a Client Name!');
@@ -45,12 +46,18 @@ function Save() {
         $("#txtPriority").focus();
         return;
     }
+    else if (!MenuName) {
+        toastr.error('Please select Menu Name!');
+        $("#txtMenuName").focus();
+        return;
+    }
     const payload = {
         Code: $("#hfCode").val() || 0,  
         ClientMaster: ClientName,
         WorkType: WorkType,
         TaskNature: TaskNature,
-        Priority: Priority
+        Priority: Priority,
+        MenuName: MenuName
     };
 
     $.ajax({
@@ -95,6 +102,7 @@ function Edit() {
                         $("#txtWorkType").val(item.WorkType || "");
                         $("#txtTaskNature").val(item.TaskNature || "");
                         $("#txtPriority").val(item.Priority || "");
+                        $("#txtMenuName").val(item.MenuName || "");
                     }
                 });
             } else {

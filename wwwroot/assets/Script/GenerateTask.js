@@ -13,6 +13,7 @@ let G_TicketTypetList = [];
 let G_PriorityList = [];
 let G_TestedBY = [];
 let G_TaskNatureList = [];
+let G_ModuleDespList = [];
 
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
@@ -70,6 +71,7 @@ $(document).ready(async function () {
     await GetPriorityDetails();
     await GetClientMasterDetails();
     await GetWorkTypes();
+    GetMenuName();
     GetTestedBY();
     GetTaskNatureMaster();
     $("#txtTaskType").change(function () {
@@ -383,6 +385,44 @@ function GetWorkTypes() {
         }
     });
 }
+function GetMenuName() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetMenuName`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_ModuleDespList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.ModuleDesp
+                }));
+            } else {
+                G_ModuleDespList = [];
+            }
+            const $select = $('#txtMenuName');
+            $select.empty();
+            if (response && response.length > 0) {
+                $select.append(new Option("Select Menu Name..", "0", true));
+                $.each(response, function (index, item) {
+                    $select.append(new Option(item.ModuleDesp, item.Code));
+                });
+                ModuleDesp = response.Code;
+            }
+            $select.select2({
+                width: '100%',
+                closeOnSelect: false,
+                //placeholder: "Select Work Type...",
+                allowClear: true
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtMenuName').empty();
+        }
+    });
+}
 function GetAssigneds(selectedCode) {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAssigneds?Code=${selectedCode}`,
@@ -614,6 +654,7 @@ function SaveData() {
     let ContactNo = $("#txtContactNo").val();
     let ContactEMail = $("#txtContactEmail").val();
     let UserMastrName = $("#txtUserName option:selected").text();
+    let ModuleMaster_Code = $("#txtMenuName").val();
     let TestedBY_Code = $("#txtTestedBY").val();
     let TaskNature = $("#txtTaskNature").val();
     if (TaskType == "") {
@@ -648,9 +689,9 @@ function SaveData() {
                     priorityMaster_Code: Priority,
                     logDate: LogDate,
                     clientMaster_Code: ProjectClient,
-                    //moduleMaster_Code: 0,
+                    ModuleMaster_Code: ModuleMaster_Code,
                     bizSolUserMaster_Code: UserMaster_Code,
-                   // sourceMaster_Code: 0,
+                    // sourceMaster_Code: 0,
                     workTypeMaster_Code: WorkType,
                     description: Description,
                     reAssign_Code: Assigned,
@@ -660,11 +701,11 @@ function SaveData() {
                     //commonColumn: 'A',
                     status: 'P',
                     userMaster_Code: UserMaster_Code,
-                    ContactNo : ContactNo,
-                    ContactEMail : ContactEMail,
-                    RaisedBy : UserMastrName,
-                    userMaster_Code : TestedBY_Code,
-                    TaskNatureMaster_Code : TaskNature
+                    ContactNo: ContactNo,
+                    ContactEMail: ContactEMail,
+                    RaisedBy: UserMastrName,
+                    userMaster_Code: TestedBY_Code,
+                    TaskNatureMaster_Code: TaskNature
                 }
             ],
             Attachment: AttachmentDetail
@@ -819,7 +860,7 @@ function Edit(code) {
                 $("#txtContactEmail").val(response[0].ContactEMail);
                 $("#txtUserName").val(response[0].UserMastrName);
                 $("#txtTestedBY").val(response[0].TestedBY_Code);
-                $("#txtTaskNature").val(response[0].TaskNature);                                  
+                $("#txtTaskNature").val(response[0].TaskNature);
                 response.forEach(item => {
                     BindSelect2(`txtProjectClient`, G_ProjectList);
                     $(`#txtProjectClient`).val(item.ClientMaster_Code).select2({ width: '100%' });
@@ -965,12 +1006,18 @@ function ClearData() {
     $("#txtTaskType").val("1");
     $("#txtTaskNo").val("");
     $("#txtPriority").val("2");
-    $("#txtProjectClient").val("").trigger('change');
-    $("#txtWorkType").val("").trigger('change');
+    $("#txtProjectClient").val("0").trigger('change');
+    $("#txtWorkType").val("0").trigger('change');
     $("#txtDescription").val("");
-    $("#txtAssigned").val("").trigger('change');
+    $("#txtAssigned").val("0").trigger('change');
     $("#txtEstimatedTime").val("");
     $("#txtAttachment").val("");
+    $("#txtTaskNature").val("0").trigger('change');
+    $("#txtUserName").val("0").trigger('change');
+    $("#txtContactNo").val("0").trigger('change');
+    $("#txtContactEmail").val("0").trigger('change');
+    $("#txtTestedBY").val("0").trigger('change');
+    $("#txtMenuName").val("0").trigger('change');
     AttachmentDetail = [];
     DatePicker();
 }
@@ -1134,8 +1181,13 @@ function UpdateLabelforItemMaster() {
                     $("#txtTaskNaturediv").hide();
                 } if (item.Priority == "YES") {
                     $("#txtPrioritydiv").show();
-                }else {
+                } else {
                     $("#txtPrioritydiv").hide();
+                }
+                if (item.MenuName == "YES") {
+                    $("#txtMenuNamediv").show();
+                } else {
+                    $("#txtMenuNamediv").hide();
                 }
             } else {
                 $("#txtProjectClientheader").text("Project / Client");
@@ -1144,6 +1196,7 @@ function UpdateLabelforItemMaster() {
                 $("#txtWorkType").attr("placeholder", "Work Type");
                 $("#txtPrioritydiv").hide();
                 $("#txtTaskNaturediv").hide();
+                $("#txtMenuNamediv").hide();
             }
         },
         error: function (xhr, status, error) {
