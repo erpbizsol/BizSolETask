@@ -2,8 +2,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 <link href="~/assets/css/filter.css" rel="stylesheet" />
 <script src="~/assets/js/xlsx.full.min.js"></script>
+
 <style>
     .tabs {
         width: 100%;
@@ -26,7 +28,7 @@
         padding: 2px 8px;
         border-bottom: 1px solid #e9eef3;
         vertical-align: middle;
-        white-space: nowrap;
+        /* white-space: nowrap; */
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -59,15 +61,15 @@
     }
     /* Client */
     #txtTable thead th:nth-child(4) {
-        width: auto;
+        width: 50px;
     }
     /* Description */
     #txtTable thead th:nth-child(5) {
-        width: 160px;
+        width: 400px;
     }
     /* Assigned */
     #txtTable thead th:nth-child(6) {
-        width: 110px;
+        width: 727px;
     }
     /* Status */
     #txtTable thead th:nth-child(7) {
@@ -91,7 +93,8 @@
 
     /* Select2 width (if used for Assigned) */
     #txtTable .assigned-ddl + .select2 {
-        width: 100% !important;
+        width: 727px
+        !important;
     }
 
     .modal {
@@ -128,6 +131,9 @@
 		background-color: #ffff0094 !important; /* Light yellow */
     }
 
+    .row-pending1 {
+        background-color: #4ba6ef !important;
+    }
 	/* Mobile/table scroll: keep header visible and enable scroll */
 	.table-wrapper.fixed-height-table1 {
 		
@@ -190,30 +196,30 @@
                                 </select>
                             </div>
                             <div class="col-md-3  col-sm-3">
+                                <label for="txtdate" class="col-form-label-sm fw-bold">
+                                    Week Date <span class="text-danger"></span>
+                                </label>
+                                <input type="date" id="txtdate" class="form-control form-control-sm box_border" maxlength="7" autocomplete="off">
+                                <div id="weekInfo" style="font-size:12px;color:#6c757d;margin-top:4px;"></div>
+                            </div>
+                            <div class="col-md-2  col-sm-2">
                                 <label for="yearSelect" class="col-form-label-sm fw-bold">
                                     Year<span class="text-danger"></span>
                                 </label>
                                 <select id="yearSelect" class="form-control form-control-sm box_border"></select>
                             </div>
-                            <div class="col-md-3  col-sm-3">
+                            <div class="col-md-2  col-sm-2">
                                 <label for="weekNumber" class="col-form-label-sm fw-bold">
                                     Week No<span class="text-danger"></span>
                                 </label>
                                 <input type="text" id="weekNumber" class="form-control form-control-sm box_border" maxlength="7" autocomplete="off">
                                 <div id="weekInfo" style="font-size:12px;color:#6c757d;margin-top:4px;"></div>
                             </div>
-                              <div class="col-md-3  col-sm-3">
-                                <label for="txtdate" class="col-form-label-sm fw-bold">
-                                    Date<span class="text-danger"></span>
-                                </label>
-                                <input type="date" id="txtdate" class="form-control form-control-sm box_border" maxlength="7" autocomplete="off">
-                                <div id="weekInfo" style="font-size:12px;color:#6c757d;margin-top:4px;"></div>
-                            </div>
-							<div class="col-12 text-end">
+
+                            <div class="col-md-2  col-sm-2">
                                 <label for="" class="col-form-label-sm fw-bold">
-                                
                                 </label>
-                               <input type="button" class="btn btn-primary btn-height btn1" id="btnSave" value="Show" style="margin-top: 12px;" />
+                                <input type="button" class=" btn btn-primary btn-height btn1" id="btnSave" value="Show" style="margin-top: 35px;"/>
 
                             </div>
                             

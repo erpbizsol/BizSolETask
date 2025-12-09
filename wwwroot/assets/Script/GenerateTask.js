@@ -267,11 +267,13 @@ $('#txtProjectClient').on('change', function () {
     if (selectedCode && selectedCode !== "0") {
         GetAssigneds(selectedCode);
         GetUserName(selectedCode);
+        $('#txtContactNo').empty();
+        $('#txtContactEmail').empty();
     }
 });
 function GetUserName(selectedCode) {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetAssigneds?Code=${selectedCode}`,
+        url: `${appBaseURL}/api/Master/GetEmployeeWiseUserName?Code=${selectedCode}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -282,9 +284,10 @@ function GetUserName(selectedCode) {
             if (response && response.length > 0) {
                 $select.append(new Option("Select User Name..", "0", true));
                 $.each(response, function (index, item) {
-                    $select.append(new Option(item.EmployeeName, item.Code));
+                    $select.append(new Option(item.UserName, item.Code));
                 });
-                EmployeeName = response.EmployeeName;
+                UserName = response.UserName;
+               
             }
             $select.select2({
                 width: '100%',
@@ -295,16 +298,18 @@ function GetUserName(selectedCode) {
             if (Array.isArray(response) && response.length > 0) {
                 G_TestedBY = response.map(item => ({
                     Code: item.Code,
-                    Name: item.EmployeeName
+                    Name: item.UserName
                 }));
             } else {
                 G_TestedBY = [];
+            
             }
 
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
             $('#txtUserName').empty();
+            
         }
 
     });
@@ -704,7 +709,7 @@ function SaveData() {
                     ContactNo: ContactNo,
                     ContactEMail: ContactEMail,
                     RaisedBy: UserMastrName,
-                    userMaster_Code: TestedBY_Code,
+                    Testedby_EmployeeMasterCode: TestedBY_Code,
                     TaskNatureMaster_Code: TaskNature
                 }
             ],
@@ -1212,7 +1217,6 @@ $('#txtUserName, #txtContactNo, #txtContactEmail').select2({
     tags: true,
     placeholder: "Select or type"
 });
-
 function setSelect2Value($el, value) {
     if (!$el.data('select2')) {
         $el.select2({ width: '100%', allowClear: true, tags: true });
@@ -1227,23 +1231,15 @@ function setSelect2Value($el, value) {
 
 $('#txtUserName').on('change', function () {
     var val = $(this).val();
-    if (!val || val === '0') {
-        return;
-    }
-    var isNumeric = /^\d+$/.test(val);
-    if (!isNumeric) {
-        // manual/new name: user khud Contact/Email type kar sakta hai
-        return;
-    }
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmployeeMasterByCode?Code=${val}`,
+        url: `${appBaseURL}/api/Master/GetUserName?UserName=${val}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (resp) {
             if (Array.isArray(resp) && resp.length > 0) {
-                var mobile = resp[0].MobileNo || '';
+                var mobile = resp[0].Mobile || '';
                 var email = resp[0].Email || '';
                 setSelect2Value($('#txtContactNo'), mobile);
                 setSelect2Value($('#txtContactEmail'), email);

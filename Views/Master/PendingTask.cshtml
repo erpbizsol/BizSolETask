@@ -172,10 +172,16 @@
         height: 400px !important;
     }
 
-    /* th {
-            background-color: #fff;
-            color: #212529;
-        } */
+    #txtConsolidateda .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    #txtConsolidateda .form-check-input {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #6c757d;
+    }
 </style>
 @* ----------------Modal-------------------- *@
 <div id="attachmentModal" class="modal" style="display:none;">
@@ -206,10 +212,12 @@
                 <div class="table-wrapper">
                     <table id="table" class="table">
                         <thead id="table-header1">
-                        <th>Worked By</th>
-                        <th>Work Date</th>
-                        <th>Time (Minutes)</th>
-                        <th>Remarks</th>
+                            <tr>
+                                <th>Worked By</th>
+                                <th>Work Date</th>
+                                <th>Time (Minutes)</th>
+                                <th>Remarks</th>
+                            </tr>
                         </thead>
                         <tbody id="table-body1"></tbody>
                     </table>
@@ -241,25 +249,20 @@
                         <div class="col-md-3 col-sm-6" style="display:none" id="txtTotalResolutionM1">
                             <label for="txtTotalResolutionM" class="col-form-label-sm fw-bold"> Resolution Time (minutes) </label>
                             <input type="text" id="txtTotalResolutionM" name="txtTotalResolutionM" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Total Resolution..." maxlength="10">
-
                         </div>
                         <div class="col-md-3 col-sm-6" style="display:none" id="txtResolutionDate">
                             <label for="txtResolutionDates" class="col-form-label-sm fw-bold">Resolution Date</label>
                             <input type="text" id="txtResolutionDates" name="txtResolutionDates" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Resolution Date.." maxlength="15">
-
                         </div>
-
                         <div class="col-md-3 col-sm-6" style="display:none" id="txtReAssign1">
                             <label for="txtReAssign" class="col-form-label-sm fw-bold">Re-Assign</label>
                             <select id="txtReAssign" name="txtReAssign" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Re-Assign..." maxlength="10">
                             </select>
                         </div>
-
                         <div class="col-md-3 col-sm-6" style="display:none" id="txtResolvedBy1">
                             <label for="txtResolvedBy" class="col-form-label-sm fw-bold">Resolved By </label>
                             <select id="txtResolvedBy" name="txtResolvedBy" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Resolved By..." maxlength="10">
                             </select>
-
                         </div>
                         <div class="col-md-3 col-sm-6" style="display:none" id="txtUpdateBy1">
                             <label for="txtUpdateBy" class="col-form-label-sm fw-bold">Update By</label>
@@ -269,7 +272,12 @@
                                 <option value="2">No</option>
                             </select>
                         </div>
-
+                        <div class="col-md-3 col-sm-6" style="display:none" id="txtReason1">
+                            <label for="txtReason" class="col-form-label-sm fw-bold">Reason</label>
+                            <select id="txtReason" class="form-control form-control-sm box_border" autocomplete="off" placeholder="Reason..." maxlength="10">
+                                
+                            </select>
+                        </div>
                         <div class="col-md-3 col-sm-6" style="display:none" id="txtAttachment1">
                             <label for="txtAttachment" class="col-form-label-sm fw-bold">Attachment</label>
                             <input type="file" id="txtAttachment" name="txtAttachment" autocomplete="off" class="form-control form-control-sm box_border" accept=".jpg, .png, .jpeg" multiple>
@@ -328,21 +336,16 @@
                     <input type="text" id="txtSerch" name="txtSerch" autocomplete="off" class="form-control form-control-sm box_border" maxlength="100" onkeydown="filterTickets(this.value)">
                 </div>
                 <div class="col-md-2  col-sm-6" id="txtConsolidateda">
-                    <strong>Status</strong>
-                    <div class="col s6 m4">
-                        <label>
-                            <input type="radio" name="ticktOrderStatus" class="with-gap" checked="checked" value="P" id="txtPending" />
-                            <span class="font-size1-3rem">Pending</span>
+                    <strong style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">Status</strong>
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <label style="display: flex; align-items: center; margin: 0; cursor: pointer;">
+                            <input type="radio" name="ticktOrderStatus" class="form-check-input" checked="checked" value="P" id="txtPending" style="margin-right: 6px; cursor: pointer;" />
+                            <span style="color: #333; font-size: 14px;">Pending</span>
                         </label>
-                        <label>
-                            <input type="radio" name="ticktOrderStatus" class="with-gap" value="C" id="txtfromdate1" />
-                            <span class="font-size1-3rem">Completed </span>
+                        <label style="display: flex; align-items: center; margin: 0; cursor: pointer;">
+                            <input type="radio" name="ticktOrderStatus" class="form-check-input" value="C" id="txtfromdate1" style="margin-right: 6px; cursor: pointer;" />
+                            <span style="color: #333; font-size: 14px;">Completed</span>
                         </label>
-                        @*  <label style="display:none;">
-                        <input type="radio" name="ticktOrderStatus" class="with-gap" value="PR" />
-                        <span class="font-size1-3rem">Re-Assigned </span>
-                        </label> *@
-
                     </div>
                 </div>
                 <div class="col-md-2 col-sm-6" style="margin-top:-10px;display:none;" id="txtshowDate">
@@ -380,15 +383,20 @@
                     <div class="table-wrapper" style="overflow: auto;">
                         <table id="table" class="table">
                             <thead id="table-header">
-                            <th>Ticket No</th>
-                            <th>Project / Client</th>
-                            <th>Log Date</th>
-                            <th>Work Type</th>
-                            <th>Description</th>
-                            <th>Assigned</th>
-                            <th>Attachment</th>
-                            <th>Action</th>
+                                <tr>
+
+                                    <th>Ticket No</th>
+                                    <th>Project / Client</th>
+                                    <th>Log Date</th>
+                                    <th>Work Type</th>
+                                    <th>Description</th>
+                                    <th>Assigned</th>
+                                    <th>Attachment</th>
+                                    <th>Action</th>
+                                </tr>
+
                             </thead>
+
                             <tbody id="table-body"></tbody>
                         </table>
                     </div>

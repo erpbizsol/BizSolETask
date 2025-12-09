@@ -95,8 +95,11 @@ function GetEmployeeMasterList() {
 
 $(document).on('click', '#btnSave', function () {
     GetCallTicketMasterPlanningDetails('Get');
-
 });
+$(document).on('change', '#ddlEmployeeName', function () {
+    GetCallTicketMasterPlanningDetails('Get');
+})
+
 function GetCallTicketMasterPlanningDetails(Type) {
 
     var empVal = $('#ddlEmployeeName').val();
@@ -149,11 +152,25 @@ function GetCallTicketMasterPlanningDetails(Type) {
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
 
-                const hiddenColumns = ["PlannedYear","PlanningMasterCode","StatusMaster_Code", "YearWeekNo", "MonthWeekNo", "Code", "ClientMaster_Code", "EmployeeName", "RaisedBy", "SecondLast_EmployeeMaster_Code"];
+                const hiddenColumns = ["PCode","PlannedYear","PlanningMasterCode","StatusMaster_Code", "YearWeekNo", "MonthWeekNo", "Code", "ClientMaster_Code", "EmployeeName", "RaisedBy", "SecondLast_EmployeeMaster_Code"];
                 const ColumnAlignment = {
                     'Time Consumned(Hr)': 'right'
                 };
+
+                // Identify admin once for row rendering (Assigned dropdown permission)
+                var isAdminUser = false;
+                if (UserTypes) {
+                    var ut = String(UserTypes).toUpperCase();
+                    if (ut === 'A') {
+                        isAdminUser = true;
+                    }
+                }
+
                 var updatedResponse = response.map(function (item) {
+
+                    var ActionEdit = '';
+                    ActionEdit = item['Action'];
+
                     var assignedCode = findEmployeeCodeByName(item.Assigned);
 
                     var planDateVal = '';
@@ -165,14 +182,14 @@ function GetCallTicketMasterPlanningDetails(Type) {
                     if (item['Priority'] !== null && item['Priority'] !== undefined && item['Priority'] !== 'null') {
                         planPriorityVal = item['Priority'];
                     }
-					var planDiscussRaw = item['Plan Discuss'];
+                    var planDiscussRaw = item['Dis'];
 					var isPlanDiscussChecked = false;
 					if (planDiscussRaw !== null && planDiscussRaw !== undefined && planDiscussRaw !== 'null') {
 						var pd = String(planDiscussRaw).toLowerCase().trim();
 						if (pd === 'y' || pd === 'yes' || pd === 'true' || pd === '1') {
 							isPlanDiscussChecked = true;
 						}
-					}
+                    }
                     var dateCls = 'plan-date-input form-control form-control-sm';
                     if (planDateVal && planDateVal !== 'dd-mm-yyyy') { dateCls += ' input-filled'; }
 
@@ -181,19 +198,22 @@ function GetCallTicketMasterPlanningDetails(Type) {
 
                     var planDateHtml = '<input type="date" class="' + dateCls + '" data-row="' + item.Code + '" value="' + planDateVal + '">';
                     var planPriorityHtml = '<input type="text" min="0" step="1" class="' + priCls + '" data-row="' + item.Code + '" value="' + planPriorityVal + '">';
-                    var assignedHtml = '<select class="assigned-ddl" data-row="' + item.Code + '">' + buildEmployeeOptions(assignedCode) + '</select>';
-                    //var planDateHtml = '<input type="date" class="plan-date-input" data-row="' + item.Code + '" value="' + planDateVal + '">';
-                    //var planPriorityHtml = '<input type="text" class="priority-input Number" data-row="' + item.Code + '" value="' + planPriorityVal + '">';
 
+                    // Assigned dropdown: editable only for admin users
+                    var assignedDisabledAttr = isAdminUser ? '' : ' disabled';
+                    var assignedHtml = '<select class="assigned-ddl" data-row="' + item.Code + '"' + assignedDisabledAttr + '>' + buildEmployeeOptions(assignedCode) + '</select>';
 					var RequiredPlanDiscussHtml = '<input type="checkbox" class="assigned-chk" data-row="' + item.Code + '"' + (isPlanDiscussChecked ? ' checked' : '') + ' />';
 
                     var timeVal = (item['Time Consumned(Hr)'] && item['Time Consumned(Hr)'] !== 'null') ? item['Time Consumned(Hr)'] : '0';
                     var timeHtml = '<a href="javascript:void(0)" class="time-link" data-uid="' + item.UID + '" data-code="' + item.Code + '">' + timeVal + '</a>';
-                    item['Time Consumned(Hr)'] = timeHtml;
+                    var ActionEdit = '<button class="btn btn-primary icon-height mb-1 btn1"  title="Edit" onclick="Edit(' + item[`Code`] + ')"><i class="fa-solid fa-pencil"></i></button>'
+                 
                     item.Assigned = assignedHtml;
                     item['Plan Date'] = planDateHtml;
                     item['Priority'] = planPriorityHtml;
-                    item['Plan Discuss'] = RequiredPlanDiscussHtml;
+                    item['Dis'] = RequiredPlanDiscussHtml;
+                    item['Time Consumned(Hr)'] = timeHtml;
+                    item['Action'] = ActionEdit;
                     return item;
                 });
                 BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
@@ -386,270 +406,29 @@ $(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input', fun
     updateCallTicketPlanning(payload);
 });
 
-//$(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input', function () {
-//    var $el = $(this);
-//    var code = $el.attr('data-row');
-
-//    if (!code || code === '0') {
-//        toastr.error('Invalid row.');
-//        return;
-//    }
-
-//    var payload = { Code: parseInt(code, 10) };
-
-//    if ($el.hasClass('assigned-ddl')) {
-//        var assignedVal = $el.val();
-//        if (!assignedVal || assignedVal === '0') {
-//            toastr.error('Please select employee.');
-//            return;
-//        }
-//        var assignedNum = parseInt(assignedVal, 10);
-//        if (isNaN(assignedNum) || assignedNum === 0) {
-//            toastr.error('Please select employee.');
-//            return;
-//        }
-//        payload.AssignedEmployeeCode = assignedNum;
-//    }
-
-//    if ($el.hasClass('priority-input')) {
-//        var priVal = $el.val();
-//        var cleaned = '';
-//        var i = 0;
-//        while (i < priVal.length) {
-//            var ch = priVal.charAt(i);
-//            if (ch >= '0' && ch <= '9') {
-//                cleaned = cleaned + ch;
-//            }
-//            i = i + 1;
-//        }
-//        if (cleaned !== priVal) {
-//            $el.val(cleaned);
-//            priVal = cleaned;
-//        }
-//        if (!priVal || priVal.length === 0) {
-//            toastr.error('Enter numeric priority.');
-//            return;
-//        }
-//        var n = parseInt(priVal, 10);
-//        if (isNaN(n)) {
-//            $el.val('');
-//            toastr.error('Enter numeric priority.');
-//            return;
-//        }
-//        payload.PlanPriority = n;
-//    }
-
-//    if ($el.hasClass('plan-date-input')) {
-//        var dateVal = $el.val(); // 'YYYY-MM-DD'
-//        if (!dateVal || dateVal.length !== 10) {
-//            toastr.error('Select valid date.');
-//            return;
-//        }
-//        payload.PlanDate = dateVal;
-//    }
-
-//    // Get the row (tr) and check class — adjust 'reassigned' to your actual class
-//    var $row = $el.closest('tr');
-//    // Also include current values from the same row so all related fields are sent together
-//    var $assignedInRow = $row.find('.assigned-ddl');
-//    if ($assignedInRow && $assignedInRow.length > 0) {
-//        var av = $assignedInRow.val();
-//        if (av && av !== '0') {
-//            var an = parseInt(av, 10);
-//            if (!isNaN(an) && an !== 0) {
-//                payload.AssignedEmployeeCode = an;
-//            }
-//        }
-//    }
-//    var $dateInRow = $row.find('.plan-date-input');
-//    if ($dateInRow && $dateInRow.length > 0) {
-//        var dv = $dateInRow.val();
-//        if (dv && dv.length === 10) {
-//            payload.PlanDate = dv;
-//        }
-//    }
-//    var $priInRow = $row.find('.priority-input');
-//    if ($priInRow && $priInRow.length > 0) {
-//        var pv = $priInRow.val();
-//        if (pv && pv.length > 0) {
-//            var pn = parseInt(pv, 10);
-//            if (!isNaN(pn)) {
-//                payload.PlanPriority = pn;
-//            }
-//        }
-//    }
-//    var statusName = 4;
-//    if ($row.hasClass('reassigned')) {
-//        statusName = 4;
-//    }
-//    payload.StatusName = statusName;
-
-//    updateCallTicketPlanning(payload);
-//});
-
-//$(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input', function () {
-
-//    var $el = $(this);
-//    var code = $el.attr('data-row');
-
-//    if (!code || code === '0') {
-//        toastr.error('Invalid row.');
-//        return;
-//    }
-
-//    var payload = { Code: parseInt(code, 10) };
-
-//    // Assigned is mandatory
-//    if ($el.hasClass('assigned-ddl')) {
-//        var assignedVal = $el.val();
-//        if (!assignedVal || assignedVal === '0') {
-//            toastr.error('Please select employee.');
-//            return;
-//        }
-//        var assignedNum = parseInt(assignedVal, 10);
-//        if (isNaN(assignedNum) || assignedNum === 0) {
-//            toastr.error('Please select employee.');
-//            return;
-//        }
-//        payload.AssignedEmployeeCode = assignedNum;
-//    }
-
-//    // Priority is optional; validate only if provided
-//    if ($el.hasClass('priority-input')) {
-//        var priVal = $el.val();
-//        var cleaned = '';
-//        var i = 0;
-//        while (priVal && i < priVal.length) {
-//            var ch = priVal.charAt(i);
-//            if (ch >= '0' && ch <= '9') {
-//                cleaned = cleaned + ch;
-//            }
-//            i = i + 1;
-//        }
-//        if (priVal !== cleaned) {
-//            $el.val(cleaned);
-//            priVal = cleaned;
-//        }
-//        if (priVal && priVal.length > 0) {
-//            var n = parseInt(priVal, 10);
-//            if (isNaN(n)) {
-//                toastr.error('Enter numeric priority.');
-//                return;
-//            }
-//            payload.PlanPriority = n;
-//        }
-//    }
-
-//    // Plan Date is optional; validate only if provided
-//    if ($el.hasClass('plan-date-input')) {
-//        var dateVal = $el.val(); // 'YYYY-MM-DD' or empty
-//        if (dateVal && dateVal.length > 0) {
-//            if (dateVal.length !== 10) {
-//                toastr.error('Select valid date.');
-//                return;
-//            }
-//            payload.PlanDate = dateVal;
-//        }
-//    }
-
-//    // Include other values from the same row if present.
-//    var $row = $el.closest('tr');
-
-//    // Enforce Assigned mandatory even when changing other fields
-//    var $assignedInRow = $row.find('.assigned-ddl');
-//    if ($assignedInRow && $assignedInRow.length > 0) {
-//        var av = $assignedInRow.val();
-//        if (!av || av === '0') {
-//            toastr.error('Please select employee.');
-//            return;
-//        }
-//        var an = parseInt(av, 10);
-//        if (isNaN(an) || an === 0) {
-//            toastr.error('Please select employee.');
-//            return;
-//        }
-//        payload.AssignedEmployeeCode = an;
-//    }
-
-//    var $dateInRow = $row.find('.plan-date-input');
-//    if ($dateInRow && $dateInRow.length > 0) {
-//        var dv = $dateInRow.val();
-//        if (dv && dv.length === 10) {
-//            payload.PlanDate = dv;
-//        }
-//    }
-
-//    var $priInRow = $row.find('.priority-input');
-//    if ($priInRow && $priInRow.length > 0) {
-//        var pv = $priInRow.val();
-//        if (pv && pv.length > 0) {
-//            var pn = parseInt(pv, 10);
-//            if (!isNaN(pn)) {
-//                payload.PlanPriority = pn;
-//            }
-//        }
-//    }
-
-//    var statusName = 4;
-//    if ($row.hasClass('reassigned')) {
-//        statusName = 4;
-//    }
-//    payload.StatusName = statusName;
-
-//    updateCallTicketPlanning(payload);
-//});
-
 $(document).on('change', '.assigned-chk', function () {
-	var $el = $(this);
-	var code = $el.attr('data-row');
-	if (!code || code === '0') {
-		toastr.error('Invalid row.');
-		return;
-	}
+    var $el = $(this);
+    var code = $el.attr('data-row');
+    if (!code || code === '0') {
+        toastr.error('Invalid row.');
+        return;
+    }
 
-	var isChecked = $el.is(':checked');
-	var payload = { Code: parseInt(code, 10) };
-	// Send Y when checked, N when unchecked
-	payload.RequiredPlanDiscuss = isChecked ? 'Y' : 'N';
+    var isChecked = $el.is(':checked');
+    var payload = { Code: parseInt(code, 10) };
 
-	// Include current row context values (assigned/date/priority) if available
-	var $row = $el.closest('tr');
-	var $assignedInRow = $row.find('.assigned-ddl');
-	if ($assignedInRow && $assignedInRow.length > 0) {
-		var av = $assignedInRow.val();
-		if (av && av !== '0') {
-			var an = parseInt(av, 10);
-			if (!isNaN(an) && an !== 0) {
-				payload.AssignedEmployeeCode = an;
-			}
-		}
-	}
-	var $dateInRow = $row.find('.plan-date-input');
-	if ($dateInRow && $dateInRow.length > 0) {
-		var dv = $dateInRow.val();
-		if (dv && dv.length === 10) {
-			payload.PlanDate = dv;
-		}
-	}
-	var $priInRow = $row.find('.priority-input');
-	if ($priInRow && $priInRow.length > 0) {
-		var pv = $priInRow.val();
-		if (pv && pv.length > 0) {
-			var pn = parseInt(pv, 10);
-			if (!isNaN(pn)) {
-				payload.PlanPriority = pn;
-			}
-		}
-	}
+    // Sirf Dis flag bhejo – koi Assigned / PlanDate / Priority / Year / WeekNo nahi
+    payload.RequiredPlanDiscuss = isChecked ? 'Y' : 'N';
 
-	updateCallTicketPlanning(payload, { sourceEl: this });
+    updateCallTicketPlanning(payload, { sourceEl: this });
 
-	// Visual: mark row as pending (yellow) when checked, remove when unchecked
-	if (isChecked) {
-		$row.addClass('row-pending');
-	} else {
-		$row.removeClass('row-pending');
-	}
+    // Visual: row ka colour change
+    var $row = $el.closest('tr');
+    if (isChecked) {
+        $row.addClass('row-pending');
+    } else {
+        $row.removeClass('row-pending');
+    }
 });
 
 function updateCallTicketPlanning(payload, opts) {
@@ -961,342 +740,6 @@ function formatDM(d) {
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return d.getDate() + ' ' + months[d.getMonth()];
 }
-//document.addEventListener('DOMContentLoaded', function () {
-
-//    var yearSelect = document.getElementById('yearSelect');
-//    var weekNumberInput = document.getElementById('weekNumber');
-//    var weekInfo = document.getElementById('weekInfo');
-//    var dateInput = document.getElementById('txtdate');
-
-//    populateYears(yearSelect);
-
-//    yearSelect.addEventListener('change', function () {
-//        if (yearSelect.value === '') {
-//            weekNumberInput.value = '';
-//            if (weekInfo) {
-//                weekInfo.textContent = '';
-//                weekNumberInput.setAttribute('placeholder', '');
-//            }
-//            return;
-//        }
-
-//        var selectedYear = parseInt(yearSelect.value, 10);
-//        var today = new Date();
-//        var monthIndex = today.getMonth();
-//        var day = today.getDate();
-
-//        var daysInMonth = new Date(selectedYear, monthIndex + 1, 0).getDate();
-//        if (day > daysInMonth) {
-//            day = daysInMonth;
-//        }
-
-//        var dateInSelectedYear = new Date(selectedYear, monthIndex, day);
-//        var weeks = buildWeeksForMonth(selectedYear, monthIndex);
-//        var offset = getWeeksOffsetForMonth(selectedYear, monthIndex);
-
-//        var i = 0;
-//        var found = false;
-
-//        while (i < weeks.length) {
-//            var w = weeks[i];
-//            if (dateInSelectedYear >= w.start && dateInSelectedYear <= w.end) {
-//                var yWeek = offset + w.number;
-
-//                weekNumberInput.value = String(yWeek);
-
-//                if (weekInfo) {
-//                    var label = getMonthName(monthIndex) + ' ' + String(selectedYear) +
-//                        ' - Week ' + String(yWeek) + ' (' + formatDM(w.start) + ' - ' + formatDM(w.end) + ')';
-//                    weekInfo.textContent = label;
-//                    weekNumberInput.setAttribute('placeholder', label);
-//                }
-
-//                found = true;
-//                break;
-//            }
-//            i = i + 1;
-//        }
-
-//        if (!found) {
-//            weekNumberInput.value = '';
-//            if (weekInfo) {
-//                weekInfo.textContent = '';
-//                weekNumberInput.setAttribute('placeholder', '');
-//            }
-//        }
-//    });
-
-//    // Manual edit: typing a year-wise week number updates the info below (finds the correct month)
-//    weekNumberInput.addEventListener('input', function () {
-//        var digits = weekNumberInput.value.replace(/[^0-9]/g, '');
-//        if (digits !== weekNumberInput.value) {
-//            weekNumberInput.value = digits;
-//        }
-
-//        var selectedYear = parseInt(yearSelect.value, 10);
-//        if (isNaN(selectedYear)) {
-//            if (weekInfo) {
-//                weekInfo.textContent = '';
-//            }
-//            weekNumberInput.setAttribute('placeholder', '');
-//            return;
-//        }
-
-//        var n = parseInt(weekNumberInput.value, 10);
-//        if (isNaN(n)) {
-//            if (weekInfo) {
-//                weekInfo.textContent = '';
-//            }
-//            weekNumberInput.setAttribute('placeholder', '');
-//            return;
-//        }
-
-//        var m = 0;
-//        var foundInfo = null;
-
-//        while (m < 12) {
-//            var ws = buildWeeksForMonth(selectedYear, m);
-//            var off = getWeeksOffsetForMonth(selectedYear, m);
-
-//            var i = 0;
-//            while (i < ws.length) {
-//                var w = ws[i];
-//                if ((off + w.number) === n) {
-//                    foundInfo = { monthIndex: m, week: w };
-//                    break;
-//                }
-//                i = i + 1;
-//            }
-
-//            if (foundInfo) {
-//                break;
-//            }
-
-//            m = m + 1;
-//        }
-
-//        if (foundInfo) {
-//            var label = getMonthName(foundInfo.monthIndex) + ' ' + String(selectedYear) +
-//                ' - Week ' + String(n) + ' (' + formatDM(foundInfo.week.start) + ' - ' + formatDM(foundInfo.week.end) + ')';
-//            if (weekInfo) {
-//                weekInfo.textContent = label;
-//            }
-//            weekNumberInput.setAttribute('placeholder', label);
-//        } else {
-//            if (weekInfo) {
-//                weekInfo.textContent = '';
-//            }
-//            weekNumberInput.setAttribute('placeholder', '');
-//        }
-//    });
-
-//    // When a specific working date is chosen, auto-calculate its Year-wise Week No
-//    if (dateInput) {
-//        dateInput.addEventListener('change', function () {
-//            var val = dateInput.value; // 'YYYY-MM-DD'
-//            if (!val || val.length !== 10) {
-//                weekNumberInput.value = '';
-//                if (weekInfo) {
-//                    weekInfo.textContent = '';
-//                }
-//                weekNumberInput.setAttribute('placeholder', '');
-//                return;
-//            }
-
-//            var parts = val.split('-');
-//            if (!parts || parts.length !== 3) {
-//                weekNumberInput.value = '';
-//                if (weekInfo) {
-//                    weekInfo.textContent = '';
-//                }
-//                weekNumberInput.setAttribute('placeholder', '');
-//                return;
-//            }
-
-//            var y = parseInt(parts[0], 10);
-//            var m = parseInt(parts[1], 10);
-//            var d = parseInt(parts[2], 10);
-//            if (isNaN(y) || isNaN(m) || isNaN(d)) {
-//                weekNumberInput.value = '';
-//                if (weekInfo) {
-//                    weekInfo.textContent = '';
-//                }
-//                weekNumberInput.setAttribute('placeholder', '');
-//                return;
-//            }
-
-//            var selectedDate = new Date(y, m - 1, d);
-
-//            if (yearSelect) {
-//                yearSelect.value = String(y);
-//            }
-
-//            var weeksInMonth = buildWeeksForMonth(y, m - 1);
-//            var offset = getWeeksOffsetForMonth(y, m - 1);
-//            var i = 0;
-//            var foundWeek = null;
-//            while (i < weeksInMonth.length) {
-//                var w = weeksInMonth[i];
-//                if (selectedDate >= w.start && selectedDate <= w.end) {
-//                    foundWeek = w;
-//                    break;
-//                }
-//                i = i + 1;
-//            }
-
-//            if (foundWeek) {
-//                var yWeek = offset + foundWeek.number;
-//                weekNumberInput.value = String(yWeek);
-//                if (weekInfo) {
-//                    var label = getMonthName(m - 1) + ' ' + String(y) +
-//                        ' - Week ' + String(yWeek) + ' (' + formatDM(foundWeek.start) + ' - ' + formatDM(foundWeek.end) + ')';
-//                    weekInfo.textContent = label;
-//                    weekNumberInput.setAttribute('placeholder', label);
-//                } else {
-//                    weekNumberInput.setAttribute('placeholder', '');
-//                }
-//            } else {
-//                weekNumberInput.value = '';
-//                if (weekInfo) {
-//                    weekInfo.textContent = '';
-//                }
-//                weekNumberInput.setAttribute('placeholder', '');
-//            }
-//        });
-//    }
-
-//});
-
-//function getMonthName(index) {
-//    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-//    if (index < 0) {
-//        index = 0;
-//    }
-//    if (index > 11) {
-//        index = 11;
-//    }
-//    return months[index];
-//}
-
-//function populateYears(selectEl) {
-//    while (selectEl.firstChild) {
-//        selectEl.removeChild(selectEl.firstChild);
-//    }
-//    var optDefault = document.createElement('option');
-//    optDefault.value = '';
-//    optDefault.textContent = 'Select';
-//    selectEl.appendChild(optDefault);
-
-//    var nowYear = new Date().getFullYear();
-//    var start = nowYear - 5;
-//    var end = nowYear + 5;
-
-//    var y = start;
-//    while (y <= end) {
-//        addOption(selectEl, String(y), String(y));
-//        y = y + 1;
-//    }
-//}
-
-//function addOption(selectEl, value, text) {
-//    var opt = document.createElement('option');
-//    opt.value = value;
-//    opt.textContent = text;
-//    selectEl.appendChild(opt);
-//}
-
-//function buildWeeksForYear(year) {
-//    var months = [];
-//    var m = 0;
-//    while (m < 12) {
-//        var weeks = buildWeeksForMonth(year, m);
-//        months.push({
-//            monthIndex: m,
-//            monthName: getMonthName(m),
-//            weeks: weeks
-//        });
-//        m = m + 1;
-//    }
-//    return months;
-//}
-
-//function findWeekNumberAcrossMonths(year, n) {
-//    var result = [];
-//    var m = 0;
-//    while (m < 12) {
-//        var weeks = buildWeeksForMonth(year, m);
-//        var i = 0;
-//        var matched = null;
-//        while (i < weeks.length) {
-//            var w = weeks[i];
-//            if (w.number === n) {
-//                matched = w;
-//                break;
-//            }
-//            i = i + 1;
-//        }
-//        if (matched) {
-//            result.push({
-//                monthIndex: m,
-//                monthName: getMonthName(m),
-//                week: matched
-//            });
-//        }
-//        m = m + 1;
-//    }
-//    return result;
-//}
-
-//function buildWeeksForMonth(year, monthIndex) {
-//    var result = [];
-
-//    var daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-//    var first = new Date(year, monthIndex, 1);
-//    var firstDow = first.getDay(); // 0=Sun..6=Sat
-//    if (firstDow === 0) {
-//        firstDow = 7;
-//    }
-
-//    var offset = firstDow - 1;
-//    var weekNum = 1;
-
-//    var startDay = 1;
-//    var endDay = 7 - offset;
-//    if (endDay > daysInMonth) {
-//        endDay = daysInMonth;
-//    }
-
-//    while (startDay <= daysInMonth) {
-//        var s = new Date(year, monthIndex, startDay);
-//        var e = new Date(year, monthIndex, endDay);
-//        result.push({ number: weekNum, start: s, end: e });
-
-//        weekNum = weekNum + 1;
-//        startDay = endDay + 1;
-//        endDay = startDay + 6;
-//        if (endDay > daysInMonth) {
-//            endDay = daysInMonth;
-//        }
-//    }
-
-//    return result;
-//}
-
-//function getWeeksOffsetForMonth(year, monthIndex) {
-//    var off = 0;
-//    var m = 0;
-//    while (m < monthIndex) {
-//        var ws = buildWeeksForMonth(year, m);
-//        off = off + ws.length;
-//        m = m + 1;
-//    }
-//    return off;
-//}
-
-//function formatDM(d) {
-//    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-//    return d.getDate() + ' ' + months[d.getMonth()];
-//}
 
 $(document).on('click', '.time-link', function () {
     var uid = $(this).data('uid');
@@ -1335,8 +778,17 @@ function Changecolor() {
     var headerCells = document.querySelectorAll('#table-header th');
     var priorityIndex = -1;
     var dateIndex = -1;
-	var planDiscussIndex = -1;
+    var planDiscussIndex = -1;
+    var selectedEmpCode = '';
+    var empSelect = document.getElementById('ddlEmployeeName');
+    var highlightByAssigned = false;
 
+    if (empSelect) {
+        selectedEmpCode = empSelect.value;
+        if (selectedEmpCode && selectedEmpCode !== '0') {
+            highlightByAssigned = true;
+        }
+    }
     headerCells.forEach(function (th, i) {
         var text = '';
         if (th.textContent) {
@@ -1348,9 +800,9 @@ function Changecolor() {
         if (text === 'Plan Date') {
             dateIndex = i;
         }
-		if (text === 'Plan Discuss') {
-			planDiscussIndex = i;
-		}
+        if (text === 'Dis') {
+            planDiscussIndex = i;
+        }
     });
 
     var rows = document.querySelectorAll('#table-body tr');
@@ -1400,21 +852,51 @@ function Changecolor() {
             row.style.backgroundColor = '';
         }
 
-		// Yellow row when Plan Discuss is checked
-		if (planDiscussIndex >= 0 && cells.length > planDiscussIndex) {
-			var pdTd = cells[planDiscussIndex];
-			var pdChk = pdTd.querySelector('input.assigned-chk');
-			if (pdChk && pdChk.checked) {
-				if (!row.classList.contains('row-pending')) {
-					row.classList.add('row-pending');
-				}
-			} else {
-				if (row.classList.contains('row-pending')) {
-					row.classList.remove('row-pending');
-				}
-			}
-		}
+        // Yellow row when Plan Discuss is checked
+        if (planDiscussIndex >= 0 && cells.length > planDiscussIndex) {
+            var pdTd = cells[planDiscussIndex];
+            var pdChk = pdTd.querySelector('input.assigned-chk');
+            if (pdChk && pdChk.checked) {
+                if (!row.classList.contains('row-pending')) {
+                    row.classList.add('row-pending');
+                }
+            } else {
+                if (row.classList.contains('row-pending')) {
+                    row.classList.remove('row-pending');
+                }
+            }
+        }
+
+       
+        if (highlightByAssigned) {
+            // YAHAN getElementById nahi, querySelector use karein:
+            var assignedSelect = row.querySelector('select.assigned-ddl');
+
+            if (assignedSelect) {
+                var rowEmpCode = assignedSelect.value;
+                if (rowEmpCode && rowEmpCode !== selectedEmpCode) {
+                    row.style.backgroundColor = '#4ba6ef';
+                }
+            }
+        }
     });
 }
 
 setInterval(Changecolor, 100);
+
+function Edit(code) {
+    if (!code || code === 0) {
+        toastr.error('Invalid ticket.');
+        return;
+    }
+
+    // Yaha apna actual URL lagao jahan edit view hai:
+    // Example: MVC route /Tickets/Edit?code=...
+    var url = M + 'Master/PendingTask';
+
+    // 1) Same tab me open karna ho:
+    window.location.href = url;
+
+    // 2) Agar naya tab me kholna ho to upar wali line hata ke ye use karo:
+    // window.open(url, '_blank');
+}

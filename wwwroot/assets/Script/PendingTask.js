@@ -10,6 +10,7 @@ let G_ReAssignList = [];
 let fileName;
 let AttachmentDetail = [];
 let G_Code;
+let G_ReasonList = [];
 $(document).ready(async function () {
     $("#ERPHeading").text("Pending Task");
     $(".Number").keyup(function (e) {
@@ -65,6 +66,7 @@ $("#txtStatus").on('change', function () {
         $("#txtUpdateBy1").show();
         $("#txtAttachment1").show();
         $("#txtReAssign1").hide();
+        $("#txtReason1").hide();
         GetResolvedBy();
         StatusType();
 
@@ -75,8 +77,11 @@ $("#txtStatus").on('change', function () {
         $("#txtAttachment1").show();
         $("#txtResolvedBy1").hide();
         $("#txtUpdateBy1").hide();
+        $("#txtReason1").show();
         StatusType();
         GetReAssign();
+        GetReason();
+
 
     } else {
         $("#txtTotalResolutionM1").hide();
@@ -85,6 +90,7 @@ $("#txtStatus").on('change', function () {
         $("#txtUpdateBy1").hide();
         $("#txtAttachment1").hide();
         $("#txtReAssign1").hide();
+        $("#txtReason1").hide();
     }
 
 });
@@ -326,6 +332,8 @@ $("#txtBack").click(function () {
     $("#txtAttachment1").hide();
     $("#txtResolvedBy1").hide();
     $("#txtUpdateBy1").hide();
+    $("#txtReason1").hide();
+
 
 });
 
@@ -472,6 +480,44 @@ function GetResolvedBy() {
         }
     });
 }
+function GetReason() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetReason`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_ReasonList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.Reason
+                }));
+            } else {
+                G_ReasonList = [];
+            }
+            const $select = $('#txtReason');
+            $select.empty();
+            if (response && response.length > 0) {
+                $select.append(new Option("Select Reason..", true, true));
+                $.each(response, function (index, item) {
+                    $select.append(new Option(item.Reason, item.Code));
+                });
+                Reason = response.Code;
+            }
+            $select.select2({
+                width: '100%',
+                closeOnSelect: false,
+                placeholder: "Select Reason...",
+                allowClear: true
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtReason').empty();
+        }
+    });
+}
 function GetReAssign() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAssignedss`,
@@ -491,7 +537,7 @@ function GetReAssign() {
             const $select = $('#txtReAssign');
             $select.empty();
             if (response && response.length > 0) {
-                // $select.append(new Option("Select Assigned..", true, true));
+                 $select.append(new Option("Select Assigned..", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
@@ -533,12 +579,14 @@ function StatusType() {
         },
         success: function (response) {
             if (response) {
+               
                 if (Status == "2") {
                     $("#txtTotalResolutionM").val(response[0].Times);
                     $("#txtResolutionDates").val(response[0].Dates);
                     $("#txtRemarks").val(response[0].Remarks);
                     $("#txtResolvedBy").val(response[0].Code);
                     $("#txtReAssign").val(response[0].Code);
+                 
                     response.forEach(item => {
                         BindSelect2(`txtResolvedBy`, G_ResolvedByList);
                         $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
@@ -709,6 +757,13 @@ function convertDateFormat(dateString) {
     const monthAbbreviation = monthNames[parseInt(month) - 1];
     return `${day}-${monthAbbreviation}-${year}`;
 }
+function convertDatenumber(dateString) {
+    let [day, month, year] = dateString.split('/');
+    month = month.padStart(2, '0');
+    day = day.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function Save() {
     let Status = $("#txtStatus").val();
     let TotalResolutionM = $("#txtTotalResolutionM").val();
@@ -717,6 +772,7 @@ function Save() {
     let ResolvedBy = $("#txtResolvedBy").val();
     let UpdateBy = $("#txtUpdateBy").val();
     let Remarks = $("#txtRemarks").val();
+    let Reason = $("#txtReason").val();
     if (Status == "") {
         toastr.error('Please select Status.');
         $("#txtStatus").focus();
@@ -735,6 +791,7 @@ function Save() {
                     updateBy: parseInt(UpdateBy || 0),
                     remarks: Remarks,
                     userMaster_Code: parseInt(UserMaster_Code || 0),
+                    ReasonMaster_Code: Reason,
                 }
             ],
             Attachment: AttachmentDetail
@@ -780,6 +837,7 @@ function ClearData() {
     $("#txtReAssign").val("0").trigger('change');
     $("#txtResolvedBy").val("0").trigger('change');
     $("#txtUpdateBy").val('0').trigger('change');
+    $("#txtReason1").val('0').trigger('change');
     DatePicker();
 }
 function GetEmployeeMasterList() {

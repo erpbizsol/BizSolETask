@@ -117,6 +117,7 @@ function Save() {
     var Numberofdays = $("#txtnumberofdays").val();
     var WorkingHours = $("#txtWorkingHours").val();
     var Code = $("#hftxtCode").val();
+    var Role = $("#txtRole").val();
     if (EmployeeCard == "") {
         toastr.error('Please enter Employee Card.');
         $("#txtEmployeeCard").focus();
@@ -174,7 +175,8 @@ function Save() {
             EmployeeType: EmployeeType,
             EmployeeId: UserMaster_Code,
             Numberofdays: Numberofdays,
-            WorkingHours: WorkingHours
+            WorkingHours: WorkingHours,
+            Role: Role
         };
         $.ajax({
             url: `${appBaseURL}/api/Master/SaveEmployeeMaster`,
@@ -274,6 +276,7 @@ function Create() {
     $("#txtnumberofdays").show();
     $("#dvExcel").show();
     $("#txtWorkingHours").show();
+    $("#txtRole").show();
 }
 function Back() {
     $("#txtListpage").show();
@@ -299,6 +302,7 @@ function Edit(code) {
     $("#dvExcel").hide();
     $("#txtnumberofdays").show();
     $("#txtWorkingHours").show();
+    $("#txtRole").show();
     $.ajax({
         url: ` ${appBaseURL}/api/Master/GetEmployeeMasterByCode?Code=${code}`,
         type: 'GET',
@@ -315,6 +319,7 @@ function Edit(code) {
                 $("#txtEmployeeType").val(response[0].EmployeeType);
                 $("#txtnumberofdays").val(response[0].NumberOfdays);
                 $("#txtWorkingHours").val(response[0].WorkingHours);
+                $("#txtRole").val(response[0].Role);
             } else {
                 toastr.error("Record not found...!");
             }
@@ -342,6 +347,7 @@ function ChangePassword(code) {
     $("#btnPass").show();
     $("#divnumber").hide();
     $("#divWorkingHours").hide();
+    $("#divtxtRole").hide();
 }
 function ClearData() {
     $("#hftxtCode").val("0");
@@ -355,6 +361,7 @@ function ClearData() {
     $("#txtExcelFile").val("");
     $("#txtnumberofdays").val("");
     $("#txtWorkingHours").val("");
+    $("#txtRole").val("D");
     G_Edit = false;
 }
 function ActionStatus(code) {
