@@ -419,7 +419,7 @@ function GetNormalPriority(Mode) {
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
-            $('#table-bodyEmployeeType').empty();
+            $('#txtNormalPriority').empty();
         }
     });
 }
@@ -444,7 +444,7 @@ function GetHighPriority(Mode) {
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
-            $('#table-bodyEmployeeType').empty();
+            $('#txtHighPriority').empty();
         }
     });
 }
