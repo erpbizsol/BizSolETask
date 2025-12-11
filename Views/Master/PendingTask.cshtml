@@ -8,6 +8,34 @@
 <script src="~/assets/js/xlsx.full.min.js"></script>
 <script src="~/assets/js/blockui.js"></script>
 <style>
+    @@media (max-width: 576px) 
+        .status-select
+
+    {
+        font-size: 12px; /* text chhota */
+        height: 32px; /* box height chhoti */
+        padding: 4px 8px;
+    }
+
+    /* Agar select2 use kar rahe ho to ye bhi add karo */
+    .select2-container--default .select2-selection--single {
+        font-size: 12px;
+        height: 32px;
+    }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 30px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 30px;
+        }
+
+    .select2-dropdown {
+        font-size: 12px; /* options list ka text bhi chhota */
+    }
+
+    }
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #ede8e8 !important;
         border: 0px solid #aaa !important;

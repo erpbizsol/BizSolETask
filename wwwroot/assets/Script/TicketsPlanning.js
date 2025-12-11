@@ -1118,7 +1118,7 @@ function GetResolvedBy() {
 }
 function GetReason() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetReason`,
+        url: `${appBaseURL}/api/Master/GetReason?EmployeeCode=${UserMaster_Code}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);

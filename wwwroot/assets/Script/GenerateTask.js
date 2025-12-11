@@ -333,7 +333,7 @@ function GetTestedBY() {
             const $select = $('#txtTestedBY');
             $select.empty();
             if (response && response.length > 0) {
-                $select.append(new Option("Select Tested BY..", "0", true));
+                $select.append(new Option("Select Tested By..", "0", true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
@@ -678,11 +678,14 @@ function SaveData() {
         toastr.error('Please Select Work Type.');
         $("#txtWorkType").focus();
         return;
-    } else if (Assigned == "0") {
-        toastr.error('Please Select Assigned.');
-        $("#txtAssigned").focus();
-        return;
-    } else {
+    }
+    //else if (Assigned == "0") {
+    //    toastr.error('Please Select Assigned.');
+    //    $("#txtAssigned").focus();
+    //    return;
+    //}
+    else {
+        lastFormData = captureFormData();
         let Postdata =
         {
             generateTask: [
@@ -699,7 +702,7 @@ function SaveData() {
                     // sourceMaster_Code: 0,
                     workTypeMaster_Code: WorkType,
                     description: Description,
-                    reAssign_Code: Assigned,
+                    reAssign_Code: Assigned || 0,
                     commitedDate: CommittedDate,
                     estimatedTime: EstimatedTime || 0,
                     statusMaster_Code: 1,
@@ -1006,7 +1009,101 @@ function onAttachmentClick(fileName, base64Data, code, download) {
         URL.revokeObjectURL(url);
     }
 }
+//function ClearData() {
+//    $("#hftxtCode").val("0");
+//    $("#txtTaskType").val("1");
+//    $("#txtTaskNo").val("");
+//    $("#txtPriority").val("2");
+//    $("#txtProjectClient").val("0").trigger('change');
+//    $("#txtWorkType").val("0").trigger('change');
+//    $("#txtDescription").val("");
+//    $("#txtAssigned").val("0").trigger('change');
+//    $("#txtEstimatedTime").val("");
+//    $("#txtAttachment").val("");
+//    $("#txtTaskNature").val("0").trigger('change');
+//    $("#txtUserName").val("0").trigger('change');
+//    $("#txtContactNo").val("0").trigger('change');
+//    $("#txtContactEmail").val("0").trigger('change');
+//    $("#txtTestedBY").val("0").trigger('change');
+//    $("#txtMenuName").val("0").trigger('change');
+//    AttachmentDetail = [];
+//    DatePicker();
+//}
+let lastFormData = null;
+function captureFormData() {
+    return {
+        TaskType: $("#txtTaskType").val(),
+        TicketNo: $("#txtTaskNo").val(),
+        Priority: $("#txtPriority").val(),
+        LogDate: $("#txtLogDate").val(),
+        ProjectClient: $("#txtProjectClient").val(),
+        WorkType: $("#txtWorkType").val(),
+        Description: $("#txtDescription").val(),
+        Assigned: $("#txtAssigned").val(),
+        CommittedDate: $("#txtCommittedDate").val(),
+        EstimatedTime: $("#txtEstimatedTime").val(),
+        ContactNo: $("#txtContactNo").val(),
+        ContactEMail: $("#txtContactEmail").val(),
+        UserName: $("#txtUserName").val(),
+        MenuName: $("#txtMenuName").val(),
+        TestedBY: $("#txtTestedBY").val(),
+        TaskNature: $("#txtTaskNature").val()
+    };
+}
+function fillFormData(data) {
+    if (!data) {
+        return;
+    }
+
+    $("#txtTaskType").val(data.TaskType);
+    $("#txtTaskNo").val(data.TicketNo);
+    $("#txtPriority").val(data.Priority);
+    $("#txtLogDate").val(data.LogDate);
+
+    $("#txtProjectClient").val(data.ProjectClient).trigger('change');
+    $("#txtWorkType").val(data.WorkType).trigger('change');
+   // $("#txtDescription").val(data.Description);
+
+    $("#txtAssigned").val(data.Assigned).trigger('change');
+    $("#txtCommittedDate").val(data.CommittedDate);
+    $("#txtEstimatedTime").val(data.EstimatedTime);
+
+    $("#txtUserName").val(data.UserName).trigger('change');
+    $("#txtContactNo").val(data.ContactNo).trigger('change');
+    $("#txtContactEmail").val(data.ContactEMail).trigger('change');
+    $("#txtTestedBY").val(data.TestedBY).trigger('change');
+    $("#txtMenuName").val(data.MenuName).trigger('change');
+    $("#txtTaskNature").val(data.TaskNature).trigger('change');
+}
+$('#chkContinuousTicket').on('change', function () {
+    if (this.checked && lastFormData) {
+        fillFormData(lastFormData);
+    }
+});
 function ClearData() {
+
+    var isContinuous = $("#chkContinuousTicket").is(":checked");
+
+    if (isContinuous && lastFormData) {
+
+        // Code new entry ke liye 0 hi rakho
+        $("#hftxtCode").val("0");
+
+        // Ticket No aur Attachment ko fresh rakhna hai
+        $("#txtTaskNo").val("");
+        $("#txtAttachment").val("");
+        AttachmentDetail = [];
+
+        // Date ko aaj ki date se set karna ho to:
+        DatePicker();
+
+        // Baaki saare fields ko pichle data se bhar do
+        fillFormData(lastFormData);
+
+        return;
+    }
+
+    // Agar continuous OFF hai to purana ClearData jaisa hi rakho
     $("#hftxtCode").val("0");
     $("#txtTaskType").val("1");
     $("#txtTaskNo").val("");
@@ -1023,6 +1120,7 @@ function ClearData() {
     $("#txtContactEmail").val("0").trigger('change');
     $("#txtTestedBY").val("0").trigger('change');
     $("#txtMenuName").val("0").trigger('change');
+
     AttachmentDetail = [];
     DatePicker();
 }

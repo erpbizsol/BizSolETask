@@ -18,6 +18,26 @@
 
 
 <style>
+    .form-check .form-check-input {
+        /* float: left; */
+        margin-left: -1.5em;
+    }
+    #chkContinuousTicket.form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-top: 0.1rem;
+    }
+
+        /* Theme color (apke buttons jaisa) */
+        #chkContinuousTicket.form-check-input:checked {
+            background-color: #0ba4af;
+            border-color: #0ba4af;
+        }
+
+    /* Label thoda compact */
+    .form-check-label {
+        font-size: 0.9rem;
+    }
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #ede8e8 !important;
         border: 0px solid #aaa !important;
@@ -256,8 +276,8 @@
                             </select>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <label for="txtTestedBY2" class="col-form-label-sm fw-bold" id="txtTestedBY2">Tested BY</label>
-                            <select id="txtTestedBY" name="txtTestedBY" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Tested BY..." maxlength="150">
+                            <label for="txtTestedBY2" class="col-form-label-sm fw-bold" id="txtTestedBY2">Tested By</label>
+                            <select id="txtTestedBY" name="txtTestedBY" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Tested By..." maxlength="150">
                             </select>
                         </div>
                         <div class="col-md-6 col-sm-6">
@@ -274,6 +294,14 @@
                                 <option value="0">Please Select</option>
                             </select>
                         </div>
+                        <div class="col-md-2 col-sm-6">
+                            <div class="form-check" style="margin-top: 28px;">
+                                <input type="checkbox" class="form-check-input" id="chkContinuousTicket">
+                                <label class="form-check-label" for="chkContinuousTicket">
+                                    Continuous ticket
+                                </label>
+                            </div>
+                        </div>
                         <div class="col-md-3 col-sm-6">
                             <label for="txtAssigned" class="col-form-label-sm fw-bold">Assigned</label>
                             <select id="txtAssigned" name="txtAssigned" autocomplete="off" class="form-control form-control-sm box_border" placeholder="Assigned..." maxlength="10">
@@ -289,7 +317,7 @@
                             <label for="txtEstimatedTime" class="col-form-label-sm fw-bold">Estimated Time (minutes)</label>
                             <input type="text" id="txtEstimatedTime" name="txtEstimatedTime" autocomplete="off" class="Number form-control form-control-sm box_border" placeholder="Estimated Time.." maxlength="15">
                         </div>
-                        <div class="col-md-3 col-sm-6" style="margin-top: 28px;border-radius:50px;">
+                        <div class="col-md-1 col-sm-6" style="margin-top: 28px;border-radius:50px;">
                             <button type="button" class="btn btn-success" title="Save" onclick="SaveData()" id="txtbtn">Save</button>
                         </div>
                     </div>

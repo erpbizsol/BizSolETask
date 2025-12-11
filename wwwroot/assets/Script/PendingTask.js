@@ -482,7 +482,7 @@ function GetResolvedBy() {
 }
 function GetReason() {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetReason`,
+        url: `${appBaseURL}/api/Master/GetReason?EmployeeCode=${UserMaster_Code}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -615,6 +615,7 @@ $("#txtAttachment").on('change', (event) => {
         fileName = files[0].name;
     }
 });
+
 $('#txtAttachment').bind('change', function () {
     $.each($('#txtAttachment')[0].files, function (key, file) {
         reduceFileSize(file, 500 * 1024, 1000, Infinity, 0.9, blob => {
@@ -841,6 +842,7 @@ function ClearData() {
     DatePicker();
 }
 function GetEmployeeMasterList() {
+
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAssignedss`,
         type: 'GET',
@@ -849,40 +851,37 @@ function GetEmployeeMasterList() {
         },
         success: function (response) {
             if (response.length > 0) {
+
                 let html = '';
+
+                // YAHAN naya option add kiya
+                html += `<label>
+                            <input type="checkbox" class="option" value="0" data-name="">N/A
+                         </label><br>`;
+
+                // Baaki employees
                 response.forEach(item => {
                     html += `<label>
-                    <input type="checkbox" class="option" value="${item.Code}" data-name="${item.EmployeeName.trim()}"> ${item.EmployeeName.trim()}
-                    </label><br>`;
+                                <input type="checkbox" class="option" value="${item.Code}" data-name="${item.EmployeeName.trim()}"> ${item.EmployeeName.trim()}
+                             </label><br>`;
                 });
+
                 $('#checkboxOptions').html(html);
-                //if (UserTypes == "A") {
 
-                //    $('#checkboxOptions').html(html);
-                //} else {
-                //    $('#dropdownButton').val(UserName);
-                //    $('#dropdownButton').val();
-
-                //}
                 if (UserTypes === "A") {
                     $('#checkboxOptions input[type="checkbox"]').prop('disabled', false);
                     GetGenerateTaskTicketDateList('Get');
                 } else {
                     $('#dropdownButton').val(UserName).prop('disabled', true);
-
                     $('#checkboxOptions input[type="checkbox"]').each(function () {
                         if ($(this).data('name') === UserName.trim()) {
                             $(this).prop('checked', true);
                             GetGenerateTaskTicketDateList('Get');
                         } else {
                             $(this).prop('disabled', true);
-
                         }
                     });
-
-
                 }
-
             }
         },
         error: function () {
@@ -890,6 +889,56 @@ function GetEmployeeMasterList() {
         }
     });
 }
+//function GetEmployeeMasterList() {
+//    $.ajax({
+//        url: `${appBaseURL}/api/Master/GetAssignedss`,
+//        type: 'GET',
+//        beforeSend: function (xhr) {
+//            xhr.setRequestHeader('Auth-Key', authKeyData);
+//        },
+//        success: function (response) {
+//            if (response.length > 0) {
+//                let html = '';
+//                response.forEach(item => {
+//                    html += `<label>
+//                    <input type="checkbox" class="option" value="${item.Code}" data-name="${item.EmployeeName.trim()}"> ${item.EmployeeName.trim()}
+//                    </label><br>`;
+//                });
+//                $('#checkboxOptions').html(html);
+//                //if (UserTypes == "A") {
+
+//                //    $('#checkboxOptions').html(html);
+//                //} else {
+//                //    $('#dropdownButton').val(UserName);
+//                //    $('#dropdownButton').val();
+
+//                //}
+//                if (UserTypes === "A") {
+//                    $('#checkboxOptions input[type="checkbox"]').prop('disabled', false);
+//                    GetGenerateTaskTicketDateList('Get');
+//                } else {
+//                    $('#dropdownButton').val(UserName).prop('disabled', true);
+
+//                    $('#checkboxOptions input[type="checkbox"]').each(function () {
+//                        if ($(this).data('name') === UserName.trim()) {
+//                            $(this).prop('checked', true);
+//                            GetGenerateTaskTicketDateList('Get');
+//                        } else {
+//                            $(this).prop('disabled', true);
+
+//                        }
+//                    });
+
+
+//                }
+
+//            }
+//        },
+//        error: function () {
+//            alert('Error loading work types');
+//        }
+//    });
+//}
 function updateSelected() {
     let selectedNames = $('.option:checked').map(function () {
         return $(this).data('name');
