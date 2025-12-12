@@ -19,7 +19,9 @@ $(document).ready(function () {
     DatePicker();
     $("#ERPHeading").text("Tickets Planning");
     GetEmployeeMasterList();
-   // GetEmployeeMasterLists('Load');
+    // Grid + popup Reason master ko pehle hi load kar lein
+    GetReason();
+    // GetEmployeeMasterLists('Load');
     GetCallTicketMasterPlanningDetails('Get');
     $(".Number").keyup(function (e) {
         if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9.]/g, '')
@@ -184,7 +186,7 @@ function GetCallTicketMasterPlanningDetails(Type) {
                     ActionEdit = item['Action'];
 
                     var assignedCode = findEmployeeCodeByName(item.Assigned);
-
+                   
                     var planDateVal = '';
                     if (item['Plan Date'] && item['Plan Date'] !== 'null') {
                         planDateVal = item['Plan Date'];
@@ -194,19 +196,25 @@ function GetCallTicketMasterPlanningDetails(Type) {
                     if (item['Priority'] !== null && item['Priority'] !== undefined && item['Priority'] !== 'null') {
                         planPriorityVal = item['Priority'];
                     }
+
                     var planDiscussRaw = item['Dis'];
-					var isPlanDiscussChecked = false;
-					if (planDiscussRaw !== null && planDiscussRaw !== undefined && planDiscussRaw !== 'null') {
-						var pd = String(planDiscussRaw).toLowerCase().trim();
-						if (pd === 'y' || pd === 'yes' || pd === 'true' || pd === '1') {
-							isPlanDiscussChecked = true;
-						}
+                    var isPlanDiscussChecked = false;
+                    if (planDiscussRaw !== null && planDiscussRaw !== undefined && planDiscussRaw !== 'null') {
+                        var pd = String(planDiscussRaw).toLowerCase().trim();
+                        if (pd === 'y' || pd === 'yes' || pd === 'true' || pd === '1') {
+                            isPlanDiscussChecked = true;
+                        }
                     }
+
                     var dateCls = 'plan-date-input form-control form-control-sm';
-                    if (planDateVal && planDateVal !== 'dd-mm-yyyy') { dateCls += ' input-filled'; }
+                    if (planDateVal && planDateVal !== 'dd-mm-yyyy') {
+                        dateCls += ' input-filled';
+                    }
 
                     var priCls = 'priority-input form-control form-control-sm';
-                    if (planPriorityVal !== null && planPriorityVal !== undefined && String(planPriorityVal).trim() !== '') { priCls += ' input-filled'; }
+                    if (planPriorityVal !== null && planPriorityVal !== undefined && String(planPriorityVal).trim() !== '') {
+                        priCls += ' input-filled';
+                    }
 
                     var planDateHtml = '<input type="date" class="' + dateCls + '" data-row="' + item.Code + '" value="' + planDateVal + '">';
                     var planPriorityHtml = '<input type="text" min="0" step="1" class="' + priCls + '" data-row="' + item.Code + '" value="' + planPriorityVal + '">';
@@ -214,21 +222,77 @@ function GetCallTicketMasterPlanningDetails(Type) {
                     // Assigned dropdown: editable only for admin users
                     var assignedDisabledAttr = isAdminUser ? '' : ' disabled';
                     var assignedHtml = '<select class="assigned-ddl" data-row="' + item.Code + '"' + assignedDisabledAttr + '>' + buildEmployeeOptions(assignedCode) + '</select>';
-					var RequiredPlanDiscussHtml = '<input type="checkbox" class="assigned-chk" data-row="' + item.Code + '"' + (isPlanDiscussChecked ? ' checked' : '') + ' />';
+
+                    // Reason dropdown: Assigned ke just baad dikhana hai
+                    var reasonCode = 0;
+                    var reasonText = '';
+
+                    if (item.ReasonMaster_Code !== null && item.ReasonMaster_Code !== undefined &&
+                        item.ReasonMaster_Code !== 'null')  {                
+                        var rc = parseInt(item.ReasonMaster_Code, 10); c = parseInt(item.ReasonMaster_Code, 10);
+                        if (!isNaN(rc) && rc > 0) {
+                            reasonCode = rc;
+                        }
+                    } else if (item.Reason !== null && item.Reason !== undefined && item.Reason !== 'null') {
+                        reasonText = String(item.Reason);
+                        var fr = findReasonCodeByName(reasonText);
+                        if (!isNaN(fr) && fr > 0) {
+                            reasonCode = fr;
+                        }
+                    }
+
+                    var reasonDisabledAttr = isAdminUser ? '' : ' disabled';
+                    var reasonHtml = '<select class="reason-ddl form-control form-control-sm" data-row="' + item.Code + '" data-reason-code="' + String(reasonCode) + '" data-reason-text="' + (reasonText || '') + '"' + reasonDisabledAttr + '>' + buildReasonOptions(reasonCode) + '</select>';
+
+                    var RequiredPlanDiscussHtml = '<input type="checkbox" class="assigned-chk" data-row="' + item.Code + '"' + (isPlanDiscussChecked ? ' checked' : '') + ' />';
 
                     var timeVal = (item['Time Consumned(Hr)'] && item['Time Consumned(Hr)'] !== 'null') ? item['Time Consumned(Hr)'] : '0';
                     var timeHtml = '<a href="javascript:void(0)" class="time-link" data-uid="' + item.UID + '" data-code="' + item.Code + '">' + timeVal + '</a>';
-                    var ActionEdit = '<button class="btn btn-primary icon-height mb-1 btn1"  title="Edit" onclick="Edit(' + item[`Code`] + ')"><i class="fa-solid fa-pencil"></i></button>'
-                 
-                    item.Assigned = assignedHtml;
-                    item['Plan Date'] = planDateHtml;
-                    item['Priority'] = planPriorityHtml;
-                    item['Dis'] = RequiredPlanDiscussHtml;
-                    item['Time Consumned(Hr)'] = timeHtml;
-                    item['Action'] = ActionEdit;
-                    return item;
+                    var ActionEditNew = '<button class="btn btn-primary icon-height mb-1 btn1"  title="Edit" onclick="Edit(' + item['Code'] + ')"><i class="fa-solid fa-pencil"></i></button>';
+
+                    // Naya object banayenge taki column order maintain rahe aur Reason ko Assigned ke bagal me la sake
+                    var newItem = {};
+                    var keys = Object.keys(item);
+                    var i = 0;
+                    while (i < keys.length) {
+                        var key = keys[i];
+                        if (key === 'Assigned') {
+                            // Assigned ke turant baad Reason column inject karo
+                            newItem[key] = assignedHtml;
+                            newItem['Reason'] = reasonHtml;
+                        } else if (key === 'Reason') {
+                            // Server se aane wale plain text Reason ko ignore karein
+                            // kyunki hum dropdown already add kar chuke hain
+                        } else if (key === 'Plan Date') {
+                            newItem[key] = planDateHtml;
+                        } else if (key === 'Priority') {
+                            newItem[key] = planPriorityHtml;
+                        } else if (key === 'Dis') {
+                            newItem[key] = RequiredPlanDiscussHtml;
+                        } else if (key === 'Time Consumned(Hr)') {
+                            newItem[key] = timeHtml;
+                        } else if (key === 'Action') {
+                            newItem[key] = ActionEditNew;
+                        } else {
+                            newItem[key] = item[key];
+                        }
+                        i = i + 1;
+                    }
+
+                    // Agar server se Assigned column nahi aaya to bhi ham apne columns add kar dein
+                    if (!newItem.Assigned) {
+                        newItem.Assigned = assignedHtml;
+                        newItem.Reason = reasonHtml;
+                    }
+                    if (!newItem['Action']) {
+                        newItem['Action'] = ActionEditNew;
+                    }
+
+                    return newItem;
                 });
                 BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment, false);
+
+             
             } else {
                 $("#txtTable").hide();
                 if (Type != 'Load') {
@@ -257,6 +321,22 @@ function buildEmployeeOptions(selectedCode) {
     }
     return html;
 }
+function buildReasonOptions(selectedCode) {
+    var html = '<option value="0">Select</option>';
+    if (G_ReasonList && G_ReasonList.length > 0) {
+        var i = 0;
+        while (i < G_ReasonList.length) {
+            var itm = G_ReasonList[i];
+            var sel = '';
+            if (!isNaN(parseInt(selectedCode, 10)) && parseInt(selectedCode, 10) === parseInt(itm.Code, 10)) {
+                sel = ' selected';
+            }
+            html += '<option value="' + itm.Code + '"' + sel + '>' + itm.Name + '</option>';
+            i = i + 1;
+        }
+    }
+    return html;
+}
 function findEmployeeCodeByName(name) {
     if (!name) {
         return 0;
@@ -275,8 +355,26 @@ function findEmployeeCodeByName(name) {
     }
     return 0;
 }
+function findReasonCodeByName(name) {
+    if (!name) {
+        return 0;
+    }
+    var n = String(name).toLowerCase().trim();
+    if (!G_ReasonList || G_ReasonList.length === 0) {
+        return 0;
+    }
+    var i = 0;
+    while (i < G_ReasonList.length) {
+        var itm = G_ReasonList[i];
+        if (String(itm.Name).toLowerCase().trim() === n) {
+            return parseInt(itm.Code, 10);
+        }
+        i = i + 1;
+    }
+    return 0;
+}
 
-$(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input', function () {
+$(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input, .reason-ddl', function () {
 
     // Require Year and Week before allowing row updates
     var yearVal = $('#yearSelect').val();
@@ -321,6 +419,18 @@ $(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input', fun
         }
 
         payload.AssignedEmployeeCode = assignedNum;
+    }
+
+    // Reason optional – agar user ne select kiya hai to bhej denge
+    if ($el.hasClass('reason-ddl')) {
+        var reasonVal = $el.val();
+        if (reasonVal && reasonVal !== '0') {
+            var rn = parseInt(reasonVal, 10);
+            if (!isNaN(rn) && rn > 0) {
+                payload.ReasonMaster_Code = rn;
+                $el.attr('data-reason-code', String(rn));
+            }
+        }
     }
 
     // Priority is optional; validate only if provided
@@ -400,6 +510,17 @@ $(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input', fun
             var pn = parseInt(pv, 10);
             if (!isNaN(pn)) {
                 payload.PlanPriority = pn;
+            }
+        }
+    }
+
+    var $reasonInRow = $row.find('.reason-ddl');
+    if ($reasonInRow && $reasonInRow.length > 0) {
+        var rv = $reasonInRow.val();
+        if (rv && rv !== '0') {
+            var rnv = parseInt(rv, 10);
+            if (!isNaN(rnv) && rnv > 0) {
+                payload.ReasonMaster_Code = rnv;
             }
         }
     }
@@ -1147,6 +1268,37 @@ function GetReason() {
                 placeholder: "Select Reason...",
                 allowClear: true
             });
+
+            // Grid ke saare Reason dropdown ko bhi refresh kar do (Assigned ke bagal)
+            var $gridReason = $('.reason-ddl');
+            if ($gridReason && $gridReason.length > 0) {
+                $gridReason.each(function () {
+                    var $ddl = $(this);
+                    var selCode = $ddl.attr('data-reason-code');
+                    var selText = $ddl.attr('data-reason-text');
+                    var selectedCode = 0;
+
+                    if (selCode && selCode !== '0') {
+                        selectedCode = parseInt(selCode, 10);
+                        if (isNaN(selectedCode)) {
+                            selectedCode = 0;
+                        }
+                    }
+
+                    if ((!selectedCode || selectedCode === 0) && selText && selText !== '') {
+                        var calc = findReasonCodeByName(selText);
+                        if (!isNaN(calc) && calc > 0) {
+                            selectedCode = calc;
+                            $ddl.attr('data-reason-code', String(calc));
+                        }
+                    }
+
+                    $ddl.html(buildReasonOptions(selectedCode));
+                    if (selectedCode && selectedCode > 0) {
+                        $ddl.val(String(selectedCode));
+                    }
+                });
+            }
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);

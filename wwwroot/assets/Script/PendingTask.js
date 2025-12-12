@@ -499,7 +499,7 @@ function GetReason() {
             const $select = $('#txtReason');
             $select.empty();
             if (response && response.length > 0) {
-                $select.append(new Option("Select Reason..", true, true));
+                $select.append(new Option("Select Reason..", "0", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.Reason, item.Code));
                 });
@@ -792,7 +792,7 @@ function Save() {
                     updateBy: parseInt(UpdateBy || 0),
                     remarks: Remarks,
                     userMaster_Code: parseInt(UserMaster_Code || 0),
-                    ReasonMaster_Code: Reason,
+                    ReasonMaster_Code: Reason ||0,
                 }
             ],
             Attachment: AttachmentDetail

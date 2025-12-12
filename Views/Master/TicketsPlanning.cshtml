@@ -10,33 +10,30 @@
 
 <style>
     @@media (max-width: 576px) .status-select
-
     {
         font-size: 12px; /* text chhota */
         height: 32px; /* box height chhoti */
         padding: 4px 8px;
     }
-
-    /* Agar select2 use kar rahe ho to ye bhi add karo */
     .select2-container--default .select2-selection--single {
         font-size: 12px;
         height: 32px;
     }
 
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 30px;
-        }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 30px;
+    }
 
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 30px;
-        }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 30px;
+    }
 
     .select2-dropdown {
-        font-size: 12px; /* options list ka text bhi chhota */
+    font-size: 12px; 
     }
 
-    }
-    .datepicker table tr td, .datepicker table tr td {
+    .datepicker table tr td, .datepicker table tr td 
+    {
         padding: 8px 9px !important;
         height: 16px !important;
         border-radius: 20px;
@@ -76,81 +73,72 @@
         margin-right: 8px;
     }
     select, input {
-        margin-bottom: 8px;
-        padding: 4px;
+        /* margin-bottom: 6px; */
+        padding: 4px 8px;
     }
-    #txtTable th,
-    #txtTable td {
-        padding: 2px 8px;
-        border-bottom: 1px solid #e9eef3;
-        vertical-align: middle;
-        /* white-space: nowrap; */
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+   
 
     #txtTable tbody tr:hover {
         background: #f6fafc;
     }
 
-    /* Inputs/selects inside cells */
+    /* Inputs/selects inside grid cells */
     #txtTable .assigned-ddl,
+    #txtTable .reason-ddl,
     #txtTable .plan-date-input,
     #txtTable .priority-input {
-        width: 100% !important;
+        width: 100%;
         box-sizing: border-box;
         height: 32px;
         padding: 4px 8px;
     }
 
-    /* Column widths (adjust as you like) */
+    /* Column widths – keep data readable */
+    /* UID */
     #txtTable thead th:nth-child(1) {
+        width: 80px;
+    }
+
+    #txtTable thead th:nth-child(2) {
         width: 110px;
     }
-    /* UID */
-    #txtTable thead th:nth-child(2) {
-        width: 100px;
-    }
-    /* LogDate */
-    #txtTable thead th:nth-child(3) {
-        width: 140px;
-    }
-    /* Client */
-    #txtTable thead th:nth-child(4) {
-        width: 50px;
-    }
-    /* Description */
-    #txtTable thead th:nth-child(5) {
-        width: 400px;
-    }
-    /* Assigned */
-    #txtTable thead th:nth-child(6) {
-        width: 727px;
-    }
-    /* Status */
-    #txtTable thead th:nth-child(7) {
-        width: 500px;
-    }
-    /* Priority */
-    #txtTable thead th:nth-child(8) {
-        width: 150px;
-    }
-    /* Plan Date */
-    #txtTable thead th:nth-child(9) {
-        width: 140px;
-    }
-    /* Time Consumed */
 
+    #txtTable thead th:nth-child(3) {
+        width: 110px;
+    }
+
+    #txtTable thead th:nth-child(4) {
+        width: 260px;
+    }
+
+    #txtTable thead th:nth-child(5) {  /* Assigned */
+        width: 180px;
+    }
+
+    #txtTable thead th:nth-child(6) {  /* Reason */
+        width: 320px;
+    }
+
+    #txtTable thead th:nth-child(7) {
+        width: 120px;
+    }
+
+    #txtTable thead th:nth-child(8) {
+        width: 80px;
+    }
+
+    #txtTable thead th:nth-child(9) {
+        width: 130px;
+    }
     /* Align numeric cells */
-    #txtTable td:nth-child(7),
-    #txtTable td:nth-child(9) {
+    #txtTable td:nth-child(8),
+    #txtTable td:nth-child(10) {
         text-align: right;
     }
 
     /* Select2 width (if used for Assigned) */
     #txtTable .assigned-ddl + .select2 {
-        width: 727px
-        !important;
+        width: 100% !important;
     }
 
     .modal {
@@ -192,9 +180,7 @@
     }
 	/* Mobile/table scroll: keep header visible and enable scroll */
 	.table-wrapper.fixed-height-table1 {
-		
 		-webkit-overflow-scrolling: touch;
-
 	}
 	/* Sticky table header inside the scroll container */
 	table.fixed-height-table1 thead th {
@@ -202,11 +188,6 @@
 		top: 0;
 		background-image: linear-gradient(#032954, #032954);
 		z-index: 2;
-	}
-	/* Ensure table can expand horizontally on small screens */
-	fixed-height-table1 {
-		min-width: 900px;
-		table-layout: auto;
 	}
 
 </style>
