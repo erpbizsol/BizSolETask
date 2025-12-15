@@ -8,12 +8,14 @@ let fileName;
 let AttachmentDetail = [];
 let G_WorkTypeList = [];
 let G_EmployeeNameList = [];
+let G_UserNameList = [];
 let G_ProjectList = [];
 let G_TicketTypetList = [];
 let G_PriorityList = [];
 let G_TestedBY = [];
 let G_TaskNatureList = [];
 let G_ModuleDespList = [];
+let lastFormData = null;
 
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
@@ -296,12 +298,12 @@ function GetUserName(selectedCode) {
                 tags: true,
             });
             if (Array.isArray(response) && response.length > 0) {
-                G_TestedBY = response.map(item => ({
+                G_UserNameList = response.map(item => ({
                     Code: item.Code,
                     Name: item.UserName
                 }));
             } else {
-                G_TestedBY = [];
+                G_UserNameList = [];
             
             }
 
@@ -886,7 +888,7 @@ function Edit(code) {
                     $(`#txtTestedBY`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
                 });
                 response.forEach(item => {
-                    BindSelect2(`txtUserName`, G_EmployeeNameList);
+                    BindSelect2(`txtUserName`, G_UserNameList);
                     $(`#txtUserName`).val(item.EmployeeMaster_Code).select2({ width: '100%' });
                 });
                 response.forEach(item => {
@@ -1029,7 +1031,7 @@ function onAttachmentClick(fileName, base64Data, code, download) {
 //    AttachmentDetail = [];
 //    DatePicker();
 //}
-let lastFormData = null;
+
 function captureFormData() {
     return {
         TaskType: $("#txtTaskType").val(),
@@ -1060,17 +1062,20 @@ function fillFormData(data) {
     $("#txtPriority").val(data.Priority);
     $("#txtLogDate").val(data.LogDate);
 
-    $("#txtProjectClient").val(data.ProjectClient).trigger('change');
-    $("#txtWorkType").val(data.WorkType).trigger('change');
-   // $("#txtDescription").val(data.Description);
+    // Yahan sirf value set kar rahe hain, change event trigger nahi kar rahe
+    // taki Client change hone par User Name list dobara reset na ho.
+    $("#txtProjectClient").val(data.ProjectClient);
+    $("#txtWorkType").val(data.WorkType);
+    // $("#txtDescription").val(data.Description);
 
-    $("#txtAssigned").val(data.Assigned).trigger('change');
+    $("#txtAssigned").val(data.Assigned);
     $("#txtCommittedDate").val(data.CommittedDate);
     $("#txtEstimatedTime").val(data.EstimatedTime);
 
+    // User Name par change trigger rehne do taaki mobile/email auto‑fill ho sake
     $("#txtUserName").val(data.UserName).trigger('change');
-    $("#txtContactNo").val(data.ContactNo).trigger('change');
-    $("#txtContactEmail").val(data.ContactEMail).trigger('change');
+    $("#txtContactNo").val(data.ContactNo);
+    $("#txtContactEmail").val(data.ContactEMail);
     $("#txtTestedBY").val(data.TestedBY).trigger('change');
     $("#txtMenuName").val(data.MenuName).trigger('change');
     $("#txtTaskNature").val(data.TaskNature).trigger('change');
@@ -1086,20 +1091,23 @@ function ClearData() {
 
     if (isContinuous && lastFormData) {
 
-        // Code new entry ke liye 0 hi rakho
+        // Naya record ke liye Code 0 rakho
         $("#hftxtCode").val("0");
 
-        // Ticket No aur Attachment ko fresh rakhna hai
+        // Pichle save ka pura data sab fields me daalo
+        fillFormData(lastFormData);
+
+        // Ab sirf yeh fields fresh rakhni hain:
+        // 1) Ticket No (agar naya generate karna hai)
         $("#txtTaskNo").val("");
+        // 2) Description blank
+        $("#txtDescription").val("");
+        // 3) Attachment blank + list clear
         $("#txtAttachment").val("");
         AttachmentDetail = [];
 
-        // Date ko aaj ki date se set karna ho to:
-        DatePicker();
-
-        // Baaki saare fields ko pichle data se bhar do
-        fillFormData(lastFormData);
-
+        // Baaki sab (Project, User Name, Assigned, Priority, Dates, etc.)
+        // lastFormData ke hisaab se filled rahenge.
         return;
     }
 
@@ -1110,10 +1118,10 @@ function ClearData() {
     $("#txtPriority").val("2");
     $("#txtProjectClient").val("0").trigger('change');
     $("#txtWorkType").val("0").trigger('change');
-    $("#txtDescription").val("");
     $("#txtAssigned").val("0").trigger('change');
     $("#txtEstimatedTime").val("");
     $("#txtAttachment").val("");
+    $("#txtDescription").val("");
     $("#txtTaskNature").val("0").trigger('change');
     $("#txtUserName").val("0").trigger('change');
     $("#txtContactNo").val("0").trigger('change');
