@@ -18,25 +18,34 @@
 
 
 <style>
-    .form-check .form-check-input {
-        /* float: left; */
-        margin-left: -1.5em;
+    .form-check1 {
+        display: block ;
+        min-height: 1.3125rem;
+        /* padding-left: 1.5em; */
+        margin-bottom: .125rem
     }
+
+    /* Continuous ticket checkbox styling */
     #chkContinuousTicket.form-check-input {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.2rem;
+        height: 1.2rem;
         margin-top: 0.1rem;
+        margin-right: 6px;
+        margin-left: 0;          /* default alignment */
+        border-radius: 4px;
+        border: 2px solid #0ba4af;
+        box-shadow: none;
     }
 
-        /* Theme color (apke buttons jaisa) */
-        #chkContinuousTicket.form-check-input:checked {
-            background-color: #0ba4af;
-            border-color: #0ba4af;
-        }
+    /* Theme color (buttons jaisa) */
+    #chkContinuousTicket.form-check-input:checked {
+        background-color: #0ba4af;
+        border-color: #0ba4af;
+    }
 
-    /* Label thoda compact */
-    .form-check-label {
-        font-size: 0.9rem;
+    /* Sirf Continuous ticket ka label – thoda sa spacing */
+    #chkContinuousTicket + .form-check-label {
+        margin-left: 2px;
     }
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #ede8e8 !important;
@@ -295,9 +304,9 @@
                             </select>
                         </div>
                         <div class="col-md-2 col-sm-6">
-                            <div class="form-check" style="margin-top: 28px;">
+                            <div class="form-check1" style="margin-top: 28px;">
                                 <input type="checkbox" class="form-check-input" id="chkContinuousTicket">
-                                <label class="form-check-label" for="chkContinuousTicket">
+                                <label class="col-form-label-sm fw-bold" for="chkContinuousTicket">
                                     Continuous ticket
                                 </label>
                             </div>
