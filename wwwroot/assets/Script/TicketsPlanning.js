@@ -12,7 +12,7 @@ let G_ReAssignList = [];
 let fileName;
 let AttachmentDetail = [];
 let G_Code;
-let G_ReasonList = [];
+let G_TaskNatureList = [];
 
 $(document).ready(function () {
     GetStatuss();
@@ -21,6 +21,7 @@ $(document).ready(function () {
     GetEmployeeMasterList();
     // Grid + popup Reason master ko pehle hi load kar lein
     GetReason();
+    GetTaskNatureMaster();
     // GetEmployeeMasterLists('Load');
     GetCallTicketMasterPlanningDetails('Get');
     $(".Number").keyup(function (e) {
@@ -223,18 +224,23 @@ function GetCallTicketMasterPlanningDetails(Type) {
                     var assignedDisabledAttr = isAdminUser ? '' : ' disabled';
                     var assignedHtml = '<select class="assigned-ddl" data-row="' + item.Code + '"' + assignedDisabledAttr + '>' + buildEmployeeOptions(assignedCode) + '</select>';
 
-                    // Reason dropdown: Assigned ke just baad dikhana hai
+                    // Reason (Task Nature) dropdown: Assigned ke just baad dikhana hai
                     var reasonCode = 0;
                     var reasonText = '';
 
-                    if (item.ReasonMaster_Code !== null && item.ReasonMaster_Code !== undefined &&
-                        item.ReasonMaster_Code !== 'null')  {                
-                        var rc = parseInt(item.ReasonMaster_Code, 10); c = parseInt(item.ReasonMaster_Code, 10);
+                    // Server se agar TaskNatureMaster_Code aa raha hai to usko hi primary source maanenge
+                    if (item.TaskNatureMaster_Code !== null &&
+                        item.TaskNatureMaster_Code !== undefined &&
+                        item.TaskNatureMaster_Code !== 'null') {
+                        var rc = parseInt(item.TaskNatureMaster_Code, 10);
                         if (!isNaN(rc) && rc > 0) {
                             reasonCode = rc;
                         }
-                    } else if (item.Reason !== null && item.Reason !== undefined && item.Reason !== 'null') {
-                        reasonText = String(item.Reason);
+                    }
+                    // Nahi mila to Nature (text) se code nikaalne ki koshish karenge
+                    if ((!reasonCode || reasonCode === 0) &&
+                        item.Nature !== null && item.Nature !== undefined && item.Nature !== 'null') {
+                        reasonText = String(item.Nature);
                         var fr = findReasonCodeByName(reasonText);
                         if (!isNaN(fr) && fr > 0) {
                             reasonCode = fr;
@@ -242,7 +248,7 @@ function GetCallTicketMasterPlanningDetails(Type) {
                     }
 
                     var reasonDisabledAttr = isAdminUser ? '' : ' disabled';
-                    var reasonHtml = '<select class="reason-ddl form-control form-control-sm" data-row="' + item.Code + '" data-reason-code="' + String(reasonCode) + '" data-reason-text="' + (reasonText || '') + '"' + reasonDisabledAttr + '>' + buildReasonOptions(reasonCode) + '</select>';
+                    var reasonHtml = '<select class="TaskNature-ddl form-control form-control-sm" data-row="' + item.Code + '" data-TaskNature-code="' + String(reasonCode) + '" data-TaskNature-text="' + (reasonText || '') + '"' + reasonDisabledAttr + '>' + buildReasonOptions(reasonCode) + '</select>';
 
                     var RequiredPlanDiscussHtml = '<input type="checkbox" class="assigned-chk" data-row="' + item.Code + '"' + (isPlanDiscussChecked ? ' checked' : '') + ' />';
 
@@ -259,8 +265,8 @@ function GetCallTicketMasterPlanningDetails(Type) {
                         if (key === 'Assigned') {
                             // Assigned ke turant baad Reason column inject karo
                             newItem[key] = assignedHtml;
-                            newItem['Reason'] = reasonHtml;
-                        } else if (key === 'Reason') {
+                            newItem['Nature'] = reasonHtml;
+                        } else if (key === 'Nature') {
                             // Server se aane wale plain text Reason ko ignore karein
                             // kyunki hum dropdown already add kar chuke hain
                         } else if (key === 'Plan Date') {
@@ -323,10 +329,10 @@ function buildEmployeeOptions(selectedCode) {
 }
 function buildReasonOptions(selectedCode) {
     var html = '<option value="0">Select</option>';
-    if (G_ReasonList && G_ReasonList.length > 0) {
+    if (G_TaskNatureList && G_TaskNatureList.length > 0) {
         var i = 0;
-        while (i < G_ReasonList.length) {
-            var itm = G_ReasonList[i];
+        while (i < G_TaskNatureList.length) {
+            var itm = G_TaskNatureList[i];
             var sel = '';
             if (!isNaN(parseInt(selectedCode, 10)) && parseInt(selectedCode, 10) === parseInt(itm.Code, 10)) {
                 sel = ' selected';
@@ -360,12 +366,12 @@ function findReasonCodeByName(name) {
         return 0;
     }
     var n = String(name).toLowerCase().trim();
-    if (!G_ReasonList || G_ReasonList.length === 0) {
+    if (!G_TaskNatureList || G_TaskNatureList.length === 0) {
         return 0;
     }
     var i = 0;
-    while (i < G_ReasonList.length) {
-        var itm = G_ReasonList[i];
+    while (i < G_TaskNatureList.length) {
+        var itm = G_TaskNatureList[i];
         if (String(itm.Name).toLowerCase().trim() === n) {
             return parseInt(itm.Code, 10);
         }
@@ -374,7 +380,7 @@ function findReasonCodeByName(name) {
     return 0;
 }
 
-$(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input, .reason-ddl', function () {
+$(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input, .TaskNature-ddl', function () {
 
     // Require Year and Week before allowing row updates
     var yearVal = $('#yearSelect').val();
@@ -402,7 +408,9 @@ $(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input, .rea
         return;
     }
 
-    var payload = { Code: parseInt(code, 10) };
+    // Hamesha row ka Code (ticket / planning row id) yahan store rakhenge
+    var rowCode = parseInt(code, 10);
+    var payload = { Code: rowCode };
 
     // Assigned is mandatory
     if ($el.hasClass('assigned-ddl')) {
@@ -421,14 +429,15 @@ $(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input, .rea
         payload.AssignedEmployeeCode = assignedNum;
     }
 
-    // Reason optional – agar user ne select kiya hai to bhej denge
-    if ($el.hasClass('reason-ddl')) {
+    // Reason (Task Nature) optional – agar user ne select kiya hai to bhej denge
+    if ($el.hasClass('TaskNature-ddl')) {
         var reasonVal = $el.val();
         if (reasonVal && reasonVal !== '0') {
             var rn = parseInt(reasonVal, 10);
             if (!isNaN(rn) && rn > 0) {
-                payload.ReasonMaster_Code = rn;
-                $el.attr('data-reason-code', String(rn));
+                // Row ka Code change nahi karna, alag field me Task Nature ka code bhejna hai
+                payload.TaskNatureMaster_Code = rn;
+                $el.attr('data-TaskNature-code', String(rn));
             }
         }
     }
@@ -514,13 +523,14 @@ $(document).on('change', '.assigned-ddl, .priority-input, .plan-date-input, .rea
         }
     }
 
-    var $reasonInRow = $row.find('.reason-ddl');
+    var $reasonInRow = $row.find('.TaskNature-ddl');
     if ($reasonInRow && $reasonInRow.length > 0) {
         var rv = $reasonInRow.val();
         if (rv && rv !== '0') {
             var rnv = parseInt(rv, 10);
             if (!isNaN(rnv) && rnv > 0) {
-                payload.ReasonMaster_Code = rnv;
+                // Yahan bhi sirf Task Nature ka code hi bhejna hai
+                payload.TaskNatureMaster_Code = rnv;
             }
         }
     }
@@ -1269,36 +1279,7 @@ function GetReason() {
                 allowClear: true
             });
 
-            // Grid ke saare Reason dropdown ko bhi refresh kar do (Assigned ke bagal)
-            var $gridReason = $('.reason-ddl');
-            if ($gridReason && $gridReason.length > 0) {
-                $gridReason.each(function () {
-                    var $ddl = $(this);
-                    var selCode = $ddl.attr('data-reason-code');
-                    var selText = $ddl.attr('data-reason-text');
-                    var selectedCode = 0;
-
-                    if (selCode && selCode !== '0') {
-                        selectedCode = parseInt(selCode, 10);
-                        if (isNaN(selectedCode)) {
-                            selectedCode = 0;
-                        }
-                    }
-
-                    if ((!selectedCode || selectedCode === 0) && selText && selText !== '') {
-                        var calc = findReasonCodeByName(selText);
-                        if (!isNaN(calc) && calc > 0) {
-                            selectedCode = calc;
-                            $ddl.attr('data-reason-code', String(calc));
-                        }
-                    }
-
-                    $ddl.html(buildReasonOptions(selectedCode));
-                    if (selectedCode && selectedCode > 0) {
-                        $ddl.val(String(selectedCode));
-                    }
-                });
-            }
+           
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -1705,4 +1686,72 @@ function GetAssingData(TickatNo) {
         }
     });
 
+}
+function GetTaskNatureMaster() {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetTaskNatureMaster`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_TaskNatureList = response.map(item => ({
+                    Code: item.Code,
+                    Name: item.Nature
+                }));
+            } else {
+                G_TaskNatureList = [];
+            }
+            const $select = $('#txtTaskNature');
+            $select.empty();
+            if (response && response.length > 0) {
+                $select.append(new Option("Select Task Nature..", "0", true));
+                $.each(response, function (index, item) {
+                    $select.append(new Option(item.Nature, item.Code));
+                });
+                Nature = response.Code;
+            }
+            $select.select2({
+                width: '100%',
+                closeOnSelect: false,
+                //placeholder: "Select Work Type...",
+                allowClear: true
+            });
+            // Grid ke saare Reason dropdown ko bhi refresh kar do (Assigned ke bagal)
+            var $gridTaskNature = $('.TaskNature-ddl');
+            if ($gridTaskNature && $gridTaskNature.length > 0) {
+                $gridTaskNature.each(function () {
+                    var $ddl = $(this);
+                    var selCode = $ddl.attr('data-TaskNature-code');
+                    var selText = $ddl.attr('data-TaskNature-text');
+                    var selectedCode = 0;
+
+                    if (selCode && selCode !== '0') {
+                        selectedCode = parseInt(selCode, 10);
+                        if (isNaN(selectedCode)) {
+                            selectedCode = 0;
+                        }
+                    }
+
+                    if ((!selectedCode || selectedCode === 0) && selText && selText !== '') {
+                        var calc = findReasonCodeByName(selText);
+                        if (!isNaN(calc) && calc > 0) {
+                            selectedCode = calc;
+                            $ddl.attr('data-TaskNature-code', String(calc));
+                        }
+                    }
+
+                    $ddl.html(buildReasonOptions(selectedCode));
+                    if (selectedCode && selectedCode > 0) {
+                        $ddl.val(String(selectedCode));
+                    }
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtTaskNature').empty();
+        }
+    });
 }
