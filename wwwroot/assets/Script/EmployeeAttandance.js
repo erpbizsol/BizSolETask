@@ -6,6 +6,7 @@ const appBaseURL = sessionStorage.getItem('AppBaseURL');
 let G_selectedCodes = [];
 let G_workingHours = [];
 let G_EmployeeMasterList = [];
+
 $(document).ready(async function () {
     DatePicker();
     GetEmployeeIdCard();
@@ -50,14 +51,15 @@ $(document).ready(async function () {
             $('#selectAll').prop('checked', true);
         } else {
             $('#selectAll').prop('checked', false);
-            
+
         }
         updateSelectedText();
         GetEmpCodes();
     });
-  
-   
+
+
 });
+
 async function GetEmployeeIdCard() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeIdCard`,
@@ -87,7 +89,6 @@ async function GetEmployeeIdCard() {
         },
     });
 }
-
 
 async function GetCardwiseEmployeeName(cardCodesArray) {
     const cardCodes = cardCodesArray.join(',');
@@ -166,6 +167,7 @@ function convertDateFormat(dateString) {
     const monthAbbreviation = monthNames[parseInt(month) - 1];
     return `${year}-${month}-${day}`;
 }
+
 $(document).on('change', '#checkboxOptions,#selectAll,#txtFromDate', function () {
     if ($('.option:checked').length === $('.option').length) {
         $('#selectAll').prop('checked', true);
@@ -178,49 +180,49 @@ $(document).on('change', '#checkboxOptions,#selectAll,#txtFromDate', function ()
     GetGenerateTaskTicketDateList();
 });
 function GetGenerateTaskTicketDateList() {
-  
+
     let Date = convertDateFormat($("#txtFromDate").val());
     let codes = GetEmpCodes();
-    let Employee_Codes = UserType=='A'?Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',') : UserMaster_Code;
+    let Employee_Codes = UserType == 'A' ? Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',') : UserMaster_Code;
 
-        $.ajax({
-            url: `${appBaseURL}/api/Master/GetEmployeeAttandance?EmployeeCode=${Employee_Codes}&Date=${Date}`,
-            type: 'POST',
-            dataType: "json",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Auth-Key', authKeyData);
-            },
-            success: function (response) {
-                if (response.length > 0) {
-                    $("#txtSummary").show();
-                    $("#txtstatus").show();
-                    const StringFilterColumn = [];
-                    const NumericFilterColumn = [];
-                    const DateFilterColumn = [];
-                    const Button = false;
-                    const showButtons = [];
-                    const StringdoubleFilterColumn = [];
-                    const hiddenColumns = ["Code"];
-                    const ColumnAlignment = {};
-                    const statusOptions = [
-                        'Present',
-                        'Absent',
-                      /*  'Weekly Off',*/
-                        'Holiday',
-                        /*'Sick Leave',*/
-                        'Leave',
-                        'Half Day'
-                    ];
-                    const updatedResponse = response.map((item, index) => {
-                        const statusSelect = `
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetEmployeeAttandance?EmployeeCode=${Employee_Codes}&Date=${Date}`,
+        type: 'POST',
+        dataType: "json",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                $("#txtSummary").show();
+                $("#txtstatus").show();
+                const StringFilterColumn = [];
+                const NumericFilterColumn = [];
+                const DateFilterColumn = [];
+                const Button = false;
+                const showButtons = [];
+                const StringdoubleFilterColumn = [];
+                const hiddenColumns = ["Code"];
+                const ColumnAlignment = {};
+                const statusOptions = [
+                    'Present',
+                    'Absent',
+                    /*  'Weekly Off',*/
+                    'Holiday',
+                    /*'Sick Leave',*/
+                    'Leave',
+                    'Half Day'
+                ];
+                const updatedResponse = response.map((item, index) => {
+                    const statusSelect = `
                 <select id="ddlStatus_${item.Code}" class="ddlStatus box_border form-control form-control-sm" data-index="${index}" autocomplete="off">
                 <option value="">-- Select --</option>
                 ${statusOptions.map(opt =>
-                            `<option value="${opt}" ${opt === item.Status ? 'selected' : ''}>${opt}</option>`
-                        ).join('')}
+                        `<option value="${opt}" ${opt === item.Status ? 'selected' : ''}>${opt}</option>`
+                    ).join('')}
                 </select>`;
 
-                        const workingHoursInput = `
+                    const workingHoursInput = `
                 <input type="number" id="txtWorkingHours_${item.Code}"
                 class="txtWorkingHours Amount box_border form-control form-control-sm Number"
                 data-index="${index}" 
@@ -229,7 +231,7 @@ function GetGenerateTaskTicketDateList() {
                 autocomplete="off" />
                 `;
 
-                const RemainingHoursInput = `
+                    const RemainingHoursInput = `
                 <input type="number" id="txtRemainingHours_${item.Code}"
                 class="txtRemainingHours box_border form-control form-control-sm"
                 data-index="${index}" 
@@ -237,25 +239,25 @@ function GetGenerateTaskTicketDateList() {
                 min="0" max="24" step="0.5" 
                 autocomplete="off" readonly/>
                 `;
-                        return {
-                            ...item,
-                            "Status": statusSelect,
-                            "WorkingHours": workingHoursInput,
-                            "RemainingHours": RemainingHoursInput
-                        };
-                    });
-                    BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
-                } else {
-                    $("#txtSummary").hide();
-                    $("#txtstatus").hide();
-                    //toastr.error("Record not found...!");
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error:", error);
+                    return {
+                        ...item,
+                        "Status": statusSelect,
+                        "WorkingHours": workingHoursInput,
+                        "RemainingHours": RemainingHoursInput
+                    };
+                });
+                BizsolCustomFilterGrid.CreateDataTable("table-header", "table-body", updatedResponse, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
+            } else {
+                $("#txtSummary").hide();
+                $("#txtstatus").hide();
+                //toastr.error("Record not found...!");
             }
-        });
-    
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+
 }
 function updateSelectedText() {
     let selectedNames = $('.option:checked').map(function () {
@@ -264,13 +266,13 @@ function updateSelectedText() {
     $('#dropdownButton').val(selectedNames);
 }
 function GetEmpCodes() {
-     G_selectedCodes = [];
+    G_selectedCodes = [];
     $('.option:checked').each(function () {
         G_selectedCodes.push($(this).val());
     });
     if (G_selectedCodes.length > 0) {
         GetCardwiseEmployeeName(G_selectedCodes);
-    }else {
+    } else {
         $("#txtEmployeeName").val("");
     }
     return G_selectedCodes;
@@ -284,39 +286,39 @@ $(document).on('change', '.ddlStatus,.txtWorkingHours', function () {
     G_workingHours = $("#txtWorkingHours_" + EmployeeMaster_Code).val();
     let RemainingHourss = $("#txtRemainingHours_" + EmployeeMaster_Code).val();
     const date = convertDateFormat($("#txtFromDate").val());
-    SaveEmployeeStatus(EmployeeMaster_Code, date, status, G_workingHours,RemainingHourss);
+    SaveEmployeeStatus(EmployeeMaster_Code, date, status, G_workingHours, RemainingHourss);
 });
 function SaveEmployeeStatus(Employee_Codes, date, status, workingHours, RemainingHourss) {
-        const payload = {
-            EmployeeMaster_Code: Employee_Codes,
-            Date: date,
-            Status: status,
-            WorkingHours: workingHours,
-            RemainingHours: RemainingHourss,
-            UserMaster_Code: UserMaster_Code
-        };
-        $.ajax({
-            url: `${appBaseURL}/api/Master/SaveEmployeeAttandance`,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(payload),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Auth-Key', authKeyData);
-            },
-            success: function (response) {
-                if (response[0].Status =='Y') {
-                    toastr.success(response[0].Msg);
-                    GetGenerateTaskTicketDateList();
-                } else {
-                    toastr.success(response[0].Msg);
-                }
-               
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                toastr.error("Failed to save status.");
+    const payload = {
+        EmployeeMaster_Code: Employee_Codes,
+        Date: date,
+        Status: status,
+        WorkingHours: workingHours,
+        RemainingHours: RemainingHourss,
+        UserMaster_Code: UserMaster_Code
+    };
+    $.ajax({
+        url: `${appBaseURL}/api/Master/SaveEmployeeAttandance`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response[0].Status == 'Y') {
+                toastr.success(response[0].Msg);
+                GetGenerateTaskTicketDateList();
+            } else {
+                toastr.success(response[0].Msg);
             }
-        });
+
+        },
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            toastr.error("Failed to save status.");
+        }
+    });
 }
 function Reset() {
     $("#txtSummary").hide();
@@ -329,8 +331,9 @@ function Reset() {
     G_selectedCodes = [];
     $(".option").prop("checked", false);
 }
+
 $(document).on('change', '#txtddlStatus', function () {
-    const status = $(this).val();  
+    const status = $(this).val();
     const date = convertDateFormat($("#txtFromDate").val());
     SaveEmployeeStatuss(G_selectedCodes, status, date);
 });

@@ -19,11 +19,11 @@ $(document).ready(function () {
     DatePicker();
     $("#ERPHeading").text("Tickets Planning");
     GetEmployeeMasterList();
-    // Grid + popup Reason master ko pehle hi load kar lein
+   
     GetReason();
     GetTaskNatureMaster();
     // GetEmployeeMasterLists('Load');
-    GetCallTicketMasterPlanningDetails('Get');
+    GetCallTicketMasterPlanningDetails('Load');
     $(".Number").keyup(function (e) {
         if (/\D/g.test(this.value)) this.value = this.value.replace(/[^0-9.]/g, '')
     });
@@ -885,7 +885,7 @@ function formatDM(d) {
 }
 
 $(document).on('click', '.time-link', function () {
-    var uid = $(this).data('uid');
+    let uid = $(this).data('uid');
     GetAssingData(uid);
 });
 function GetAssingData(TickatNo) {

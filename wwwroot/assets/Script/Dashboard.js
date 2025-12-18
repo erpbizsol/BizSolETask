@@ -38,7 +38,7 @@ $(document).ready(function () {
         $('.option').prop('checked', this.checked);
         updateSelected();
         GetEmpCodes();
-        
+
     });
     $(document).on('change', '.option', function () {
         if ($('.option:checked').length === $('.option').length) {
@@ -138,7 +138,7 @@ function GetEmployeeType(Mode) {
                                 data: RemainingHoursData,
                                 backgroundColor: '#0B4CCA' // dark blue
                             }
-                            
+
                         ]
                     },
                     options: {
@@ -528,7 +528,7 @@ function GetEmployeeEfficiency(Mode) {
                                     display: true,
                                     text: 'Employee Performance (%)'
                                 },
-                                 font: {
+                                font: {
                                     size: 16,
                                     weight: 'bold',
                                 }
@@ -842,7 +842,6 @@ $(document).on('change', '#checkboxOptions,#selectAll', function () {
     loadPieChartFromAPI('GET');
     GetClientPending('GET');
 });
-
 function Reset() {
     DatePicker();
     $('#dropdownButton').val(null).trigger('change');
@@ -850,4 +849,3 @@ function Reset() {
     $(".option").prop("checked", false);
 }
 
-   

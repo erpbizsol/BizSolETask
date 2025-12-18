@@ -82,7 +82,6 @@ $(document).ready(function () {
         }
         updateSelectedText();
     });
-   // GetClientList(G_selectedCode);
     GetClientMasterDetails(0);
 });
 function ShowClientMaster(Type) {
@@ -95,13 +94,13 @@ function ShowClientMaster(Type) {
         success: function (response) {
             if (response.length > 0) {
                 $("#txtTable").show();
-                const StringFilterColumn = ["Client Name","Default Emails"];
+                const StringFilterColumn = ["Client Name", "Default Emails"];
                 const NumericFilterColumn = [];
                 const DateFilterColumn = [];
                 const Button = false;
                 const showButtons = [];
                 const StringdoubleFilterColumn = [];
-                const hiddenColumns = ["Code","Employee_Codes"];
+                const hiddenColumns = ["Code", "Employee_Codes"];
                 const ColumnAlignment = {
                 };
                 const updatedResponse = response.map(item => ({
@@ -208,20 +207,12 @@ function Edit(code) {
                 $("#hfCode").val(response[0].Code);
                 $("#txtClientName").val(response[0].ClientName);
                 $("#txtDefaultEmail").val(response[0].DefaultEmails);
-               // let codesRaw = response[0].Employee_Codes;
-                //if (typeof codesRaw === "string") {
-                //        let fixed = codesRaw.trim().replace(/^\[|\]$/g, '').replace(/'/g, '"');  
-                //        let finalJson = "[" + fixed + "]";
-                //        let codes = JSON.parse(finalJson);
-                //    $('#dropdownButton').val(codes).trigger('change');
-                //}
                 let codesRaw = response[0].Employee_Codes;
                 let codes = [];
-
                 try {
                     let fixed = codesRaw.trim().replace(/^\[|\]$/g, '').replace(/'/g, '"');
                     let finalJson = "[" + fixed + "]";
-                    codes = JSON.parse(finalJson); 
+                    codes = JSON.parse(finalJson);
                 } catch (e) {
                     console.error("Employee_Codes parse error:", e);
                 }
@@ -437,7 +428,7 @@ function validateExcelFormat(data) {
     }
 
     const headers = data[0].map(header => header.replace(/[\s.]+/g, ''));
-    const requiredColumns = ['ClientName','DefaultEmails'];
+    const requiredColumns = ['ClientName', 'DefaultEmails'];
 
     const missingColumns = requiredColumns.filter(col => !headers.includes(col));
     if (missingColumns.length > 0) {
@@ -469,7 +460,6 @@ function validateExcelFormat(data) {
 }
 function GetEmployeeMasterList() {
     $.ajax({
-        //url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=U`,
         url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
         type: 'GET',
         beforeSend: function (xhr) {
@@ -503,17 +493,16 @@ function GetSelectedWorkTypeCodes() {
     $('.option:checked').each(function () {
         selectedCodes.push($(this).val());
     });
-    return selectedCodes; 
+    return selectedCodes;
 }
 function isEmail(email) {
     var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     return regex.test(email);
 }
 function GetAssignClient() {
-    //GetClientList(G_selectedCode);
     openSavePopup();
 
-}   
+}
 function openSavePopup() {
     var saveModal = new bootstrap.Modal(document.getElementById("staticBackdrop"));
     saveModal.show();
@@ -536,7 +525,7 @@ function GetEmpCodes() {
     $('.option1:checked').each(function () {
         selectedCodes.push($(this).val());
     });
-   
+
     return selectedCodes;
 }
 function GetEmployeeList() {
@@ -557,10 +546,6 @@ function GetEmployeeList() {
                 $('#ddlEmployeeName').select2({
                     width: '-webkit-fill-available'
                 });
-                //SelectOptionByText('ddlEmployeeName', UserName);
-                //let selectedCode = $('#ddlEmployeeName').val();
-
-
             } else {
                 $('#ddlEmployeeName').empty();
             }
@@ -634,36 +619,36 @@ function AssignClients() {
     let EmployeeMaster_Code = $("#ddlEmployeeName").val();
     let codes = GetSelectedClientCodes();
     let Client_Codes = Array.isArray(codes) ? codes : JSON.parse(codes.replace(/'/g, '"'));
-        let payload = Client_Codes.map(code => {
-            return {
-                EmployeeMaster_Code: parseInt(EmployeeMaster_Code),
-                ClientMaster_Code: code.toString()
-            };
-        });
-        $.ajax({
-            url: `${appBaseURL}/api/Master/AssignClientsToEmployee`,
-            type: "POST",
-            contentType: "application/json",
-            dataType: "json",
-            data: JSON.stringify(payload),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Auth-Key", authKeyData);
-            },
-            success: function (response) {
-                if (response[0].Status === "Y") {
-                    toastr.success(response[0].Msg);
-                    ClearData();
-                }
-                else {
-                    toastr.error(response[0].Msg);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error:", xhr.responseText);
-                toastr.error("An error occurred while saving the data.");
-            },
-        });
-    
+    let payload = Client_Codes.map(code => {
+        return {
+            EmployeeMaster_Code: parseInt(EmployeeMaster_Code),
+            ClientMaster_Code: code.toString()
+        };
+    });
+    $.ajax({
+        url: `${appBaseURL}/api/Master/AssignClientsToEmployee`,
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify(payload),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Auth-Key", authKeyData);
+        },
+        success: function (response) {
+            if (response[0].Status === "Y") {
+                toastr.success(response[0].Msg);
+                ClearData();
+            }
+            else {
+                toastr.error(response[0].Msg);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", xhr.responseText);
+            toastr.error("An error occurred while saving the data.");
+        },
+    });
+
 }
 function GetSelectedClientCodes() {
     let selectedCodes = [];

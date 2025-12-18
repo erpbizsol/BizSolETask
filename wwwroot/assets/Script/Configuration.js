@@ -31,7 +31,7 @@ function Save() {
         $("#txtClientName").focus();
         return;
     }
-    else if (!WorkType) { 
+    else if (!WorkType) {
         toastr.error('Please enter Work Type!');
         $("#txtWorkType").focus();
         return;
@@ -52,7 +52,7 @@ function Save() {
         return;
     }
     const payload = {
-        Code: $("#hfCode").val() || 0,  
+        Code: $("#hfCode").val() || 0,
         ClientMaster: ClientName,
         WorkType: WorkType,
         TaskNature: TaskNature,
@@ -65,7 +65,7 @@ function Save() {
         type: 'POST',
         contentType: 'application/json',
         dataType: 'json',
-        data: JSON.stringify(payload),  
+        data: JSON.stringify(payload),
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
