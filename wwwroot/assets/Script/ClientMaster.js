@@ -278,9 +278,9 @@ function GetExcelTemplate(WithData) {
         success: function (response) {
             if (response.length > 0) {
                 if (WithData == 'N') {
-                    ExportToExcel(response, 'ClientMaster_Tamplate.xlsx');
+                    ExportToExcel(response, 'ClientMaster_Template.xlsx');
                 } else {
-                    ExportToExcel(response, 'ClientMaster_Tamplate_Sample.xlsx');
+                    ExportToExcel(response, 'ClientMaster_Template_Sample.xlsx');
                 }
 
             } else {
