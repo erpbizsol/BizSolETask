@@ -1,4 +1,4 @@
-﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
+var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
 var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
@@ -1228,7 +1228,7 @@ function GetResolvedBy() {
             const $select = $('#txtResolvedBy');
             $select.empty();
             if (response && response.length > 0) {
-                // $select.append(new Option("Select Assigned..", true, true));
+                 $select.append(new Option("Select Assigned..", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
@@ -1559,18 +1559,19 @@ function Save() {
     } else {
         let Postdata =
         {
-            pendingTask: [
+            request: [
                 {
                     code: parseInt(G_Code),
                     status: parseInt(Status),
                     ResolutionTime: parseInt(TotalResolutionM || 0),
                     resolutiondDate: ResolutionDates,
-                    reAssign: ReAssign || 0,
+                    reAssign: parseInt(ReAssign || 0),
                     resolvedBy: parseInt(ResolvedBy || 0),
                     updateBy: parseInt(UpdateBy || 0),
                     remarks: Remarks,
                     userMaster_Code: parseInt(UserMaster_Code || 0),
-                    ReasonMaster_Code: Reason,
+                    ReasonMaster_Code: parseInt(Reason || 0),
+                    ticketNo: 0
                 }
             ],
             Attachment: AttachmentDetail

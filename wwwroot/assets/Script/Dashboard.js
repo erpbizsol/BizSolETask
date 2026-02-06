@@ -820,6 +820,7 @@ $('#txtFromDate, #txtToDate').on('change', function () {
     loadPieChartFromAPI('GET');
     GetClientPending('GET');
     GetNormalPriority('GET');
+
     GetHighPriority('GET');
     GetEmployeeEfficiency('GET');
     GetEMPLOYEEWORKEDHOURS('GET');

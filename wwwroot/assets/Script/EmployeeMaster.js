@@ -138,11 +138,13 @@ function Save() {
         toastr.error('Please enter Mobile No.');
         $("#txtMobileNo").focus();
         return;
-    } else if (!IsMobileNumber(MobileNo)) {
-        toastr.error('Please enter valid Mobile No.');
-        $("#txtMobileNo").focus();
-        return; 
-    } else if (Password == "" && Code == 0) {
+    }
+    //else if (!IsMobileNumber(MobileNo)) {
+    //    toastr.error('Please enter valid Mobile No.');
+    //    $("#txtMobileNo").focus();
+    //    return; 
+    //}
+    else if (Password == "" && Code == 0) {
         toastr.error('Please enter Password.');
         $("#txtPassword").focus();
         return;
@@ -456,9 +458,9 @@ function GetExcelTemplate(WithData){
         success: function (response) {
             if (response.length > 0) {
                 if (WithData == 'N') {
-                    ExportToExcel(response, 'EmployeeMaster_Tamplate.xlsx');
+                    ExportToExcel(response, 'EmployeeMaster_Template.xlsx');
                 } else {
-                    ExportToExcel(response, 'EmployeeMaster_Tamplate_Sample.xlsx');
+                    ExportToExcel(response, 'EmployeeMaster_Template_Sample.xlsx');
                 }
             } else {
                     toastr.error("Record not found...!");

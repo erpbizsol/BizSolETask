@@ -1,4 +1,4 @@
-﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
+var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
 var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
@@ -16,6 +16,7 @@ let G_TestedBY = [];
 let G_TaskNatureList = [];
 let G_ModuleDespList = [];
 let lastFormData = null;
+let G_AssignedName = "";
 
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
@@ -94,6 +95,7 @@ $(document).ready(async function () {
         $("#txtAllUser").hide();
     }
     UpdateLabelforItemMaster();
+
 });
 
 $('input[name="ticktOrder"], input[name="ticktOrderStatus"]').on('change', function () {
@@ -135,10 +137,9 @@ function GetTicketNo() {
             xhr.setRequestHeader('Auth-Key', authKeyData);
         },
         success: function (response) {
-            const $select = $('#txtTaskNo');
+            let $select = $('#txtTaskNo');
             $select.empty();
             if (response && response.length > 0) {
-                //  $select.append(new Option("Select Ticket No...", "", true, true));
                 $.each(response, function (index, item) {
                     $select.append(new Option(item.UID));
                 });
@@ -147,7 +148,6 @@ function GetTicketNo() {
             $select.select2({
                 width: '100%',
                 closeOnSelect: false,
-                //placeholder: "Select Ticket No...",
                 allowClear: true
             });
         },
@@ -263,7 +263,6 @@ function GetClientMasterDetails() {
     });
 }
 
-
 $('#txtProjectClient').on('change', function () {
     let selectedCode = $(this).val();
     if (selectedCode && selectedCode !== "0") {
@@ -289,7 +288,7 @@ function GetUserName(selectedCode) {
                     $select.append(new Option(item.UserName, item.Code));
                 });
                 UserName = response.UserName;
-               
+
             }
             $select.select2({
                 width: '100%',
@@ -304,14 +303,14 @@ function GetUserName(selectedCode) {
                 }));
             } else {
                 G_UserNameList = [];
-            
+
             }
 
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
             $('#txtUserName').empty();
-            
+
         }
 
     });
@@ -441,8 +440,10 @@ function GetAssigneds(selectedCode) {
             if (Array.isArray(response) && response.length > 0) {
                 G_EmployeeNameList = response.map(item => ({
                     Code: item.Code,
-                    Name: item.EmployeeName
+                    Name: item.EmployeeName,
+                    
                 }));
+                
             } else {
                 G_EmployeeNameList = [];
                 toastr.error("No employees found.");
@@ -455,6 +456,7 @@ function GetAssigneds(selectedCode) {
                     $select.append(new Option(item.EmployeeName, item.Code));
                 });
                 Assigned = response.Code;
+                G_AssignedName = response[0].EmployeeName
             }
             $select.select2({
                 width: '100%',
@@ -476,6 +478,7 @@ $("#txtAttachment").on('change', (event) => {
         fileName = files[0].name;
     }
 });
+
 $('#txtAttachment').bind('change', function () {
 
     $.each($('#txtAttachment')[0].files, function (key, file) {
@@ -699,7 +702,7 @@ function SaveData() {
                     priorityMaster_Code: Priority,
                     logDate: LogDate,
                     clientMaster_Code: ProjectClient,
-                    ModuleMaster_Code: ModuleMaster_Code,
+                    ModuleMaster_Code: ModuleMaster_Code || 0,
                     bizSolUserMaster_Code: UserMaster_Code,
                     // sourceMaster_Code: 0,
                     workTypeMaster_Code: WorkType,
@@ -715,7 +718,7 @@ function SaveData() {
                     ContactEMail: ContactEMail,
                     RaisedBy: UserMastrName,
                     Testedby_EmployeeMasterCode: TestedBY_Code,
-                    TaskNatureMaster_Code: TaskNature
+                    TaskNatureMaster_Code: TaskNature||0
                 }
             ],
             Attachment: AttachmentDetail
@@ -733,11 +736,32 @@ function SaveData() {
             success: function (response) {
                 if (response[0].Status === "Y") {
                     toastr.success(response[0].Msg);
-                    ClearData();
-                    //GetGenerateTaskTicketDateList('Get');
+                
+                    var message = 'Ticket #' + TicketNo + ' assigned by ' + G_AssignedName + '. Description: ' + Description;
 
+                   
+                    if (Assigned && Assigned != "0") {
+                        SendNotificationToUser(
+                            UserMaster_Code,        
+                            message,
+                            '/Master/GenerateTask?code=' + response[0].Code,  
+                            response[0].Code,             
+                            'EmployeeMaster'
+                            
+                        );
+                        SendNotificationToUserAndroid(
+                            UserMaster_Code,
+                            message,
+                            '/Master/GenerateTask?code=' + response[0].Code,
+                            response[0].Code,
+                            'EmployeeMaster'
+                        );
+                    }
+                    // Send email
                     SenEmailMassage(response[0].Code);
-                    // SendWhatsApp(response[0].Code);
+
+                    // Now clear the form
+                    ClearData();
                     unblockUI();
                 }
                 else {
@@ -1336,7 +1360,7 @@ function setSelect2Value($el, value) {
 }
 
 $('#txtUserName').on('change', function () {
-    var val = $(this).val();
+    let val = $(this).val();
     $.ajax({
         url: `${appBaseURL}/api/Master/GetUserName?UserName=${val}`,
         type: 'GET',
@@ -1354,5 +1378,60 @@ $('#txtUserName').on('change', function () {
     });
 });
 
+function SendNotificationToUser(employeeCode, message, url, masterTableCode, masterTableName) {
+    $.ajax({
+        url: `${appBaseURL}/api/PushNotification/SendNotificationToUser`,
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            // ⭐ All Required Parameters
+            EmployeeMaster_Code: employeeCode,          
+            SendTo: "",                                  
+            Message: message,                            
+            Url: url || "",                             
+            SendImmediate: true,                          
+            MasterTableCode: masterTableCode || 0,        
+            MasterTableName: masterTableName || "",       
+            PushNotificationsType: "Web"                
+        }),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Auth-Key", authKeyData);
+        },
+        success: function (result) {
+           // alert(result.message);
+        },
+        error: function (xhr) {
+            console.error('❌ Failed to send notification:', xhr.responseText);
+        }
+    });
+}
+function SendNotificationToUserAndroid(employeeCode, message, url, masterTableCode, masterTableName) {
+    $.ajax({
+        url: `${appBaseURL}/api/PushNotification/SendNotificationToUserAndroid`,
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            // ⭐ All Required Parameters
+            EmployeeMaster_Code: employeeCode,
+            SendTo: "",
+            Message: message,
+            Url: url || "",
+            SendImmediate: true,
+            MasterTableCode: masterTableCode || 0,
+            MasterTableName: masterTableName || "",
+            PushNotificationsType: "Android"
+        }),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Auth-Key", authKeyData);
+        },
+        success: function (result) {
+            // alert(result.message);
+        },
+        error: function (xhr) {
+            console.error('❌ Failed to send notification:', xhr.responseText);
+        }
+    });
+}
 
-
+window.getAndSavePlayerId = getAndSavePlayerId;
+window.savePlayerIdToBackend = savePlayerIdToBackend;

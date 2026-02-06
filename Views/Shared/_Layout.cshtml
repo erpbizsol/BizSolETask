@@ -28,25 +28,172 @@
     <link rel="stylesheet" href="~/assets/css/app.min.css" />
     <link rel="stylesheet" href="~/assets/css/header-footer-red.css" />
     <script src="~/assets/js/jquery-3.6.0.min.js"></script>
-
     <style>
         /*  .breadcrumbs1 {
-             background: #dddde4;
-             position: sticky;
-             top: 0;
-             background-color: #dddde4;
-             z-index: 1000;
-             padding: 8px 0 8px 9px;
-             border-top-right-radius: 5px;
-             border-top-left-radius: 5px;
-             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.9);
-             height: 36px;
-         } */
-         .Highlighted {
-             background-color: #FFD700 !important; /* Gold color */
-             color: black !important;
-         }
+                     background: #dddde4;
+                     position: sticky;
+                     top: 0;
+                     background-color: #dddde4;
+                     z-index: 1000;
+                     padding: 8px 0 8px 9px;
+                     border-top-right-radius: 5px;
+                     border-top-left-radius: 5px;
+                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.9);
+                     height: 36px;
+                 } */
+        .Highlighted {
+            background-color: #FFD700 !important; /* Gold color */
+            color: black !important;
+        }
     </style>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+          const isMedianApp = typeof window.median !== "undefined";
+         window.onMedianPlayerId = function (playerId) {
+             console.log("✅ Player ID received from Median:", playerId);
+             toastr.success("Android", playerId);
+         };
+
+         window.OneSignalDeferred = window.OneSignalDeferred || [];
+         OneSignalDeferred.push(async function(OneSignal) {
+
+             // Initialize OneSignal
+             await OneSignal.init({
+                 appId: "a28c6398-62f1-4f4d-b26c-a29bda8faab0",
+                 allowLocalhostAsSecureOrigin: true,
+                 serviceWorkerParam: { scope: "/" },
+                 serviceWorkerPath: "OneSignalSDKWorker.js"
+             });
+
+             // Show notification prompt
+             OneSignal.Slidedown.promptPush();
+
+             // Get current subscription status
+             const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
+             console.log('✓ Current subscription status:', isSubscribed);
+             if (isSubscribed) {
+                 // Get and save Player ID if already subscribed
+                 await getAndSavePlayerId();
+             }
+
+             // Listen for subscription changes
+             OneSignal.User.PushSubscription.addEventListener('change', async function(event) {
+                 console.log('✓ Subscription changed:', event);
+
+                 if (event.current.optedIn) {
+                     console.log('✓ User subscribed!');
+                     await getAndSavePlayerId();
+                 } else {
+                     console.log('⚠ User unsubscribed');
+                 }
+             });
+
+             // Listen for notification clicks
+             OneSignal.Notifications.addEventListener('click', function(event) {
+                 console.log('📨 Notification clicked:', event);
+             });
+
+             // Listen for permission changes
+             OneSignal.Notifications.addEventListener('permissionChange', async function(permission) {
+                 console.log('✓ Permission changed:', permission);
+              
+                 if (permission) {
+                     await getAndSavePlayerId();
+                 }
+             });
+         });
+
+
+         // Function to get Player ID and save
+         async function getAndSavePlayerId() {
+             try {
+                 // Wait for OneSignal to be ready
+                 await window.OneSignalDeferred;
+                 let deviceType = 'web';
+                 window.OneSignalDeferred.push(async function(OneSignal) {
+                     // Get subscription ID (Player ID)
+                     let subscriptionId = OneSignal.User.PushSubscription.id;
+
+                     
+                     if (subscriptionId) {
+                         console.log('✓ Player ID obtained:', subscriptionId);
+                         savePlayerIdToBackend(subscriptionId,deviceType);
+
+                     } else {
+                         console.log('⚠ Player ID not available yet');
+
+                         // Retry after 2 seconds
+                         setTimeout(async function() {
+                             let retryId = OneSignal.User.PushSubscription.id;
+
+                             if (retryId) {
+                                 console.log('✓ Player ID obtained (retry):', retryId);
+                                 savePlayerIdToBackend(retryId,deviceType);
+                             }
+                         }, 2000);
+                     }
+                 });
+             } catch (error) {
+                 console.error('❌ Error getting Player ID:', error);
+             }
+         }
+
+         // Save Player ID to backend
+         function  savePlayerIdToBackend(playerId,deviceType) {
+             //alert(playerId);
+             console.log('→ Saving Player ID to backend:', playerId);
+              //toastr.success(deviceType,playerId);
+              //toastr.success("android",playerId);
+             var authKeyData = sessionStorage.getItem('authKey');
+             var appBaseURL = sessionStorage.getItem('AppBaseURL');
+
+             if (!authKeyData || !appBaseURL) {
+                 console.log('⚠ User not logged in, skipping save');
+                 return;
+             }
+
+             try {
+                 var authKey = JSON.parse(authKeyData);
+
+                 $.ajax({
+                     url: appBaseURL + '/api/PushNotification/SaveOneSignalPlayerId',
+                     type: 'POST',
+                     contentType: 'application/json',
+                     data: JSON.stringify({
+                         userId: authKey.UserMaster_Code,
+                         playerId: playerId,
+                         DeviceType:deviceType ? deviceType : "android"
+                     }),
+                     beforeSend: function(xhr) {
+                         xhr.setRequestHeader('Auth-Key', JSON.stringify(authKey));
+                     },
+                     success: function(result) {
+                        // alert('✅ Player ID saved successfully:', result);
+
+                     },
+                     error: function(xhr, status, error) {
+                        alert('❌ Failed to save Player ID:')
+                     }
+                 });
+             } catch (ex) {
+                 console.error('❌ Error in savePlayerIdToBackend:', ex);
+             }
+         }
+
+    </script>
+    @*  <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "a28c6398-62f1-4f4d-b26c-a29bda8faab0",
+          serviceWorkerParam: { scope: "/" },
+          serviceWorkerPath: "OneSignalSDKWorker.js"
+        });
+        });
+     
+      
+    </script> *@
+
 </head>
 <body>
     <div id="layout-wrapper">
@@ -58,7 +205,7 @@
                         <a href="index.html" class="logo logo-dark">
                             <span class="logo-sm">
                                 @* <img src="~/assets/images/menulogo.jpg" /> *@
-                                <img src="~/assets/images/e-task.png" alt="" height="30">
+                                <img src="~/assets/images/users/allierapage.png" alt="" height="30">
                             </span>
                             <span class="logo-lg">
                                 <img src="~/assets/images/users/allierapage.png" alt="" height="30" class="LogoLg"> <span class="logo-txt">Alliera</span>
@@ -85,7 +232,7 @@
                 </div>
 
                 <div class="d-flex">
-                    
+
                     @* <div class="dropdown d-inline-block d-lg-none ms-2">
                         <button type="button" class="btn header-item" id="page-header-search-dropdown"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -147,10 +294,10 @@
                             @* <span class="d-none d-xl-inline-block ms-1 fw-medium">User</span>
                             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i> *@
                         </button>
-                        
+
                         <div class="dropdown-menu dropdown-menu-end">
                             <!-- item-->
-                            <a class="dropdown-item" href="@Html.Raw(ViewBag.AppBaseURLMenu)/Master/UserMaster?Profile=1">
+                            <a class="dropdown-item" href="https://bizsol.in/">
                                 <i class='bx bxs-user align-middle userIcon me-1'></i> <span>Profile</span>
                             </a>
                             <div class="dropdown-divider"></div>
@@ -171,7 +318,7 @@
                             <span class="d-xl-inline-block fw-medium font-size-13" id="txtuserName">User</span>
                         </div>
                     </div>
-                    
+
                     <div class="dropdown d-inline-block me-2 pt-1-1 font-size-13">
                         Total Time :
                         <span id="gettime"></span>
@@ -268,7 +415,7 @@
         <!-- ============================================================== -->
         <!-- Start Footer here -->
         <!-- ============================================================== -->
-      @*   <footer class="footer">
+        @*   <footer class="footer">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-4 text-left">
@@ -294,7 +441,7 @@
                         </div>
                     </div>
                     <div class="col-md-8 text-end">
-                        <div><p class="m-0 copyright">Copyright © 2024 <a href="">BizSol Technologies Pvt. Ltd.</a> All rights reserved.</p></div>
+                        <div><p class="m-0 copyright">Copyright © 2026 <a href="">BizSol Technologies Pvt. Ltd.</a> All rights reserved.</p></div>
                     </div>
 
                 </div>
@@ -496,47 +643,47 @@
     <script src="~/assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-world-mill-en.js"></script>
     @*  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> *@
     <script src="~/assets/libs/select2-4.1.0-rc.0/dist/js/select2.min.js"></script>
- @*    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> *@
-    <script>
-       
-        // $(document).ready(function () {
-        var authKey = '@Html.Raw(ViewBag.AuthKey)';
-        if (authKey !== '') {
-            sessionStorage.setItem('authKey', authKey);
-            sessionStorage.setItem('AppBaseURL', '@Html.Raw(ViewBag.AppBaseURL)');
-            sessionStorage.setItem('AppBaseURLMenu', '@Html.Raw(ViewBag.AppBaseURLMenu)');
-            sessionStorage.setItem('UserName', '@Html.Raw(ViewBag.UserName)');
-            sessionStorage.setItem('UserMasterCode', '@Html.Raw(ViewBag.UserMasterCode)');
-           // sessionStorage.setItem('UserMaster_Code', '@Html.Raw(ViewBag.UserMaster_Code)');
-            //window.AppBaseURL='@Html.Raw(ViewBag.AppBaseURL)';
-           
-        }
-        // });
-        $("#ERPUserName").text(sessionStorage.getItem('UserName'));
-        $("#txtuserName").text(sessionStorage.getItem('UserName'));
+    @*    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> *@
 
-        $(document).on('select2:open', function () { 
-            if ($('.select2-search__field').length > 1) {
-                $('.select2-search__field')[1].focus()
-            }
-            else {
-                $('.select2-search__field')[0].focus();
-            }
-            
+    <script>
+
+         // $(document).ready(function () {
+         var authKey = '@Html.Raw(ViewBag.AuthKey)';
+         if (authKey !== '') {
+             sessionStorage.setItem('authKey', authKey);
+             sessionStorage.setItem('AppBaseURL', '@Html.Raw(ViewBag.AppBaseURL)');
+             sessionStorage.setItem('AppBaseURLMenu', '@Html.Raw(ViewBag.AppBaseURLMenu)');
+             sessionStorage.setItem('UserName', '@Html.Raw(ViewBag.UserName)');
+             sessionStorage.setItem('UserMasterCode', '@Html.Raw(ViewBag.UserMasterCode)');
+            // sessionStorage.setItem('UserMaster_Code', '@Html.Raw(ViewBag.UserMaster_Code)');
+             //window.AppBaseURL='@Html.Raw(ViewBag.AppBaseURL)';
+
+         }
+         // });
+         $("#ERPUserName").text(sessionStorage.getItem('UserName'));
+         $("#txtuserName").text(sessionStorage.getItem('UserName'));
+
+         $(document).on('select2:open', function () {
+             if ($('.select2-search__field').length > 1) {
+                 $('.select2-search__field')[1].focus()
+             }
+             else {
+                 $('.select2-search__field')[0].focus();
+             }
+
+         });
+        $(document).ready(function(){
+            setTimeout(function(){
+                GetWorksTime();
+            },2000)
+
         });
-       $(document).ready(function(){
-           setTimeout(function(){
-               GetWorksTime();
-           },2000)
-           
-       });
-           jQuery.event.special.mousewheel = {
-            setup: function (_, ns, handle) {
-                this.addEventListener("mousewheel", handle, { passive: true });
-            }
-        };
+            jQuery.event.special.mousewheel = {
+             setup: function (_, ns, handle) {
+                 this.addEventListener("mousewheel", handle, { passive: true });
+             }
+         };
     </script>
- 
     <script src="~/assets/script/logout.js"></script>
     <script src="~/assets/js/menu.js"></script>
     <script src="~/assets/script/common.js"></script>

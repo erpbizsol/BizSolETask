@@ -10,6 +10,7 @@ let G_ReAssignList = [];
 let fileName;
 let AttachmentDetail = [];
 let G_Code;
+let G_ReAssignCode;
 let G_ReasonList = [];
 $(document).ready(async function () {
     $("#ERPHeading").text("Pending Task");
@@ -57,7 +58,60 @@ $(document).ready(async function () {
 
 });
 
-$("#txtStatus").on('change', function () {
+async function GetReAssign() {
+    try {
+        const response = await fetch(`${appBaseURL}/api/Master/GetAssignedss`, {
+            method: 'GET',
+            headers: {
+                'Auth-Key': authKeyData
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+
+
+
+        if (Array.isArray(data) && data.length > 0) {
+            G_ReAssignCode = data[0].Code;
+            G_ReAssignList = data.map(item => ({
+                Code: item.Code,
+                Name: item.EmployeeName
+            }));
+        } else {
+            G_ReAssignList = [];
+        }
+
+        const $select = $('#txtReAssign');
+        $select.empty();
+
+        if (Array.isArray(data) && data.length > 0) {
+            $select.append(new Option("Select ReAssign..", "", true, true));
+
+            data.forEach(item => {
+                $select.append(new Option(item.EmployeeName, item.Code));
+            });
+        }
+
+        // Initialize Select2
+        $select.select2({
+            width: '100%',
+            closeOnSelect: false,
+            placeholder: "Select ReAssign...",
+            allowClear: true
+        });
+
+    } catch (error) {
+        console.error("Error:", error);
+        $('#txtReAssign').empty();
+        toastr.error("Failed to fetch ReAssign list.");
+    }
+}
+
+$("#txtStatus").on('change', async function () {
     var Status = $("#txtStatus").val();
     if (Status == "2") {
         $("#txtTotalResolutionM1").show();
@@ -67,7 +121,8 @@ $("#txtStatus").on('change', function () {
         $("#txtAttachment1").show();
         $("#txtReAssign1").hide();
         $("#txtReason1").hide();
-        GetResolvedBy();
+        await GetResolvedBy();
+        $("#txtResolvedBy").val(UserMaster_Code).trigger("change");
         StatusType();
 
     } else if (Status == "4") {
@@ -78,8 +133,9 @@ $("#txtStatus").on('change', function () {
         $("#txtResolvedBy1").hide();
         $("#txtUpdateBy1").hide();
         $("#txtReason1").show();
+        await GetReAssign();
+        
         StatusType();
-        GetReAssign();
         GetReason();
 
 
@@ -91,9 +147,12 @@ $("#txtStatus").on('change', function () {
         $("#txtAttachment1").hide();
         $("#txtReAssign1").hide();
         $("#txtReason1").hide();
+        $("#txtStatus").val("0");
+        $("#txtRemarks").val("");
     }
 
 });
+
 
 $(document).on('change', '.option', function () {
     GetGenerateTaskTicketDateList('Get');
@@ -118,7 +177,7 @@ $(document).on('change', '#ddlReportType', function () {
         $("#txtshowDate1").hide();
         $("#table-header").empty();
         $("#table-body").empty();
-        
+
 
     }
 });
@@ -183,10 +242,10 @@ function GetGenerateTaskTicketDateList(Type) {
                 const updatedResponse = response.map(item => ({
                     ...item, 'Action':
                         `
-                        <a class= "btn1 btn btn-primary icon-height" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
+                        <a class= "btn btn-primary btn1 icon-height mb-1" title="View Attachment" onclick="ViewAttachment('${item.Code}')" > <i class="fa fa-paperclip"></i></a>
                         <button class="btn btn-primary btn1 icon-height mb-1"   title="Edit" onclick="Edit('${item.Code}')"><i class="fa-solid fa-pencil"></i></button>
                         <button class="btn btn-primary btn1 icon-height mb-1" style="display:none"  title="StatusType" onclick="StatusType('${item.Code}','${UserMaster_Code}')"><i class="fa-solid fa-pencil"></i></button>
-                          <button class="btn btn-success1 icon-height mb-1" style="background:#216c4a" title="Activity Details" onclick="GetAssingData('${item[`TicketNo`]}')">
+                          <button class="btn btn-success1 btn1 icon-height mb-1" style="background:#216c4a" title="Activity Details" onclick="GetAssingData('${item[`TicketNo`]}')">
                        A D
                         </button>
                         `
@@ -333,7 +392,8 @@ $("#txtBack").click(function () {
     $("#txtResolvedBy1").hide();
     $("#txtUpdateBy1").hide();
     $("#txtReason1").hide();
-
+    $("#txtStatus").val("0");
+    $("#txtRemarks").val("");
 
 });
 
@@ -442,44 +502,58 @@ function formatDateToString(dateObj) {
     const year = dateObj.getFullYear();
     return `${day}/${month}/${year}`;
 }
-function GetResolvedBy() {
-    $.ajax({
-        url: `${appBaseURL}/api/Master/GetAssignedss`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (Array.isArray(response) && response.length > 0) {
-                G_ResolvedByList = response.map(item => ({
-                    Code: item.Code,
-                    Name: item.EmployeeName
-                }));
-            } else {
-                G_ResolvedByList = [];
+
+async function GetResolvedBy() {
+    try {
+        const response = await fetch(`${appBaseURL}/api/Master/GetAssignedss`, {
+            method: 'GET',
+            headers: {
+                'Auth-Key': authKeyData
             }
-            const $select = $('#txtResolvedBy');
-            $select.empty();
-            if (response && response.length > 0) {
-                // $select.append(new Option("Select Assigned..", true, true));
-                $.each(response, function (index, item) {
-                    $select.append(new Option(item.EmployeeName, item.Code));
-                });
-                EmployeeName = response.Code;
-            }
-            $select.select2({
-                width: '100%',
-                closeOnSelect: false,
-                placeholder: "Select Resolved By...",
-                allowClear: true
-            });
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            $('#txtResolvedBy').empty();
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
         }
-    });
+
+        const data = await response.json();
+
+        // Prepare global list
+        if (Array.isArray(data) && data.length > 0) {
+            G_ResolvedByList = data.map(item => ({
+                Code: item.Code,
+                Name: item.EmployeeName
+            }));
+        } else {
+            G_ResolvedByList = [];
+        }
+
+        const $select = $('#txtResolvedBy');
+        $select.empty();
+
+        if (Array.isArray(data) && data.length > 0) {
+            $select.append(new Option("Select Assigned..", "", true, true));
+
+            data.forEach(item => {
+                $select.append(new Option(item.EmployeeName, item.Code));
+            });
+        }
+
+        // Initialize Select2
+        $select.select2({
+            width: '100%',
+            closeOnSelect: false,
+            placeholder: "Select Resolved By...",
+            allowClear: true
+        });
+
+    } catch (error) {
+        console.error("Error:", error);
+        $('#txtResolvedBy').empty();
+        toastr.error("Failed to fetch Resolved By list.");
+    }
 }
+
 function GetReason() {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetReason?EmployeeCode=${UserMaster_Code}`,
@@ -518,44 +592,8 @@ function GetReason() {
         }
     });
 }
-function GetReAssign() {
-    $.ajax({
-        url: `${appBaseURL}/api/Master/GetAssignedss`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Auth-Key', authKeyData);
-        },
-        success: function (response) {
-            if (Array.isArray(response) && response.length > 0) {
-                G_ReAssignList = response.map(item => ({
-                    Code: item.Code,
-                    Name: item.EmployeeName
-                }));
-            } else {
-                G_ReAssignList = [];
-            }
-            const $select = $('#txtReAssign');
-            $select.empty();
-            if (response && response.length > 0) {
-                 $select.append(new Option("Select Assigned..", true, true));
-                $.each(response, function (index, item) {
-                    $select.append(new Option(item.EmployeeName, item.Code));
-                });
-                EmployeeName = response.Code;
-            }
-            $select.select2({
-                width: '100%',
-                closeOnSelect: false,
-                placeholder: "Select Resolved By...",
-                allowClear: true
-            });
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            $('#txtReAssign').empty();
-        }
-    });
-}
+
+
 function BindSelect2(elementId, list) {
     let option = '<option value="0">Select</option>';
     $.each(list, function (key, val) {
@@ -579,25 +617,28 @@ function StatusType() {
         },
         success: function (response) {
             if (response) {
-               
+
                 if (Status == "2") {
                     $("#txtTotalResolutionM").val(response[0].Times);
                     $("#txtResolutionDates").val(response[0].Dates);
                     $("#txtRemarks").val(response[0].Remarks);
-                    $("#txtResolvedBy").val(response[0].Code);
-                    $("#txtReAssign").val(response[0].Code);
-                 
-                    response.forEach(item => {
-                        BindSelect2(`txtResolvedBy`, G_ResolvedByList);
-                        $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
-                    });
+                    // $("#txtResolvedBy").val(response[0].Code);
+                    //$("#txtReAssign").val(response[0].Code);
+                    $('#txtResolvedBy').val(UserMaster_Code);
+
+                    //response.forEach(item => {
+                    //    BindSelect2(`txtResolvedBy`, G_ResolvedByList);
+                    //    $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
+                    //});
+
                 }
                 else if (Status == "4") {
                     $("#txtTotalResolutionM").val(response[0].Times);
                     $("#txtResolutionDates").val(response[0].Dates);
                     $("#txtRemarks").val(response[0].Remarks);
-                    $("#txtResolvedBy").val(response[0].Code);
-                    $("#txtReAssign").val(response[0].Code);
+                    // $("#txtResolvedBy").val(response[0].Code);
+                   // $("#txtReAssign").val(response[0].G_ReAssignCode);
+                    $("#txtReAssign").val(response[0].Code).trigger("change");
                 }
 
             }
@@ -792,7 +833,7 @@ function Save() {
                     updateBy: parseInt(UpdateBy || 0),
                     remarks: Remarks,
                     userMaster_Code: parseInt(UserMaster_Code || 0),
-                    ReasonMaster_Code: Reason ||0,
+                    ReasonMaster_Code: Reason || 0,
                 }
             ],
             Attachment: AttachmentDetail
@@ -972,13 +1013,13 @@ function GetPendingTaskReport(Type) {
                 const Button = false;
                 const showButtons = [""];
                 const StringdoubleFilterColumn = [""];
-                const hiddenColumns = ["EmployeeMaster_Code","AssignedBy","WorkByCode", "ReAssign_Code", "TicketAssignedBy", "CreateTicketBy_Code", "Remarks"];
+                const hiddenColumns = ["EmployeeMaster_Code", "AssignedBy", "WorkByCode", "ReAssign_Code", "TicketAssignedBy", "CreateTicketBy_Code", "Remarks"];
                 const ColumnAlignment = {};
                 BizsolCustomFilterGrid.CreateDataTable("table-headerC", "table-bodyC", response, Button, showButtons, StringFilterColumn, NumericFilterColumn, DateFilterColumn, StringdoubleFilterColumn, hiddenColumns, ColumnAlignment);
             } else {
                 $("#txtTable").hide();
                 if (Type != 'Load') {
-                   // toastr.error("Record not found...!");
+                    // toastr.error("Record not found...!");
                 }
             }
         },

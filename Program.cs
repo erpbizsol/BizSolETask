@@ -13,6 +13,9 @@ namespace Bizsol_ESMS.Controllers
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddControllersWithViews();
 
+            // Add HttpClient for Push Notifications
+            builder.Services.AddHttpClient();
+
             // Add session service
             builder.Services.AddSession(options =>
             {
@@ -50,7 +53,20 @@ namespace Bizsol_ESMS.Controllers
                 app.UseHsts();
             }
 
-            app.UseStaticFiles();
+            // Configure static files with proper MIME types
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    // Allow service workers to be served with proper headers
+                    if (ctx.File.Name.EndsWith(".js") && 
+                        (ctx.File.Name.Contains("OneSignal") || ctx.File.Name.Contains("service-worker")))
+                    {
+                        ctx.Context.Response.Headers.Append("Service-Worker-Allowed", "/");
+                        ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+                    }
+                }
+            });
 
             app.UseSession();
             app.UseRouting();

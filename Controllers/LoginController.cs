@@ -146,7 +146,7 @@ namespace Bizsol_ETask.Controllers
                 {
                     HttpContext.Session.SetString("IsMainUserMasterLogin", "");
                     connection1.Open();
-                    string query1 = $"Select * From EmployeeMaster Where MobileNo={UserID.Trim()}";
+                    string query1 = $"Select * From EmployeeMaster Where MobileNo='{UserID.Trim()}'";
                     using (var command = new SqlCommand(query1, connection1))
                     {
                         command.Parameters.AddWithValue("@UserID", UserID.Trim());
