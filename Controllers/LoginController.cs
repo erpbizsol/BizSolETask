@@ -1,4 +1,4 @@
-﻿using Bizsol_ESMS.Models;
+using Bizsol_ESMS.Models;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.Xml.Linq;
+using static Bizsol_ETask.Controllers.LoginController;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 
@@ -83,7 +84,7 @@ namespace Bizsol_ETask.Controllers
             }
         }
         [HttpPost]
-        public IActionResult Authenticate(string CompanyCode, string UserID, string Password,string RememberMe)
+        public IActionResult Authenticate(string CompanyCode, string UserID, string Password, string RememberMe)
         {
             var IsFirstLogin1 = "N";
             string Mobile = "", pw = "", companyCode = "", Name = "";
@@ -111,7 +112,7 @@ namespace Bizsol_ETask.Controllers
                         }
                     }
                 }
-                connections.Close(); 
+                connections.Close();
             }
             if (UserID == Mobile && Password == pw)
             {
@@ -138,9 +139,11 @@ namespace Bizsol_ETask.Controllers
                     HttpContext.Session.SetString("Code", "0");
                     HttpContext.Session.SetString("Role", "A");
                     HttpContext.Session.SetString("IsMainUserMasterLogin", "");
-                    return Ok(new { success = true, message = "Login successful!", IsFirstLogin = 'N'});
+                    return Ok(new { success = true, message = "Login successful!", IsFirstLogin = 'N' });
                 }
-            } else if (LogInUser(UserID ,Password)) {
+            }
+            else if (LogInUser(UserID, Password))
+            {
                 string connectionString1 = HttpContext.Session.GetString("ConnectionString");
                 using (var connection1 = new SqlConnection(connectionString1))
                 {
@@ -156,7 +159,7 @@ namespace Bizsol_ETask.Controllers
                             {
                                 while (reader.Read())
                                 {
-                                    HttpContext.Session.SetString("User","");
+                                    HttpContext.Session.SetString("User", "");
                                     HttpContext.Session.SetString("Code", reader["Code"].ToString());
                                     HttpContext.Session.SetString("EmployeeCard", reader["EmployeeCard"].ToString());
                                     HttpContext.Session.SetString("EmployeeName", reader["EmployeeName"].ToString());
@@ -166,7 +169,7 @@ namespace Bizsol_ETask.Controllers
                                     HttpContext.Session.SetString("ServerDate", DateTime.Now.Date.ToString("yyyy-MM-dd"));
                                     HttpContext.Session.SetString("Role", reader["Role"].ToString());
                                     HttpContext.Session.SetString("IsFirstLogin", reader["IsFirstLogin"].ToString());
-                                    IsFirstLogin1= reader["IsFirstLogin"].ToString();
+                                    IsFirstLogin1 = reader["IsFirstLogin"].ToString();
                                 }
                             }
                         }
@@ -277,7 +280,7 @@ namespace Bizsol_ETask.Controllers
         public async Task<IActionResult> SendOTP(string CompanyCode, string UserId)
         {
             string connectionString = HttpContext.Session.GetString("ConnectionString");
-            string MobileNo = "";string Email = "";string EmployeeName = "";
+            string MobileNo = ""; string Email = ""; string EmployeeName = "";
             dynamic obj = "";
             using (var connections = new SqlConnection(connectionString))
             {
@@ -303,7 +306,7 @@ namespace Bizsol_ETask.Controllers
                 }
                 connections.Close();
             }
-            if (MobileNo !="" && Email != "" && EmployeeName != "")
+            if (MobileNo != "" && Email != "" && EmployeeName != "")
             {
                 string Otp;
                 if (HttpContext.Session.GetString("OTP") != null)
@@ -312,31 +315,31 @@ namespace Bizsol_ETask.Controllers
                 {
                     Random r = new Random();
                     Otp = r.Next(1000, 9999).ToString();
-                    HttpContext.Session.SetString("OTP",Otp);
+                    HttpContext.Session.SetString("OTP", Otp);
                 }
-                HttpContext.Session.SetString("ReferralUserCode",MobileNo);
-                
+                HttpContext.Session.SetString("ReferralUserCode", MobileNo);
+
                 string Msg = "<div style=\"background:#feef54;width:100%;padding:50px 0px;\"><div style=\"width:600px;background:white;margin:0px auto;\"><div style=\"width:40px;margin-left: 40px;padding-top:0px;\"></div><br><div style=\"padding:20px;padding: 40px;font-size: 12px;line-height: 22px;\">Dear <strong>" + EmployeeName + "</strong>,<br/><br/> We have received a request for password reset for your account :<strong>" + MobileNo + "</strong> <br>Your login password reset OTP :  <strong>   " + Otp + "</strong> <br/><br/>Thanks for Contacting BizSol.<br><br><U>Regards</U><br/> Customer Support Team<br/> <br/> Email: <a href = 'mailto:support@bizsol.in' > support@bizsol.in</a> <br/>BizSol Technologies Pvt Ltd <br /></div></div></div>";
 
                 bool Mail = SendEmailOTP(Email, "BizSol CRM - Password Reset OTP", Msg);
                 if (Mail)
                 {
 
-                   string Text = "Password Reset OTP has been sent an your Registered Email Id " + Email.Substring(0, 2) + "xxxxxx" + Email.Substring(Email.Length - 2, 2) + "";
-                     obj = new
+                    string Text = "Password Reset OTP has been sent an your Registered Email Id " + Email.Substring(0, 2) + "xxxxxx" + Email.Substring(Email.Length - 2, 2) + "";
+                    obj = new
                     {
                         Msg = Text,
                         Status = "Y",
                         Otp
                     };
                     return Json(obj);
-                    
+
                 }
             }
             else
             {
                 string Text = "Invalid Registered Email Id Or Mobile";
-                 obj = new
+                obj = new
                 {
                     Msg = Text,
                     Status = "N",
@@ -344,7 +347,7 @@ namespace Bizsol_ETask.Controllers
                 };
                 return Json(obj);
             }
-             obj = new
+            obj = new
             {
                 Msg = "Error found.!",
                 Status = "N",
@@ -477,5 +480,272 @@ namespace Bizsol_ETask.Controllers
                 return Json(new { success = false, message = "Invalid Password!" });
             }
         }
+
+        private string GetConnectionStringByCompanyCode(string companyCode)
+        {
+            if (string.IsNullOrWhiteSpace(companyCode))
+                return null;
+
+            // 1) Master DB ka connection (jahan ETaskCompanyConfiguration table hai)
+            string masterConn = _configuration.GetConnectionString("DefaultConnectionSQL");
+
+            // 2) Template connection string jisme placeholders hain: IP, DatabaseName, UserID, Password
+            string templateConn = _configuration.GetConnectionString("ConnectionString");
+
+            using (var connection = new SqlConnection(masterConn))
+            {
+                connection.Open();
+
+                string query = "SELECT SQLIp, DataBaseName, DataBaseUser, DataBasePassword " +
+                               "FROM ETaskCompanyConfiguration WHERE CompanyCode = @CompanyCode";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@CompanyCode", companyCode);
+
+                    using (var dr = command.ExecuteReader())
+                    {
+                        if (!dr.Read())
+                            return null;
+                        string cs = templateConn;
+                        cs = cs.Replace("IP", dr["SQLIp"].ToString());
+                        cs = cs.Replace("DatabaseName", dr["DataBaseName"].ToString());
+                        cs = cs.Replace("UserID", dr["DataBaseUser"].ToString());
+                        cs = cs.Replace("Password", dr["DataBasePassword"].ToString());
+
+                        return cs;
+                    }
+                }
+            }
+        }
+        public class TicketRatingViewModel
+        {
+            public string CompanyCode { get; set; }
+            public string TicketNo { get; set; }
+            public string CallTcketMaster_Code { get; set; }
+            public string ClientEmail { get; set; }
+            public string QueryDescription { get; set; }
+
+            public int Rating { get; set; }
+            public string Status { get; set; } // "P" / "C"
+            public string Remark { get; set; }
+            public string Type { get; set; }   // "Y" / "N"
+
+            public bool AlreadyRated { get; set; }
+            public string Message { get; set; }
+
+            // Optional
+            public string? ClientName { get; set; }
+        }
+
+        [HttpGet]
+        public IActionResult GetTicketRatingData(string companyCode, int code, string clientEmail, string type)
+        {
+            var companyConn = GetConnectionStringByCompanyCode(companyCode);
+            if (companyConn == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid company code."
+                });
+            }
+
+            string ticketNoDb = null;
+            string emailDb = null;
+            string descriptionDb = null;
+            int? ratingDb = null;
+            string statusDb = null;
+
+            using (var con = new SqlConnection(companyConn))
+            {
+                con.Open();
+
+                string sql = @"
+SELECT TOP 1 
+       CT.UID,
+       UM.Email,
+       CT.Description,
+       CT.Status
+FROM CallTicketMaster CT
+LEFT JOIN UserMaster UM ON CT.BizSolUserMaster_Code = UM.Code
+WHERE CT.Code = @Code AND UM.Email = @Email";
+
+                using (var cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@Code", code);
+                    cmd.Parameters.AddWithValue("@Email", clientEmail);
+
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        if (rdr.Read())
+                        {
+                            ticketNoDb = rdr["UID"].ToString();
+                            emailDb = rdr["Email"].ToString();
+                            descriptionDb = rdr["Description"].ToString();
+                            //statusDb = rdr["Status"].ToString();
+
+                            
+                        }
+                        else
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                message = "Ticket not found."
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Default rating / status op (Y/N) ke hisaab se
+            int rating = 0;
+            string status = "P";
+
+            if (type == "Y")
+            {
+                rating = 10;
+                status = "C";
+            }
+            else if (type == "N")
+            {
+                rating = 0;
+                status = "P";
+            }
+
+            if (ratingDb.HasValue)
+                rating = ratingDb.Value;
+
+            if (!string.IsNullOrEmpty(statusDb))
+                status = statusDb;
+
+            return Json(new
+            {
+                success = true,
+                message = "",
+                companyCode,
+                ticketNo = ticketNoDb,
+                clientEmail = emailDb,
+                queryDescription = descriptionDb,
+                status,
+                rating,
+                type
+            });
+        }
+        private bool IsAjaxRequest()
+        {
+            return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        }
+
+        [HttpPost]
+        public IActionResult TicketsRating(TicketRatingViewModel model)
+        {
+            bool isAjax = IsAjaxRequest();
+            if (model == null)
+            {
+                if (isAjax) return Json(new { success = false, message = "Invalid request. Form data missing." });
+                model = new TicketRatingViewModel { Message = "Invalid request." };
+                return View("~/Views/Master/TicketsRating.cshtml", model);
+            }
+            if (model.Type == "Y")
+            {
+                model.Rating = 10;
+                model.Status = "C";
+            }
+            else if (model.Type == "N")
+            {
+                model.Rating = 0;
+                model.Status = "P";
+            }
+            else
+            {
+                model.Rating = 10;
+                model.Status = "0";
+            }
+            try
+            {
+                if (string.IsNullOrWhiteSpace(model.CompanyCode))
+                {
+                    model.Message = "Company code missing. Page ko rating link se open karein.";
+                    if (isAjax) return Json(new { success = false, message = model.Message });
+                    return View("~/Views/Master/TicketsRating.cshtml", model);
+                }
+
+                var companyConn = GetConnectionStringByCompanyCode(model.CompanyCode);
+                if (companyConn == null)
+                {
+                    model.Message = "Invalid company code.";
+                    if (isAjax) return Json(new { success = false, message = model.Message });
+                    return View("~/Views/Master/TicketsRating.cshtml", model);
+                }
+
+                using (var con = new SqlConnection(companyConn))
+                {
+                    con.Open();
+                    int callTicketMasterCode = 0;
+                    using (var cmdGetCode = new SqlCommand(
+                        "SELECT TOP 1 Code FROM CallTicketMaster WHERE UID = @TicketNo", con))
+                    {
+                        cmdGetCode.Parameters.AddWithValue("@TicketNo", model.TicketNo ?? "");
+                        var obj = cmdGetCode.ExecuteScalar();
+                        if (obj == null)
+                        {
+                            model.Message = "Ticket not found. Ticket no check karein.";
+                            if (isAjax) return Json(new { success = false, message = model.Message });
+                            return View("~/Views/Master/TicketsRating.cshtml", model);
+                        }
+                        callTicketMasterCode = Convert.ToInt32(obj);
+                    }
+                    // 2) Already rated check
+                    string checkSql = @"
+                    SELECT COUNT(1) 
+                    FROM   TicketRatingDetail
+                    WHERE  CallTicketMaster_Code = @CallTicketMaster_Code AND RatedByEmailID = @Email";
+
+                    using (var checkCmd = new SqlCommand(checkSql, con))
+                    {
+                        checkCmd.Parameters.AddWithValue("@CallTicketMaster_Code", callTicketMasterCode);
+                        checkCmd.Parameters.AddWithValue("@Email", model.ClientEmail ?? "");
+
+                        int count = (int)checkCmd.ExecuteScalar();
+                        if (count > 0)
+                        {
+                            model.AlreadyRated = true;
+                            model.Message = "Is ticket ki rating pehle hi ho chuki hai.";
+                            if (isAjax) return Json(new { success = false, message = model.Message });
+                            return View("~/Views/Master/TicketsRating.cshtml", model);
+                        }
+                    }
+
+                    // 3) Stored procedure USP_TicketRatingDetail
+                    using (var saveCmd = new SqlCommand("USP_TicketRatingDetail", con))
+                    {
+                        saveCmd.CommandType = CommandType.StoredProcedure;
+
+                        saveCmd.Parameters.AddWithValue("@Mode", "SaveDATA");
+                        saveCmd.Parameters.AddWithValue("@Code", 0);
+                        saveCmd.Parameters.AddWithValue("@CallTicketMaster_Code", callTicketMasterCode);
+                        saveCmd.Parameters.AddWithValue("@StatusByClient", model.Status);
+                        saveCmd.Parameters.AddWithValue("@ClientRemark", (object?)model.Remark ?? "");
+                        saveCmd.Parameters.AddWithValue("@RatedByEmailID", model.ClientEmail ?? "");
+                        saveCmd.Parameters.AddWithValue("@Rating", model.Rating);
+                        saveCmd.Parameters.AddWithValue("@ManagerRating", 0);
+                        saveCmd.Parameters.AddWithValue("@ClientName", model.ClientName ?? "");
+                        saveCmd.ExecuteNonQuery();
+                    }
+                }
+                model.Message = "Rating send successfully.";
+                if (isAjax) return Json(new { success = true, message = model.Message });
+                return View("~/Views/Master/TicketsRating.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                model.Message = "Save error: " + ex.Message;
+                if (isAjax) return Json(new { success = false, message = model.Message });
+                return View("~/Views/Master/TicketsRating.cshtml", model);
+            }
+        }
+
     }
 }

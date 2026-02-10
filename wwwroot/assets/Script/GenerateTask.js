@@ -75,7 +75,6 @@ $(document).ready(async function () {
     await GetClientMasterDetails();
     await GetWorkTypes();
     GetMenuName();
-    GetTestedBY();
     GetTaskNatureMaster();
     $("#txtTaskType").change(function () {
         var selectedValue = $(this).val();
@@ -268,6 +267,7 @@ $('#txtProjectClient').on('change', function () {
     if (selectedCode && selectedCode !== "0") {
         GetAssigneds(selectedCode);
         GetUserName(selectedCode);
+        GetTestedBY(selectedCode);
         $('#txtContactNo').empty();
         $('#txtContactEmail').empty();
     }
@@ -315,9 +315,9 @@ function GetUserName(selectedCode) {
 
     });
 }
-function GetTestedBY() {
+function GetTestedBY(ClientCode) {
     $.ajax({
-        url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
+        url: `${appBaseURL}/api/Master/GetClientWiseTestedBy?ClientCode=${ClientCode}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Auth-Key', authKeyData);
@@ -682,6 +682,10 @@ function SaveData() {
     } else if (WorkType == "0") {
         toastr.error('Please Select Work Type.');
         $("#txtWorkType").focus();
+        return;
+    } else if (TestedBY_Code == "0") {
+        toastr.error('Please Select Tested By.');
+        $("#txtTestedBY").focus();
         return;
     }
     //else if (Assigned == "0") {
