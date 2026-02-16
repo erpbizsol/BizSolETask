@@ -21,6 +21,16 @@ $(document).ready(function () {
     });
     $('#mySelect2').on('keydown', function (e) {
         if (e.key === "Enter") {
+            $("#ddlClientStatus").focus();
+        }
+    });
+    $('#ddlClientStatus').on('keydown', function (e) {
+        if (e.key === "Enter") {
+            $("#txtAllowPendingTkt").focus();
+        }
+    });
+    $('#txtAllowPendingTkt').on('keydown', function (e) {
+        if (e.key === "Enter") {
             $("#btnSave").focus();
         }
     });
@@ -126,6 +136,8 @@ function ShowClientMaster(Type) {
 function Save() {
     var ClientName = $("#txtClientName").val();
     var DefaultEmails = $("#txtDefaultEmail").val();
+    var ClientStatus = $("#ddlClientStatus").val();
+    let AllowPending = $("#txtAllowPendingTkt").val();
     var Code = $("#hfCode").val();
     const G_SelectedValues = document.getElementById('dropdownButton').value;
     if (ClientName == "") {
@@ -145,6 +157,11 @@ function Save() {
         $("#dropdownButton").focus();
         return;
     }
+    else if (AllowPending == 0) {
+        toastr.error('Please allow pending ticket rating.');
+        $("#txtAllowPendingTkt").focus();
+        return;
+    }
     else {
         let codes = GetSelectedWorkTypeCodes();
         let Employee_Codes = Array.isArray(codes) ? codes.join(',') : JSON.parse(codes.replace(/'/g, '"')).join(',');
@@ -153,9 +170,11 @@ function Save() {
             ClientName: ClientName,
             DefaultEmails: DefaultEmails,
             Employee_Codes: Employee_Codes,
-            UserMaster_Code: UserMaster_Code
+            UserMaster_Code: UserMaster_Code,
+            ClientStatus: ClientStatus,
+            AllowPendingTktRating: AllowPending
+
         };
-        console.log(payload);
         $.ajax({
             url: `${appBaseURL}/api/Master/SaveClientMaster`,
             type: "POST",
@@ -207,6 +226,8 @@ function Edit(code) {
                 $("#hfCode").val(response[0].Code);
                 $("#txtClientName").val(response[0].ClientName);
                 $("#txtDefaultEmail").val(response[0].DefaultEmails);
+                $("#ddlClientStatus").val(response[0].IsActive);
+                $("#txtAllowPendingTkt").val(response[0].AllowNoofPendingTktForClientRating);
                 let codesRaw = response[0].Employee_Codes;
                 let codes = [];
                 try {
@@ -240,6 +261,8 @@ function ClearData() {
     $("#hfCode").val("0");
     $("#txtClientName").val("");
     $("#txtDefaultEmail").val("");
+    $("#ddlClientStatus").val("Y");
+    $("#txtAllowPendingTkt").val("0");
     $('#dropdownButton').val(null).trigger('change');
     $('#dropdownList1').val(null).trigger('change');
     $('#ddlEmployeeName').val(0).trigger('change');

@@ -1,0 +1,422 @@
+﻿@model Bizsol_ETask.Controllers.LoginController.TicketRatingViewModel
+@{
+    Layout = null;
+}
+<link rel="stylesheet" href="~/assets/css/app.min.css" />
+<link href="~/assets/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/assets/css/toastr.min.css" rel="stylesheet" />
+
+<script src="~/assets/js/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script src="~/assets/Script/TicketsRating.js"></script>
+
+<style>
+
+    :root {
+        --form-primary: #0c7ab8;
+        --form-primary-light: #e8f4fc;
+        --form-primary-dark: #095a8a;
+        --form-success: #0d9488;
+        --form-success-soft: #ccfbf1;
+        --form-bg: #ffffff;
+        --form-bg-soft: #f8fafc;
+        --form-border: #cbd5e1;
+        --form-border-focus: #0c7ab8;
+        --form-text: #1e293b;
+        --form-muted: #64748b;
+        --form-placeholder: #94a3b8;
+        --form-footer-bg: #f1f5f9;
+        --form-btn-primary: linear-gradient(135deg, #0c7ab8, #0ea5e9);
+        --form-btn-primary-shadow: 0 4px 14px rgba(12, 122, 184, 0.4);
+        --card-bg: var(--form-bg);
+        --border: var(--form-border);
+        --text: var(--form-text);
+        --muted: var(--form-muted);
+        --primary-soft: var(--form-primary-light);
+        --primary: var(--form-primary);
+        --radius-lg: 14px;
+        --shadow-soft: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 20px 45px -12px rgba(15, 23, 42, 0.1);
+        /* Colorful accents */
+        --accent-orange: #f97316;
+        --accent-violet: #7c3aed;
+        --accent-emerald: #10b981;
+        --accent-amber: #f59e0b;
+    }
+
+    .rating-card-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        /* justify-content: space-between;  // agar center compress ho raha ho to hata bhi sakte ho */
+    }
+
+    /* Center message pill */
+    .rating-header-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 0.25rem 0.9rem;
+        border-radius: 999px;
+        background: #dc3545;
+        color: #fff;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        display: none; /* by default hidden */
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* Keep wrapper simple so it doesn't override full page */
+    .rating-card-wrapper {
+        background: transparent;
+        padding: 0.75rem 0;
+        margin: 20px 200px;
+    }
+
+    .p-2 {
+        padding: 1.5rem !important;
+    }
+
+    .rating-card-wrapper .card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-soft);
+        overflow: hidden;
+        box-shadow: 20px 20px 20px #aaaaaa;
+    }
+
+    .rating-card-header {
+        border-bottom: 1px solid var(--border);
+        padding: 0.85rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(350deg, rgba(42, 123, 155, 1) 0%, rgb(73, 228, 137) 100%);
+    }
+
+
+
+        .rating-card-header h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .rating-card-header span {
+            font-size: 0.8125rem;
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+
+    .rating-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        background: var(--primary-soft);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #f97316;
+    }
+
+    .rating-form label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.25rem;
+    }
+
+    .rating-form .form-control,
+    .rating-form .field-select,
+    .rating-form .field-textarea {
+        font-size: 0.875rem;
+        border: 1px solid #93c5fd;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: var(--form-text);
+        padding: 0.5rem 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 10px rgba(56, 189, 248, 0.1);
+    }
+
+    .rating-form .form-control,
+    .rating-form .field-select {
+        border-radius: 999px;
+    }
+
+    .rating-form .field-textarea {
+        border-radius: 12px;
+        min-height: 72px;
+        resize: vertical;
+    }
+
+        .rating-form .form-control:focus,
+        .rating-form .field-select:focus,
+        .rating-form .field-textarea:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+            background: var(--form-bg);
+        }
+
+        .rating-form .form-control::placeholder,
+        .rating-form .field-textarea::placeholder {
+            color: var(--form-placeholder);
+        }
+
+    .rating-form .field-select {
+        width: 100%;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%2364748b' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.7rem center;
+        background-size: 14px;
+        padding-right: 2rem;
+    }
+
+    .rating-slider-wrapper {
+        position: relative;
+        margin-top: 0.15rem;
+    }
+
+    .rating-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #0d9488, #22c55e, #84cc16, #eab308, #f97316, #ef4444);
+        outline: none;
+        cursor: pointer;
+    }
+
+        .rating-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid var(--form-success);
+            box-shadow: 0 6px 16px rgba(13, 148, 136, 0.5);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+            .rating-slider::-webkit-slider-thumb:hover {
+                transform: scale(1.03);
+                box-shadow: 0 8px 20px rgba(13, 148, 136, 0.65);
+            }
+
+        .rating-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid var(--form-success);
+            box-shadow: 0 6px 16px rgba(13, 148, 136, 0.5);
+        }
+
+    .rating-scale-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+    }
+
+    .rating-value-chip {
+        position: absolute;
+        right: 0;
+        top: -2.1rem;
+        padding: 0.14rem 0.55rem;
+        border-radius: 999px;
+        background: var(--form-success-soft);
+        color: #0f766e;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+
+        .rating-value-chip span {
+            font-weight: 600;
+        }
+
+    .card-footer {
+        margin-top: 0.4rem;
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #c7d2fe;
+        background: linear-gradient(180deg, #eef2ff 0%, #f0f9ff 100%);
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .helper-text {
+        font-size: 0.8rem;
+        color: var(--text); /* main text black/dark */
+        font-weight: 600;
+    }
+
+        .helper-text span {
+            color: var(--accent-orange); /* highlight part */
+            font-weight: 700;
+        }
+
+    .btn-row {
+        display: flex;
+        gap: 0.6rem;
+    }
+
+    .btn {
+        border-radius: 999px;
+        padding: 0.45rem 1.4rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
+        white-space: nowrap;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%);
+            box-shadow: 0 6px 22px rgba(16, 185, 129, 0.6);
+        }
+
+    .btn-outline {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+        color: #b45309;
+        border: 1px solid #f59e0b;
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+    }
+
+        .btn-outline:hover {
+            background: linear-gradient(135deg, #fde68a 0%, #fbbf24 50%, #f59e0b 100%);
+            color: #92400e;
+            border-color: #d97706;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    .btn-icon {
+        font-size: 0.9rem;
+    }
+
+    @@media (max-width: 768px) {
+        .rating-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2rem;
+        }
+    }
+</style>
+<div id="txtCreatepage" class="rating-card-wrapper">
+    <div class="card">
+        <div class="rating-card-header">
+            <div class="rating-badge">Ticket Rating</div>
+            <div class="rating-header-message" id="ratingHeaderMessage"></div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model?.Message))
+        {
+            <div class="alert alert-info mx-3 mt-2 mb-0" role="alert">@Model.Message</div>
+        }
+        <form id="frmTicketRating" method="post" action="@Url.Action("TicketsRating", "Login")" asp-antiforgery="true">
+            @Html.AntiForgeryToken()
+            @* Backend model binding ke liye names = TicketRatingViewModel properties *@
+            <input type="hidden" id="CompanyCode" name="CompanyCode" value="@(Model?.CompanyCode ?? Context.Request.Query["CompanyCode"].ToString())" />
+            <input type="hidden" id="Type" name="Type" value="@(Model?.Type ?? Context.Request.Query["op"].ToString())" />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row p-2">
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <label for="txtRatingBy" class="col-form-label-sm fw-bold">Rating by</label>
+                            <input type="text" id="txtRatingBy" name="ClientEmail"
+                                   autocomplete="off" class="form-control form-control-sm box_border"
+                                   placeholder="Customer email / name">
+                        </div>
+
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <label for="txtTicketNo" class="col-form-label-sm fw-bold">Ticket no</label>
+                            <input type="text" id="txtTicketNo" name="TicketNo"
+                                   autocomplete="off" class="form-control form-control-sm box_border"
+                                   placeholder="Ticket id">
+                        </div>
+
+                        <div class="col-md-6 col-sm-6 col-6">
+                            <label for="txtQueryDesc" class="col-form-label-sm fw-bold">Query description <span class="text-danger">*</span></label>
+                            <textarea id="txtQueryDesc" name="QueryDescription" class="form-control form-control form-control-sm box_border" rows="1" autocomplete="off" maxlength="1000"></textarea>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <label for="status" class="col-form-label-sm fw-bold">Status</label>
+                            <select id="status" name="Status" class="form-control form-control form-control-sm box_border" required>
+                                <option value="0">Select status</option>
+                                <option value="P">Pending</option>
+                                <option value="C" selected>Complete</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <label class="col-form-label-sm fw-bold">Rating resolved query</label>
+                            <div class="rating-slider-wrapper">
+                                <input id="rating" name="Rating" class="rating-slider" type="range"
+                                       min="0" max="10" step="1" value="10" />
+                                <div class="rating-value-chip">
+                                    <span id="ratingValue">10</span>/10
+                                </div>
+                            </div>
+                            <div class="rating-scale-text">
+                                <span>Poor</span>
+                                <span>Average</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-6">
+                            <label for="remark" class="col-form-label-sm fw-bold">Remark <span class="text-danger">*</span></label>
+                            <textarea id="remark" name="Remark" class="form-control form-control-sm box_border" rows="1" autocomplete="off" maxlength="1000"></textarea>
+                        </div>
+
+                    </div>
+
+                    <footer class="card-footer">
+                        <div class="helper-text">
+                            Your feedback directly helps <span>improve our support quality.</span>
+                        </div>
+                        <div class="btn-row">
+                            <button type="button" class="btn btn-outline" id="btnClear">
+                                <span class="btn-icon">⟲</span> Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btnSubmitRating">
+                                <span class="btn-icon">✓</span> Submit rating
+                            </button>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

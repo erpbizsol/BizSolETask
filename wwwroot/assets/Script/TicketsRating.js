@@ -1,6 +1,7 @@
+let AppBaseURLMenu = window.location.href.toLowerCase().includes('local') == true? 'https://localhost:7077/': 'https://web.bizsol.in/ETaskTest/';
+
 (function () {
     "use strict";
-
     function showHeaderMessage(msg, isError) {
         var el = document.getElementById("ratingHeaderMessage");
         if (!el) return;
@@ -20,14 +21,9 @@
             companyCode: params.get("CompanyCode") || "",
             clientEmail: params.get("ClientEmail") || "",
             ticketCode: params.get("Code") || "",
-            op: params.get("op") || ""   // "Y" = satisfied → rating 10, Complete | "N" = not satisfied → rating 0, Pending
+            op: params.get("op") || "" 
         };
     }
-
-    function getBaseUrl() {
-        return window.location.origin;
-    }
-
     // ========== STEP 2a: op = "Y" → Rating 10, Status Complete set karo ==========
     function applyOpY(elements) {
         if (elements.statusSelect) elements.statusSelect.value = "C";
@@ -49,16 +45,17 @@
     // ========== STEP 3: Server se ticket data load karo, phir op ke hisaab se rating/status set karo ==========
     function loadTicketData(qs, elements) {
         if (!qs.companyCode || !qs.ticketCode || !qs.clientEmail) return;
-
-        var url = getBaseUrl() + "/Login/GetTicketRatingData"
-            + "?companyCode=" + encodeURIComponent(qs.companyCode)
-            + "&Code=" + encodeURIComponent(qs.ticketCode)
-            + "&clientEmail=" + encodeURIComponent(qs.clientEmail)
-            + "&type=" + encodeURIComponent(qs.op || "");
-
-        fetch(url, { method: "GET" })
-            .then(function (res) { return res.json(); })
-            .then(function (data) {
+        $.ajax({
+            url:AppBaseURLMenu + "Login/GetTicketRatingData",
+            type: "GET",
+            dataType: "json",
+            data: {
+                companyCode: qs.companyCode,
+                Code: qs.ticketCode,
+                clientEmail: qs.clientEmail,
+                type: qs.op || ""
+            },
+            success: function (data) {
                 if (!data || data.success === false) {
                     console.error(data && data.message ? data.message : "Ticket load error");
                     setDefaultByOp(qs.op, elements);
@@ -82,10 +79,11 @@
                 } else {
                     setDefaultByOp(qs.op, elements);
                 }
-            })
-            .catch(function (err) {
+            },
+            error: function () {
                 setDefaultByOp(qs.op, elements);
-            });
+            }
+        });
     }
 
     function setDefaultByOp(op, elements) {
@@ -110,31 +108,23 @@
         applyOpY(elements);
         if (elements.remark) elements.remark.value = "Satisfied";
         elements.frmTicketRating.setAttribute("data-autosave-attempted", "1");
-        var formData = new FormData(elements.frmTicketRating);
-        var body = new URLSearchParams(formData).toString();
-        var actionUrl = elements.frmTicketRating.action || (getBaseUrl() + "/Login/TicketsRating");
+        var actionUrl = elements.frmTicketRating.action || AppBaseURLMenu + "Login/TicketsRating";
 
-        fetch(actionUrl, {
-            method: "POST",
-            body: body,
+        var body = $(elements.frmTicketRating).serialize();
+
+        $.ajax({
+            url: actionUrl,
+            type: "POST",
+            dataType: "json",
+            data: body,
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
                 "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-            .then(function (res) {
-                if (!res.ok) {
-                    return res.text().then(function (t) {
-                        throw new Error("Server " + res.status + (t ? ": " + t.substring(0, 100) : ""));
-                    });
-                }
-                return res.json();
-            })
-            .then(function (data) {
+            },
+            success: function (data) {
                 if (data && data.success) {
                     if (elements.frmTicketRating) elements.frmTicketRating.setAttribute("data-autosaved", "1");
                     var msg = data.message || "Rating send successfully.";
-                    // Sirf page ke andar green message dikhaye
+                   
                     showHeaderMessage(msg, true);
                     if (elements.remark) elements.remark.value = "";
                     var btnSubmit = document.getElementById("btnSubmitRating");
@@ -148,18 +138,17 @@
                     showHeaderMessage(errMsg, false);
                     if (callback) callback(false, errMsg);
                 }
-            })
-            .catch(function (err) {
-                console.error("Auto-save error", err);
-                showHeaderMessage("Request fail: " + (err.message || ""), false);
-                if (callback) callback(false, err.message);
-            });
+            },
+            error: function (xhr) {
+                console.error("Auto-save error", xhr);
+                showHeaderMessage("Request fail: " + (xhr.statusText || ""), false);
+                if (callback) callback(false, xhr.statusText);
+            }
+        });
     }
     // ========== STEP 5: Reset button — op ke hisaab se rating/status reset ==========
     function setupResetButton(elements, op) {
         if (!elements.btnClear) return;
-
-        // op na Y na N ho to reset bhi disable (sirf view)
         if (op !== "Y" && op !== "N") {
             elements.btnClear.disabled = true;
             return;
@@ -187,19 +176,13 @@
                 showHeaderMessage("Company code missing. Is page ko rating link se open karein (email link).", true);
                 return;
             }
-
-            // op=Y → submit se pehle Rating 10, Status C force
             if (op === "Y") {
                 applyOpY(elements);
             }
-            // op=N → submit se pehle Rating 0, Status P force
             if (op === "N") {
                 applyOpN(elements);
             }
-
             var remarkVal = elements.remark ? elements.remark.value.trim() : "";
-            // op = Y  → remark optional
-            // op = N  → remark mandatory
             if (op === "N" && !remarkVal) {
                 showHeaderMessage("Remark is mandatory. Please enter remark.", true);
                 if (elements.remark) elements.remark.focus();
@@ -211,48 +194,36 @@
                 btnSubmit.disabled = true;
                 btnSubmit.textContent = " Saving... ";
             }
-
-            var formData = new FormData(elements.frmTicketRating);
-            var body = new URLSearchParams(formData).toString();
-            var actionUrl = elements.frmTicketRating.action || (getBaseUrl() + "/Login/TicketsRating");
-
-            fetch(actionUrl, {
-                method: "POST",
-                body: body,
+            var actionUrl = elements.frmTicketRating.action || AppBaseURLMenu + "Login/TicketsRating";
+            var body = $(elements.frmTicketRating).serialize();
+            $.ajax({
+                url: actionUrl,
+                type: "POST",
+                dataType: "json",
+                data: body,
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
                     "X-Requested-With": "XMLHttpRequest"
-                }
-            })
-                .then(function (res) {
-                    if (!res.ok) {
-                        return res.text().then(function (t) {
-                            throw new Error("Server " + res.status + (t ? ": " + t.substring(0, 100) : ""));
-                        });
-                    }
-                    return res.json();
-                })
-                .then(function (data) {
+                },
+                success: function (data) {
                     if (data && data.success) {
-                        // Sirf page ke andar success message dikhaye
                         showHeaderMessage(data.message, true);
                         if (elements.remark) elements.remark.value = "";
                     } else {
                         var errMsg = (data && data.message) ? data.message : "Something went wrong.";
                         showHeaderMessage(errMsg, false);
                     }
-                })
-                .catch(function (err) {
-                    console.error("Submit error", err);
-                    // Error bhi page ke andar hi dikhaye
-                    showHeaderMessage("Request fail: " + (err.message || "Server se response nahi aaya."), false);
-                })
-                .finally(function () {
+                },
+                error: function (xhr) {
+                    console.error("Submit error", xhr);
+                    showHeaderMessage("Request fail: " + (xhr.statusText || "Server se response nahi aaya."), false);
+                },
+                complete: function () {
                     if (btnSubmit) {
                         btnSubmit.disabled = false;
                         btnSubmit.innerHTML = "<span class=\"btn-icon\">✓</span> Submit rating";
                     }
-                });
+                }
+            });
         });
     }
 
@@ -280,30 +251,23 @@
             txtQueryDesc: document.getElementById("txtQueryDesc"),
             statusSelect: document.getElementById("status")
         };
-
-        // Step 1: Query params
         var qs = getQueryParams();
 
-        // Hidden fields for form submit
         if (elements.companyCodeHidden) elements.companyCodeHidden.value = qs.companyCode;
         if (elements.typeHidden) elements.typeHidden.value = qs.op || "";
 
         if (elements.txtRatingBy && qs.clientEmail) elements.txtRatingBy.value = qs.clientEmail;
 
-        // Step 2 & 3: op Y/N ke hisaab se rating/status + ticket data load
         if (qs.op === "Y") {
             applyOpY(elements);
         } else if (qs.op === "N") {
             applyOpN(elements);
         } else {
-            // op empty hone par status "Select status" (blank) pe rakhna hai
             if (elements.statusSelect) {
                 elements.statusSelect.value = "";
             }
         }
         loadTicketData(qs, elements);
-
-        // op=Y: 2.5 sec baad ek baar phir auto-save try karo (agar pehle nahi chala / slow API)
         if (qs.op === "Y") {
             setTimeout(function () {
                 var form = elements.frmTicketRating;

@@ -17,6 +17,8 @@ let G_TaskNatureList = [];
 let G_ModuleDespList = [];
 let lastFormData = null;
 let G_AssignedName = "";
+let G_ClientStatus = "Y";
+let G_AllowNoofPendingTktForClientRating = 0;
 
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
@@ -86,8 +88,6 @@ $(document).ready(async function () {
             UpdateLabelforItemMaster();
         }
     });
-
-    // GetGenerateTaskTicketDateList('Get');
     if (UserTypes == "A") {
         $("#txtAllUser").show();
     } else {
@@ -268,10 +268,65 @@ $('#txtProjectClient').on('change', function () {
         GetAssigneds(selectedCode);
         GetUserName(selectedCode);
         GetTestedBY(selectedCode);
+        GetNoofPendingTktForClientRating(selectedCode);
+        GetClientStatus(selectedCode);
         $('#txtContactNo').empty();
         $('#txtContactEmail').empty();
+        if (G_ClientStatus[0].ClientStatus == 'H') {
+            toastr.warning("Please Check! No new ticket created.\n Client " + (G_ProjectList[0].Name)+ " is on hold by account department.\n Please contact to account department");
+        }
     }
 });
+function GetClientStatus(selectedCode) {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetClientStatus?ClientCode=${selectedCode}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+                G_ClientStatus = response.map(item => ({
+                    ClientStatus: item.ClientStatus
+
+                }));
+               
+            }
+           
+
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtUserName').empty();
+
+        }
+
+    });
+}
+function GetNoofPendingTktForClientRating(selectedCode) {
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetNoofPendingTktForClientRating?ClientCode=${selectedCode}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (Array.isArray(response) && response.length > 0) {
+               G_AllowNoofPendingTktForClientRating = response.map(item => ({
+                     PendingCount: item.PendingCount
+                    
+               }));
+            }
+           
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $('#txtUserName').empty();
+
+        }
+
+    });
+}
 function GetUserName(selectedCode) {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeWiseUserName?Code=${selectedCode}`,
@@ -694,91 +749,96 @@ function SaveData() {
     //    return;
     //}
     else {
-        lastFormData = captureFormData();
-        let Postdata =
-        {
-            generateTask: [
-                {
-                    code: Code,
-                    ticketTypeMaster_Code: TaskType,
-                    ticketNo: TicketNo || 0,
-                    employeeMaster_Code: 0,
-                    priorityMaster_Code: Priority,
-                    logDate: LogDate,
-                    clientMaster_Code: ProjectClient,
-                    ModuleMaster_Code: ModuleMaster_Code || 0,
-                    bizSolUserMaster_Code: UserMaster_Code,
-                    // sourceMaster_Code: 0,
-                    workTypeMaster_Code: WorkType,
-                    description: Description,
-                    reAssign_Code: Assigned || 0,
-                    commitedDate: CommittedDate,
-                    estimatedTime: EstimatedTime || 0,
-                    statusMaster_Code: 1,
-                    //commonColumn: 'A',
-                    status: 'P',
-                    userMaster_Code: UserMaster_Code,
-                    ContactNo: ContactNo,
-                    ContactEMail: ContactEMail,
-                    RaisedBy: UserMastrName,
-                    Testedby_EmployeeMasterCode: TestedBY_Code,
-                    TaskNatureMaster_Code: TaskNature||0
-                }
-            ],
-            Attachment: AttachmentDetail
-        };
-        blockUI();
-        $.ajax({
-            url: `${appBaseURL}/api/Master/SaveGenerateTaskTicket`,
-            type: "POST",
-            contentType: "application/json",
-            dataType: "json",
-            data: JSON.stringify(Postdata),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Auth-Key", authKeyData);
-            },
-            success: function (response) {
-                if (response[0].Status === "Y") {
-                    toastr.success(response[0].Msg);
-                
-                    var message = 'Ticket #' + TicketNo + ' assigned by ' + G_AssignedName + '. Description: ' + Description;
 
-                   
-                    if (Assigned && Assigned != "0") {
-                        SendNotificationToUser(
-                            UserMaster_Code,        
-                            message,
-                            '/Master/GenerateTask?code=' + response[0].Code,  
-                            response[0].Code,             
-                            'EmployeeMaster'
-                            
-                        );
-                        SendNotificationToUserAndroid(
-                            UserMaster_Code,
-                            message,
-                            '/Master/GenerateTask?code=' + response[0].Code,
-                            response[0].Code,
-                            'EmployeeMaster'
-                        );
+        if (parseInt(G_AllowNoofPendingTktForClientRating[0].PendingCount) > 0) {
+            toastr.error("Please Check! No new ticket created.\n Client " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " Pending ticket for rating: " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " is greater than to allow Pending ticket for rating: " + G_AllowNoofPendingTktForClientRating[0].PendingCount + ".\n Please contact to account department");
+        } else {
+            lastFormData = captureFormData();
+            let Postdata =
+            {
+                generateTask: [
+                    {
+                        code: Code,
+                        ticketTypeMaster_Code: TaskType,
+                        ticketNo: TicketNo || 0,
+                        employeeMaster_Code: 0,
+                        priorityMaster_Code: Priority,
+                        logDate: LogDate,
+                        clientMaster_Code: ProjectClient,
+                        ModuleMaster_Code: ModuleMaster_Code || 0,
+                        bizSolUserMaster_Code: UserMaster_Code,
+                        // sourceMaster_Code: 0,
+                        workTypeMaster_Code: WorkType,
+                        description: Description,
+                        reAssign_Code: Assigned || 0,
+                        commitedDate: CommittedDate,
+                        estimatedTime: EstimatedTime || 0,
+                        statusMaster_Code: 1,
+                        //commonColumn: 'A',
+                        status: 'P',
+                        userMaster_Code: UserMaster_Code,
+                        ContactNo: ContactNo,
+                        ContactEMail: ContactEMail,
+                        RaisedBy: UserMastrName,
+                        Testedby_EmployeeMasterCode: TestedBY_Code,
+                        TaskNatureMaster_Code: TaskNature || 0
                     }
-                    // Send email
-                    SenEmailMassage(response[0].Code);
+                ],
+                Attachment: AttachmentDetail
+            };
+            blockUI();
+            $.ajax({
+                url: `${appBaseURL}/api/Master/SaveGenerateTaskTicket`,
+                type: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(Postdata),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Auth-Key", authKeyData);
+                },
+                success: function (response) {
+                    if (response[0].Status === "Y") {
+                        toastr.success(response[0].Msg);
 
-                    // Now clear the form
-                    ClearData();
+                        var message = 'Ticket #' + TicketNo + ' assigned by ' + G_AssignedName + '. Description: ' + Description;
+
+
+                        if (Assigned && Assigned != "0") {
+                            SendNotificationToUser(
+                                UserMaster_Code,
+                                message,
+                                '/Master/GenerateTask?code=' + response[0].Code,
+                                response[0].Code,
+                                'EmployeeMaster'
+
+                            );
+                            SendNotificationToUserAndroid(
+                                UserMaster_Code,
+                                message,
+                                '/Master/GenerateTask?code=' + response[0].Code,
+                                response[0].Code,
+                                'EmployeeMaster'
+                            );
+                        }
+                        // Send email
+                        SenEmailMassage(response[0].Code);
+
+                        // Now clear the form
+                        ClearData();
+                        unblockUI();
+                    }
+                    else {
+                        toastr.error(response[0].Msg);
+                        unblockUI();
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Error:", xhr.responseText);
+                    toastr.error("An error occurred while saving the data.");
                     unblockUI();
                 }
-                else {
-                    toastr.error(response[0].Msg);
-                    unblockUI();
-                }
-            },
-            error: function (xhr) {
-                console.error("Error:", xhr.responseText);
-                toastr.error("An error occurred while saving the data.");
-                unblockUI();
-            }
-        });
+            });
+        }
     }
 }
 function GetGenerateTaskTicketDateList(Type) {
@@ -1039,26 +1099,6 @@ function onAttachmentClick(fileName, base64Data, code, download) {
         URL.revokeObjectURL(url);
     }
 }
-//function ClearData() {
-//    $("#hftxtCode").val("0");
-//    $("#txtTaskType").val("1");
-//    $("#txtTaskNo").val("");
-//    $("#txtPriority").val("2");
-//    $("#txtProjectClient").val("0").trigger('change');
-//    $("#txtWorkType").val("0").trigger('change');
-//    $("#txtDescription").val("");
-//    $("#txtAssigned").val("0").trigger('change');
-//    $("#txtEstimatedTime").val("");
-//    $("#txtAttachment").val("");
-//    $("#txtTaskNature").val("0").trigger('change');
-//    $("#txtUserName").val("0").trigger('change');
-//    $("#txtContactNo").val("0").trigger('change');
-//    $("#txtContactEmail").val("0").trigger('change');
-//    $("#txtTestedBY").val("0").trigger('change');
-//    $("#txtMenuName").val("0").trigger('change');
-//    AttachmentDetail = [];
-//    DatePicker();
-//}
 
 function captureFormData() {
     return {

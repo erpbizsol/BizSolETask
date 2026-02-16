@@ -186,16 +186,13 @@ stars.forEach(star => {
         let rating = parseInt(this.getAttribute("data-value"));
         let currentRating = parseInt(hiddenInput.value) || 0;
 
-        // 👉 अगर वही star पर क्लिक किया और वो already selected है → एक step पीछे जाओ
         if (rating === currentRating) {
             rating = rating - 1;
         }
 
         hiddenInput.value = rating;
-
-        // Reset all stars
         stars.forEach(s => s.classList.remove("active"));
-        // Highlight selected stars
+
         for (let i = 0; i < rating; i++) {
             stars[i].classList.add("active");
         }
@@ -326,8 +323,6 @@ function Ratingfunction(EmployeeMaster_Code) {
     });
 }
 
-
-// Handle Update All button click
 $(document).on("click", "#btnUpdateAll", function () {
     let allRatings = [];
 

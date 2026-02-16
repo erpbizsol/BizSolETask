@@ -106,6 +106,22 @@
                                 <div id="checkboxOptions"></div>
                                 </div>
                             </div>
+                            <div class="col-md-3  col-sm-6">
+                                <label for="ddlClientStatus" class="col-form-label-sm fw-bold">
+                                    Client Status<span class="text-danger"></span>
+                                </label>
+                                <select id="ddlClientStatus" class="form-control form-control-sm box_border">
+                                    <option value="Y">Active</option>
+                                    <option value="N">InActive</option>
+                                    <option value="H">Hold</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3  col-sm-6">
+                                <label for="txtAllowPendingTkt" class="col-form-label-sm fw-bold">
+                                    Allow Pending Tkt (Rating)<span class="text-danger">*</span>
+                                </label>
+                                <input id="txtAllowPendingTkt" oninput="this.value = this.value.replace(/[^0-9]/g, '')" type="number" value="5" maxlength="4" placeholder="Allow No of Pending Tkt For Rating" class="form-control form-control-sm box_border">
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12 col-12 text-right">

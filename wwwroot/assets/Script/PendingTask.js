@@ -12,6 +12,8 @@ let AttachmentDetail = [];
 let G_Code;
 let G_ReAssignCode;
 let G_ReasonList = [];
+let ticketFetchTimeout = null;
+
 $(document).ready(async function () {
     $("#ERPHeading").text("Pending Task");
     $(".Number").keyup(function (e) {
@@ -405,7 +407,6 @@ function filterTickets(val) {
         .forEach(r => r.style.display = r.innerText.toLowerCase().includes(val.toLowerCase()) ? "" : "none");
 }
 
-let ticketFetchTimeout = null;
 
 $("#txtSerch").on("input", function () {
     clearTimeout(ticketFetchTimeout);
