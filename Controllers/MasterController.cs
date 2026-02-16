@@ -71,7 +71,7 @@ namespace Bizsol_ETask.Controllers
             return View();
 
         }
-        public IActionResult TicketsRating()
+        public IActionResult TicketsForClientRatingPending()
         {
             return View();
         }

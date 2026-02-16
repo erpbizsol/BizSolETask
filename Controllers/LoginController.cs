@@ -527,117 +527,125 @@ namespace Bizsol_ETask.Controllers
             public string QueryDescription { get; set; }
 
             public int Rating { get; set; }
-            public string Status { get; set; } // "P" / "C"
+            public string Status { get; set; } 
             public string Remark { get; set; }
-            public string Type { get; set; }   // "Y" / "N"
-
+            public string Type { get; set; }  
             public bool AlreadyRated { get; set; }
             public string Message { get; set; }
-
-            // Optional
-            public string? ClientName { get; set; }
+            public int ClientName { get; set; }
         }
 
         [HttpGet]
         public IActionResult GetTicketRatingData(string companyCode, int code, string clientEmail, string type)
         {
-            var companyConn = GetConnectionStringByCompanyCode(companyCode);
-            if (companyConn == null)
+            try
+            {
+                var companyConn = GetConnectionStringByCompanyCode(companyCode);
+                if (companyConn == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Invalid company code."
+                    });
+                }
+
+                string ticketNoDb = null;
+                string emailDb = null;
+                string descriptionDb = null;
+                int? ratingDb = null;
+                string statusDb = null;
+
+                using (var con = new SqlConnection(companyConn))
+                {
+                    con.Open();
+
+                    string sql = @"
+                SELECT TOP 1 
+                       CT.UID,
+                       UM.Email,
+                       CT.Description,
+                       CT.Status
+                FROM CallTicketMaster CT
+                LEFT JOIN UserMaster UM ON CT.BizSolUserMaster_Code = UM.Code
+                WHERE CT.Code = @Code AND UM.Email = @Email";
+
+                    using (var cmd = new SqlCommand(sql, con))
+                    {
+                        cmd.Parameters.AddWithValue("@Code", code);
+                        cmd.Parameters.AddWithValue("@Email", clientEmail);
+
+                        using (var rdr = cmd.ExecuteReader())
+                        {
+                            if (rdr.Read())
+                            {
+                                ticketNoDb = rdr["UID"].ToString();
+                                emailDb = rdr["Email"].ToString();
+                                descriptionDb = rdr["Description"].ToString();
+                            }
+                            else
+                            {
+                                return Json(new
+                                {
+                                    success = false,
+                                    message = "Ticket not found."
+                                });
+                            }
+                        }
+                    }
+                }
+
+                int rating = 0;
+                string status = "P";
+
+                if (type == "Y")
+                {
+                    rating = 10;
+                    status = "C";
+                }
+                else if (type == "N")
+                {
+                    rating = 0;
+                    status = "P";
+                }
+
+                if (ratingDb.HasValue)
+                    rating = ratingDb.Value;
+
+                if (!string.IsNullOrEmpty(statusDb))
+                    status = statusDb;
+
+                return Json(new
+                {
+                    success = true,
+                    message = "",
+                    companyCode,
+                    ticketNo = ticketNoDb,
+                    clientEmail = emailDb,
+                    queryDescription = descriptionDb,
+                    status,
+                    rating,
+                    type
+                });
+            }
+            catch (Exception ex)
             {
                 return Json(new
                 {
                     success = false,
-                    message = "Invalid company code."
+                    message = "Server error: " + ex.Message
                 });
             }
-
-            string ticketNoDb = null;
-            string emailDb = null;
-            string descriptionDb = null;
-            int? ratingDb = null;
-            string statusDb = null;
-
-            using (var con = new SqlConnection(companyConn))
-            {
-                con.Open();
-
-                string sql = @"
-SELECT TOP 1 
-       CT.UID,
-       UM.Email,
-       CT.Description,
-       CT.Status
-FROM CallTicketMaster CT
-LEFT JOIN UserMaster UM ON CT.BizSolUserMaster_Code = UM.Code
-WHERE CT.Code = @Code AND UM.Email = @Email";
-
-                using (var cmd = new SqlCommand(sql, con))
-                {
-                    cmd.Parameters.AddWithValue("@Code", code);
-                    cmd.Parameters.AddWithValue("@Email", clientEmail);
-
-                    using (var rdr = cmd.ExecuteReader())
-                    {
-                        if (rdr.Read())
-                        {
-                            ticketNoDb = rdr["UID"].ToString();
-                            emailDb = rdr["Email"].ToString();
-                            descriptionDb = rdr["Description"].ToString();
-                            //statusDb = rdr["Status"].ToString();
-
-                            
-                        }
-                        else
-                        {
-                            return Json(new
-                            {
-                                success = false,
-                                message = "Ticket not found."
-                            });
-                        }
-                    }
-                }
-            }
-
-            // Default rating / status op (Y/N) ke hisaab se
-            int rating = 0;
-            string status = "P";
-
-            if (type == "Y")
-            {
-                rating = 10;
-                status = "C";
-            }
-            else if (type == "N")
-            {
-                rating = 0;
-                status = "P";
-            }
-
-            if (ratingDb.HasValue)
-                rating = ratingDb.Value;
-
-            if (!string.IsNullOrEmpty(statusDb))
-                status = statusDb;
-
-            return Json(new
-            {
-                success = true,
-                message = "",
-                companyCode,
-                ticketNo = ticketNoDb,
-                clientEmail = emailDb,
-                queryDescription = descriptionDb,
-                status,
-                rating,
-                type
-            });
         }
         private bool IsAjaxRequest()
         {
             return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
         }
 
+        public IActionResult TicketsRating()
+        {
+            return View();
+        }
         [HttpPost]
         public IActionResult TicketsRating(TicketRatingViewModel model)
         {
@@ -667,7 +675,7 @@ WHERE CT.Code = @Code AND UM.Email = @Email";
             {
                 if (string.IsNullOrWhiteSpace(model.CompanyCode))
                 {
-                    model.Message = "Company code missing. Page ko rating link se open karein.";
+                    model.Message = "Company code missing";
                     if (isAjax) return Json(new { success = false, message = model.Message });
                     return View("~/Views/Master/TicketsRating.cshtml", model);
                 }
@@ -679,30 +687,27 @@ WHERE CT.Code = @Code AND UM.Email = @Email";
                     if (isAjax) return Json(new { success = false, message = model.Message });
                     return View("~/Views/Master/TicketsRating.cshtml", model);
                 }
-
                 using (var con = new SqlConnection(companyConn))
                 {
                     con.Open();
                     int callTicketMasterCode = 0;
                     using (var cmdGetCode = new SqlCommand(
-                        "SELECT TOP 1 Code FROM CallTicketMaster WHERE UID = @TicketNo", con))
+                    "SELECT TOP 1 Code FROM CallTicketMaster WHERE UID = @TicketNo", con))
                     {
                         cmdGetCode.Parameters.AddWithValue("@TicketNo", model.TicketNo ?? "");
                         var obj = cmdGetCode.ExecuteScalar();
                         if (obj == null)
                         {
-                            model.Message = "Ticket not found. Ticket no check karein.";
+                            model.Message = "Ticket not found.";
                             if (isAjax) return Json(new { success = false, message = model.Message });
                             return View("~/Views/Master/TicketsRating.cshtml", model);
                         }
                         callTicketMasterCode = Convert.ToInt32(obj);
                     }
-                    // 2) Already rated check
                     string checkSql = @"
                     SELECT COUNT(1) 
                     FROM   TicketRatingDetail
                     WHERE  CallTicketMaster_Code = @CallTicketMaster_Code AND RatedByEmailID = @Email";
-
                     using (var checkCmd = new SqlCommand(checkSql, con))
                     {
                         checkCmd.Parameters.AddWithValue("@CallTicketMaster_Code", callTicketMasterCode);
@@ -712,13 +717,11 @@ WHERE CT.Code = @Code AND UM.Email = @Email";
                         if (count > 0)
                         {
                             model.AlreadyRated = true;
-                            model.Message = "Is ticket ki rating pehle hi ho chuki hai.";
+                            model.Message = "The rating for this ticket has already been submitted.";
                             if (isAjax) return Json(new { success = false, message = model.Message });
                             return View("~/Views/Master/TicketsRating.cshtml", model);
                         }
                     }
-
-                    // 3) Stored procedure USP_TicketRatingDetail
                     using (var saveCmd = new SqlCommand("USP_TicketRatingDetail", con))
                     {
                         saveCmd.CommandType = CommandType.StoredProcedure;
@@ -731,7 +734,7 @@ WHERE CT.Code = @Code AND UM.Email = @Email";
                         saveCmd.Parameters.AddWithValue("@RatedByEmailID", model.ClientEmail ?? "");
                         saveCmd.Parameters.AddWithValue("@Rating", model.Rating);
                         saveCmd.Parameters.AddWithValue("@ManagerRating", 0);
-                        saveCmd.Parameters.AddWithValue("@ClientName", model.ClientName ?? "");
+                        saveCmd.Parameters.AddWithValue("@ClientCode", model.ClientName);
                         saveCmd.ExecuteNonQuery();
                     }
                 }
