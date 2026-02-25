@@ -101,7 +101,7 @@ async function GetReAssign() {
         // Initialize Select2
         $select.select2({
             width: '100%',
-            closeOnSelect: false,
+            closeOnSelect: true,
             placeholder: "Select ReAssign...",
             allowClear: true
         });
@@ -543,7 +543,7 @@ async function GetResolvedBy() {
         // Initialize Select2
         $select.select2({
             width: '100%',
-            closeOnSelect: false,
+            closeOnSelect: true,
             placeholder: "Select Resolved By...",
             allowClear: true
         });
@@ -582,7 +582,7 @@ function GetReason() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 placeholder: "Select Reason...",
                 allowClear: true
             });
@@ -816,7 +816,7 @@ function Save() {
     let UpdateBy = $("#txtUpdateBy").val();
     let Remarks = $("#txtRemarks").val();
     let Reason = $("#txtReason").val();
-    if (Status == "") {
+    if (Status == "0") {
         toastr.error('Please select Status.');
         $("#txtStatus").focus();
         return;

@@ -1236,7 +1236,7 @@ function GetResolvedBy() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 placeholder: "Select Resolved By...",
                 allowClear: true
             });
@@ -1274,7 +1274,7 @@ function GetReason() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 placeholder: "Select Reason...",
                 allowClear: true
             });
@@ -1314,7 +1314,7 @@ function GetReAssign() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 placeholder: "Select Resolved By...",
                 allowClear: true
             });
@@ -1349,25 +1349,48 @@ function StatusType() {
         success: function (response) {
             if (response) {
 
+                //if (Status == "2") {
+                //    $("#txtTotalResolutionM").val(response[0].Times);
+                //    $("#txtResolutionDates").val(response[0].Dates);
+                //    $("#txtRemarks").val(response[0].Remarks);
+                //    $("#txtResolvedBy").val(response[0].Code);
+                //    $("#txtReAssign").val(response[0].Code);
+
+                //    response.forEach(item => {
+                //        BindSelect2(`txtResolvedBy`, G_ResolvedByList);
+                //        $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
+                //    });
+                //}
+                //else if (Status == "4") {
+                //    $("#txtTotalResolutionM").val(response[0].Times);
+                //    $("#txtResolutionDates").val(response[0].Dates);
+                //    $("#txtRemarks").val(response[0].Remarks);
+                //    $("#txtResolvedBy").val(response[0].Code);
+                //    $("#txtReAssign").val(response[0].Code);
+                //}
                 if (Status == "2") {
                     $("#txtTotalResolutionM").val(response[0].Times);
                     $("#txtResolutionDates").val(response[0].Dates);
                     $("#txtRemarks").val(response[0].Remarks);
-                    $("#txtResolvedBy").val(response[0].Code);
-                    $("#txtReAssign").val(response[0].Code);
+                    // $("#txtResolvedBy").val(response[0].Code);
+                    //$("#txtReAssign").val(response[0].Code);
+                    $('#txtResolvedBy').val(UserMaster_Code);
 
-                    response.forEach(item => {
-                        BindSelect2(`txtResolvedBy`, G_ResolvedByList);
-                        $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
-                    });
+                    //response.forEach(item => {
+                    //    BindSelect2(`txtResolvedBy`, G_ResolvedByList);
+                    //    $(`#txtResolvedBy`).val(item.Code).select2({ width: '100%' });
+                    //});
+
                 }
                 else if (Status == "4") {
                     $("#txtTotalResolutionM").val(response[0].Times);
                     $("#txtResolutionDates").val(response[0].Dates);
                     $("#txtRemarks").val(response[0].Remarks);
-                    $("#txtResolvedBy").val(response[0].Code);
-                    $("#txtReAssign").val(response[0].Code);
+                    // $("#txtResolvedBy").val(response[0].Code);
+                    // $("#txtReAssign").val(response[0].G_ReAssignCode);
+                    $("#txtReAssign").val(response[0].Code).trigger("change");
                 }
+
 
             }
         },
@@ -1552,14 +1575,14 @@ function Save() {
     let UpdateBy = $("#txtUpdateBy").val();
     let Remarks = $("#txtRemarks").val();
     let Reason = $("#txtReason").val();
-    if (Status == "") {
+    if (Status == "0") {
         toastr.error('Please select Status.');
         $("#txtStatus").focus();
         return;
     } else {
         let Postdata =
         {
-            request: [
+            pendingTask: [
                 {
                     code: parseInt(G_Code),
                     status: parseInt(Status),
@@ -1594,11 +1617,7 @@ function Save() {
                     GetCallTicketMasterPlanningDetails('Get');
                     $("#txtpage").hide();
                     unblockUI();
-                }
-                else if (response[0].Status === "N") {
-                    toastr.error(response[0].Msg);
-                    unblockUI();
-                } else {
+                }else {
                     toastr.error(response.Msg);
                     unblockUI();
                 }
@@ -1715,7 +1734,7 @@ function GetTaskNatureMaster() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 //placeholder: "Select Work Type...",
                 allowClear: true
             });

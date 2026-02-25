@@ -17,8 +17,8 @@ let G_TaskNatureList = [];
 let G_ModuleDespList = [];
 let lastFormData = null;
 let G_AssignedName = "";
-let G_ClientStatus = "Y";
 let G_AllowNoofPendingTktForClientRating = 0;
+let G_ClientStatus ="Y";
 
 $(document).ready(async function () {
     $("#ERPHeading").text("Generate Task");
@@ -146,7 +146,7 @@ function GetTicketNo() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 allowClear: true
             });
         },
@@ -241,7 +241,7 @@ function GetClientMasterDetails() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 // placeholder: "Select Project Client...",
                 allowClear: true
             });
@@ -262,23 +262,49 @@ function GetClientMasterDetails() {
     });
 }
 
-$('#txtProjectClient').on('change', function () {
+//$('#txtProjectClient').on('change',annx function () {
+//    let selectedCode = $(this).val();
+//    if (selectedCode && selectedCode !== "0") {
+//        GetAssigneds(selectedCode);
+//        GetUserName(selectedCode);
+//        GetTestedBY(selectedCode);
+//        $('#txtContactNo').empty();
+//        $('#txtContactEmail').empty();
+       
+//        GetNoofPendingTktForClientRating(selectedCode);
+//        GetClientStatus(selectedCode);   
+
+//        if (parseInt(G_AllowNoofPendingTktForClientRating[0].PendingCount) > G_ClientStatus[0].AllowTkt && parseInt(G_AllowNoofPendingTktForClientRating[0].PendingCount) == G_ClientStatus[0].AllowTkt) {
+//            toastr.warning("Please Check! No new ticket created.\n Client " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " Pending ticket for rating: " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " is greater than to allow Pending ticket for rating: " + G_ClientStatus[0].AllowTkt + ".\n Please contact to account department");
+//        }
+//        if (G_ClientStatus[0].ClientStatus == 'H') {
+//            toastr.warning("Please Check! No new ticket created.\n Client " + (G_ProjectList[0].Name) + " is on hold by account department.\n Please contact to account department");
+//        }
+//    }
+    
+//});
+$('#txtProjectClient').on('change', async function () {
     let selectedCode = $(this).val();
     if (selectedCode && selectedCode !== "0") {
         GetAssigneds(selectedCode);
         GetUserName(selectedCode);
         GetTestedBY(selectedCode);
-        GetNoofPendingTktForClientRating(selectedCode);
-        GetClientStatus(selectedCode);
         $('#txtContactNo').empty();
         $('#txtContactEmail').empty();
+        await GetNoofPendingTktForClientRating(selectedCode);
+        await GetClientStatus(selectedCode);
         if (G_ClientStatus[0].ClientStatus == 'H') {
-            toastr.warning("Please Check! No new ticket created.\n Client " + (G_ProjectList[0].Name)+ " is on hold by account department.\n Please contact to account department");
+            toastr.warning("Please Check! No new ticket created.\n Client " + (G_ProjectList[0].Name) + " is on hold by account department.\n Please contact to account department");
+        } 
+        if (G_AllowNoofPendingTktForClientRating[0].PendingCount >= G_ClientStatus[0].AllowTkt) {
+            toastr.warning("Please Check! No new ticket created.maximum limit " + G_ClientStatus[0].AllowTkt + " already exceed.To Create new ticket.  Please Close pending tickets " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " please ask cleint to give rating completed tickets.");
         }
+        
+       
     }
 });
-function GetClientStatus(selectedCode) {
-    $.ajax({
+async function GetClientStatus(selectedCode) {
+    return await $.ajax({
         url: `${appBaseURL}/api/Master/GetClientStatus?ClientCode=${selectedCode}`,
         type: 'GET',
         beforeSend: function (xhr) {
@@ -287,24 +313,20 @@ function GetClientStatus(selectedCode) {
         success: function (response) {
             if (Array.isArray(response) && response.length > 0) {
                 G_ClientStatus = response.map(item => ({
-                    ClientStatus: item.ClientStatus
-
+                    ClientStatus: item.ClientStatus,
+                    AllowTkt: item.AllowTkt
                 }));
-               
             }
-           
-
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
             $('#txtUserName').empty();
-
         }
-
     });
 }
-function GetNoofPendingTktForClientRating(selectedCode) {
-    $.ajax({
+
+async function GetNoofPendingTktForClientRating(selectedCode) {
+    return await $.ajax({
         url: `${appBaseURL}/api/Master/GetNoofPendingTktForClientRating?ClientCode=${selectedCode}`,
         type: 'GET',
         beforeSend: function (xhr) {
@@ -312,21 +334,18 @@ function GetNoofPendingTktForClientRating(selectedCode) {
         },
         success: function (response) {
             if (Array.isArray(response) && response.length > 0) {
-               G_AllowNoofPendingTktForClientRating = response.map(item => ({
-                     PendingCount: item.PendingCount
-                    
-               }));
+                G_AllowNoofPendingTktForClientRating = response.map(item => ({
+                    PendingCount: item.PendingCount
+                }));
             }
-           
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
             $('#txtUserName').empty();
-
         }
-
     });
 }
+
 function GetUserName(selectedCode) {
     $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeWiseUserName?Code=${selectedCode}`,
@@ -347,7 +366,7 @@ function GetUserName(selectedCode) {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 allowClear: true,
                 tags: true,
             });
@@ -397,7 +416,7 @@ function GetTestedBY(ClientCode) {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 //placeholder: "Select Work Type...",
                 allowClear: true
             });
@@ -435,7 +454,7 @@ function GetWorkTypes() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 //placeholder: "Select Work Type...",
                 allowClear: true
             });
@@ -473,7 +492,7 @@ function GetMenuName() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 //placeholder: "Select Work Type...",
                 allowClear: true
             });
@@ -485,6 +504,7 @@ function GetMenuName() {
     });
 }
 function GetAssigneds(selectedCode) {
+   
     $.ajax({
         url: `${appBaseURL}/api/Master/GetAssigneds?Code=${selectedCode}`,
         type: 'GET',
@@ -515,7 +535,7 @@ function GetAssigneds(selectedCode) {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 //placeholder: "Select Assigned...",
                 allowClear: true
             });
@@ -693,7 +713,7 @@ function GetTaskNatureMaster() {
             }
             $select.select2({
                 width: '100%',
-                closeOnSelect: false,
+                closeOnSelect: true,
                 //placeholder: "Select Work Type...",
                 allowClear: true
             });
@@ -738,20 +758,31 @@ function SaveData() {
         toastr.error('Please Select Work Type.');
         $("#txtWorkType").focus();
         return;
-    } else if (TestedBY_Code == "0") {
+    }
+    else if (UserMastrName == "Select User Name..") {
+        toastr.error('Please Select User Name.');
+        $("#txtUserName").focus();
+        return;
+    }
+    else if (ContactNo == null) {
+        toastr.error('Please Select Contact No.');
+        $("#txtContactNo").focus();
+        return;
+    }
+    else if (ContactEMail == null) {
+        toastr.error('Please Select Contact email.');
+        $("#txtContactEmail").focus();
+        return;
+    }
+    else if (TestedBY_Code == "0") {
         toastr.error('Please Select Tested By.');
         $("#txtTestedBY").focus();
         return;
     }
-    //else if (Assigned == "0") {
-    //    toastr.error('Please Select Assigned.');
-    //    $("#txtAssigned").focus();
-    //    return;
-    //}
     else {
-
-        if (parseInt(G_AllowNoofPendingTktForClientRating[0].PendingCount) > 0) {
-            toastr.error("Please Check! No new ticket created.\n Client " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " Pending ticket for rating: " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " is greater than to allow Pending ticket for rating: " + G_AllowNoofPendingTktForClientRating[0].PendingCount + ".\n Please contact to account department");
+        
+        if (G_AllowNoofPendingTktForClientRating[0].PendingCount >= G_ClientStatus[0].AllowTkt) {
+            toastr.warning("Please Check! No new ticket created.maximum limit " + G_ClientStatus[0].AllowTkt + " already exceed.To Create new ticket.  Please Close pending tickets " + G_AllowNoofPendingTktForClientRating[0].PendingCount + " please ask cleint to give rating completed tickets.");
         } else {
             lastFormData = captureFormData();
             let Postdata =
