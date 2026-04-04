@@ -1,4 +1,4 @@
-﻿var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
+var authKeyData = JSON.parse(sessionStorage.getItem('authKey'));
 var UserName = sessionStorage.getItem('UserName');
 let UserMaster_Code = authKeyData.UserMaster_Code;
 let UserTypes = authKeyData.UserType;
@@ -16,7 +16,8 @@ $(document).ready(async function () {
     await GetEmployeeMasterList();
     await GetWorkTypeList();
     setupDateInputFormatting();
-  
+    $('#ddlEmployeeName').trigger('change');
+
     if (UserTypes === "A") {
         $("#ddlEmployeeName").prop('disabled', false);
         
@@ -118,7 +119,7 @@ function addHighlightedDate(dateString) {
 }
 
 function GetEmployeeMasterList() {
-    $.ajax({
+    return $.ajax({
         url: `${appBaseURL}/api/Master/GetEmployeeMaster?IsActive=A&EmployeeType=`,
         type: 'GET',
         beforeSend: function (xhr) {
@@ -135,14 +136,32 @@ function GetEmployeeMasterList() {
                 $('#ddlEmployeeName').select2({
                     width: '-webkit-fill-available'
                 });
-                //SelectOptionByText('ddlEmployeeName', UserName);
-                //if (UserTypes !== "A") {
-                    
-                    GetEmpDateList();
-                   // BindSelect2(`txtddlDipartment_${item.Code}`, G_DepartmentList);
-                   // $(`#txtddlDipartment_${item.Code}`).val(item.ClientMaster_Code).select2({ width: '100%' });
-               // }
-               
+                if (UserTypes !== "A") {
+                    var myCode = 0;
+                    if (authKeyData && authKeyData.UserMaster_Code) {
+                        var n = parseInt(authKeyData.UserMaster_Code, 10);
+                        if (!isNaN(n) && n > 0) {
+                            myCode = n;
+                        }
+                    }
+                    if (myCode === 0) {
+                        var uName = UserName ? String(UserName).trim().toLowerCase() : '';
+                        for (var i = 0; i < response.length; i++) {
+                            var row = response[i];
+                            var empName = row.EmployeeName ? String(row.EmployeeName).trim().toLowerCase() : '';
+                            if (empName === uName) {
+                                var c = parseInt(row.Code, 10);
+                                if (!isNaN(c) && c > 0) {
+                                    myCode = c;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (myCode > 0) {
+                        $('#ddlEmployeeName').val(String(myCode));
+                    }
+                }
             } else {
                 $('#ddlEmployeeName').empty();
             }
@@ -178,7 +197,7 @@ async function GetDepartmentList(EmployeeName) {
     }
 }
 function GetWorkTypeList() {
-    $.ajax({
+    return $.ajax({
         url: `${appBaseURL}/api/Master/GetWorkTypeList`,
         type: 'GET',
         beforeSend: function (xhr) {
@@ -188,7 +207,6 @@ function GetWorkTypeList() {
             if (response.length > 0) {
                 G_WorkTypeList = response;
                 G_WorkTypeList = G_WorkTypeList.map((item) => ({ Code: item.Code, Name: item['WorkType'] }));
-                addNewRow();
             }
         },
         error: function (xhr, status, error) {

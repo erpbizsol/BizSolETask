@@ -1,4 +1,4 @@
-﻿let AppBaseURLMenu = window.location.href.toLowerCase().includes('local') == true ? 'https://localhost:7077' : 'https://web.bizsol.in/EtaskTest'
+﻿let AppBaseURLMenu = window.location.href.toLowerCase().includes('local') == true ? 'https://localhost:7077' : 'https://web.bizsol.in/ETask'
 let G_IsCompanyValidate = false;
 let G_Goligin = false;
 $(document).ready(function () {
