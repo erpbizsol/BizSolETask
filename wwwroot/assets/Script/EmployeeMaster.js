@@ -263,10 +263,32 @@ function EmployeeChangePassword() {
             },
             error: function (xhr, status, error) {
                 console.error("Error:", xhr.responseText);
-                toastr.error("An error occurred while saving the data.");
+                toastr.error(readAjaxError(xhr, "An error occurred while saving the data."));
             },
         });
     }
+}
+function readAjaxError(xhr, fallback) {
+    var body = xhr.responseJSON;
+    if (body && body.errors) {
+        var keys = Object.keys(body.errors);
+        if (keys.length > 0 && body.errors[keys[0]] && body.errors[keys[0]][0]) {
+            return body.errors[keys[0]][0];
+        }
+    }
+    if (body && body.title) {
+        return body.title;
+    }
+    return fallback;
+}
+function setEmployeeRole(role) {
+    var value = role || "D";
+    if (value === "Development") value = "D";
+    if (value === "Implementation") value = "I";
+    if ($("#txtRole option[value='" + value + "']").length === 0) {
+        value = "D";
+    }
+    $("#txtRole").val(value);
 }
 function Create() {
     ClearData();
@@ -282,9 +304,9 @@ function Create() {
     $("#dvPassword").show();
     $("#dvConfirmPassword").show();
     $("#divnumber").show();
-    $("#dvExcel").show();
     $("#divWorkingHours").show();
     $("#dvtxtRole").show();
+    $("#dvExcel").show();
 }
 function Back() {
     $("#txtListpage").show();
@@ -330,7 +352,7 @@ function Edit(code) {
                 $("#txtEmployeeType").val(response[0].EmployeeType);
                 $("#txtnumberofdays").val(response[0].NumberOfdays);
                 $("#txtWorkingHours").val(response[0].WorkingHours);
-                $("#txtRole").val(response[0].Role);
+                setEmployeeRole(response[0].Role);
             } else {
                 toastr.error("Record not found...!");
             }
@@ -367,7 +389,7 @@ function ChangePassword(code) {
         },
         success: function (response) {
             if (response && response.length > 0) {
-                $("#txtRole").val(response[0].Role);
+                setEmployeeRole(response[0].Role || response[0].role);
             }
         },
         error: function (xhr, status, error) {
