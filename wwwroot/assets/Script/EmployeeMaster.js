@@ -211,6 +211,7 @@ function EmployeeChangePassword() {
     var Password = $("#txtPassword").val();
     var ConfirmPassword = $("#txtConfirmPassword").val();
     var Code = $("#hftxtCode").val();
+    var Role = $("#txtRole").val();
     if (Password == "") {
         toastr.error('Please enter Password.');
         $("#txtPassword").focus();
@@ -223,6 +224,10 @@ function EmployeeChangePassword() {
         toastr.error('Your password and confirmation password do not match.');
         $("#txtPassword").focus();
         return;
+    } else if (Role == "" || Role == null) {
+        toastr.error('Please select Role.');
+        $("#txtRole").focus();
+        return;
     }
     else {
         const payload = {
@@ -233,7 +238,8 @@ function EmployeeChangePassword() {
             MobileNo: "",
             Password: Password,
             EmployeeType: "",
-            EmployeeId: ""
+            EmployeeId: "",
+            Role: Role
         };
         $.ajax({
             url: `${appBaseURL}/api/Master/ChangePassword`,
@@ -275,10 +281,10 @@ function Create() {
     $("#dvMobileNo").show();
     $("#dvPassword").show();
     $("#dvConfirmPassword").show();
-    $("#txtnumberofdays").show();
+    $("#divnumber").show();
     $("#dvExcel").show();
-    $("#txtWorkingHours").show();
-    $("#txtRole").show();
+    $("#divWorkingHours").show();
+    $("#dvtxtRole").show();
 }
 function Back() {
     $("#txtListpage").show();
@@ -286,6 +292,9 @@ function Back() {
     $("#txtheaderdiv").hide();
     $("#btnSave").show();
     $("#btnPass").hide();
+    $("#divnumber").show();
+    $("#divWorkingHours").show();
+    $("#dvtxtRole").show();
     ClearData();
 }
 function Edit(code) {
@@ -302,9 +311,9 @@ function Edit(code) {
     $("#dvPassword").hide();
     $("#dvConfirmPassword").hide();
     $("#dvExcel").hide();
-    $("#txtnumberofdays").show();
-    $("#txtWorkingHours").show();
-    $("#txtRole").show();
+    $("#divnumber").show();
+    $("#divWorkingHours").show();
+    $("#dvtxtRole").show();
     $.ajax({
         url: ` ${appBaseURL}/api/Master/GetEmployeeMasterByCode?Code=${code}`,
         type: 'GET',
@@ -349,7 +358,23 @@ function ChangePassword(code) {
     $("#btnPass").show();
     $("#divnumber").hide();
     $("#divWorkingHours").hide();
-    $("#divtxtRole").hide();
+    $("#dvtxtRole").show();
+    $.ajax({
+        url: `${appBaseURL}/api/Master/GetEmployeeMasterByCode?Code=${code}`,
+        type: 'GET',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Auth-Key', authKeyData);
+        },
+        success: function (response) {
+            if (response && response.length > 0) {
+                $("#txtRole").val(response[0].Role);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            toastr.error("Failed to load employee role.");
+        }
+    });
 }
 function ClearData() {
     $("#hftxtCode").val("0");
